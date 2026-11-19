@@ -122,7 +122,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql8
 
             var result = Generator.Generate(expression);
             result.ShouldBe(
-                $"CREATE INDEX `TestIndex` USING {algorithm.ToString().ToUpper()} ON `TestTable1` (`TestColumn1`);");
+                $"CREATE INDEX `TestIndex` USING {algorithm.ToString().ToUpperInvariant()} ON `TestTable1` (`TestColumn1`);");
         }
 
         protected static CreateIndexExpression GetCreateIndexWithExpression(

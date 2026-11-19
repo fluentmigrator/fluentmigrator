@@ -93,7 +93,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
             return IsInDatabase(cmd =>
                 {
                     cmd.CommandText = "select rdb$relation_name from rdb$relations where (rdb$flags is not null) and (rdb$relation_name = @table)";
-                    cmd.Parameters.AddWithValue("table", candidate.ToUpper());
+                    cmd.Parameters.AddWithValue("table", candidate.ToUpperInvariant());
                 });
         }
 
@@ -102,8 +102,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
             return IsInDatabase(cmd =>
                 {
                     cmd.CommandText = "select rdb$field_name from rdb$relation_fields where (rdb$relation_name = @table) and (rdb$field_name = @column)";
-                    cmd.Parameters.AddWithValue("table", tableName.ToUpper());
-                    cmd.Parameters.AddWithValue("column", candidateColumn.ToUpper());
+                    cmd.Parameters.AddWithValue("table", tableName.ToUpperInvariant());
+                    cmd.Parameters.AddWithValue("column", candidateColumn.ToUpperInvariant());
                 });
         }
 

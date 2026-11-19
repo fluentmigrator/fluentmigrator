@@ -35,7 +35,7 @@ namespace FluentMigrator.Runner.Initialization.AssemblyLoader
         /// <returns>The new assembly loader</returns>
         public virtual IAssemblyLoader GetAssemblyLoader(string name)
         {
-            var nameInLowerCase = name.ToLower();
+            var nameInLowerCase = name.ToLowerInvariant();
 
             if (nameInLowerCase.EndsWith(".dll") || nameInLowerCase.EndsWith(".exe"))
                 return new AssemblyLoaderFromFile(name);

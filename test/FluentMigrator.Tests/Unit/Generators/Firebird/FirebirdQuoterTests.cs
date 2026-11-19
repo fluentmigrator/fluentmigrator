@@ -112,7 +112,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         [Test, TestCaseSource(nameof(_fbKeywords))]
         public void Quote_ArgIsKeywordInLowercase_ArgShouldBeQuoted(string quoteArg)
         {
-            var argInLowerCase = quoteArg.ToLower();
+            var argInLowerCase = quoteArg.ToLowerInvariant();
             var actual = new FirebirdQuoter(false).Quote(argInLowerCase);
             var expected = $"\"{argInLowerCase}\"";
             actual.ShouldBe(expected);

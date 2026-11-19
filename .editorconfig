@@ -56,5 +56,10 @@ dotnet_naming_style.camel_case_underscore_style.capitalization = camel_case
 dotnet_style_predefined_type_for_locals_parameters_members = true:suggestion
 dotnet_style_predefined_type_for_member_access = true:suggestion
 
+# ToUpper()/ToLower() without a culture use the current culture, so under
+# tr-TR "i" becomes "İ" and "I" becomes "ı". Identifiers, keywords and SQL
+# must be cased with ToUpperInvariant()/ToLowerInvariant().
+dotnet_diagnostic.CA1311.severity = error
+
 [*.{csproj,proj,targets}]
 indent_size = 2
