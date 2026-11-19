@@ -730,6 +730,28 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
+        public void CanBuildMaskedWithPartialScramblingWithApostrophePadding()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithPartialScrambling("foo", 2, '\'', 2);
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.partial(foo, 2, '''', 2)");
+        }
+
+        [Test]
+        public void CanBuildObsoleteMaskedWithPartialScramblingWithApostrophePadding()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+#pragma warning disable CS0618 // Type or member is obsolete
+            builder.MaskedWithPartialScrambling(2, '\'', 2);
+#pragma warning restore CS0618 // Type or member is obsolete
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.partial(2, '''', 2)");
+        }
+
+        [Test]
         public void ThrowsWhenPartialScramblingPrefixIsNegative()
         {
             var builder = new AnonSecurityLabelBuilder();
