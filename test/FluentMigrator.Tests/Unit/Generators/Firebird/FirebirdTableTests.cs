@@ -82,7 +82,9 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
                 "EXECUTE BLOCK AS" + Environment.NewLine +
                 "BEGIN" + Environment.NewLine +
                 "IF (NOT EXISTS (SELECT 1 FROM RDB$RELATIONS WHERE (RDB$FLAGS IS NOT NULL) AND (LOWER(RDB$RELATION_NAME) = LOWER('TESTTABLE1')))) THEN" + Environment.NewLine +
-                "EXECUTE STATEMENT 'CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255) NOT NULL, TestColumn2 INTEGER DEFAULT ''it''''s'' NOT NULL)';" + Environment.NewLine +
+                "BEGIN" + Environment.NewLine +
+                "IN AUTONOMOUS TRANSACTION DO EXECUTE STATEMENT 'CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255) NOT NULL, TestColumn2 INTEGER DEFAULT ''it''''s'' NOT NULL)';" + Environment.NewLine +
+                "END" + Environment.NewLine +
                 "END^" + Environment.NewLine +
                 "SET TERM ; ^");
         }

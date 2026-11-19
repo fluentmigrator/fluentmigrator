@@ -122,7 +122,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
         /// </remarks>
         public override string Generate(CreateTableExpression expression)
         {
-            if (!expression.IfNotExists || !expression.ExpressionsForNewTable.Any(IsIndexOrForeignKey))
+            if (!expression.IfNotExists || !(expression.ExpressionsForNewTable ?? Enumerable.Empty<IMigrationExpression>()).Any(IsIndexOrForeignKey))
             {
                 return base.Generate(expression);
             }

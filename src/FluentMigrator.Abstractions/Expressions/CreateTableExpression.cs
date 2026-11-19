@@ -98,6 +98,6 @@ namespace FluentMigrator.Expressions
         }
 
         /// <inheritdoc />
-        IEnumerable<object> IValidationChildren.Children => Columns.Cast<object>().Concat(ExpressionsForNewTable);
+        IEnumerable<object> IValidationChildren.Children => Columns.Cast<object>().Concat(ExpressionsForNewTable ?? Enumerable.Empty<IMigrationExpression>());
     }
 }

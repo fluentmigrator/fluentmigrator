@@ -121,7 +121,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             CreateTableExpression expression,
             Func<IMigrationExpression, bool> generatesWithTable)
         {
-            foreach (var expressionForNewTable in expression.ExpressionsForNewTable.Where(generatesWithTable))
+            foreach (var expressionForNewTable in (expression.ExpressionsForNewTable ?? Enumerable.Empty<IMigrationExpression>()).Where(generatesWithTable))
             {
                 string sql;
                 switch (expressionForNewTable)

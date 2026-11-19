@@ -137,7 +137,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
             // SQLite has no conditional block. The foreign keys are in the CREATE TABLE IF NOT EXISTS already; the indexes
             // follow it as CREATE INDEX IF NOT EXISTS, so they are not created twice.
             var builder = new StringBuilder(createTable);
-            foreach (var index in expression.ExpressionsForNewTable.OfType<CreateIndexExpression>().Where(i => GeneratesWithTable(expression, i)))
+            foreach (var index in (expression.ExpressionsForNewTable ?? Enumerable.Empty<IMigrationExpression>()).OfType<CreateIndexExpression>().Where(i => GeneratesWithTable(expression, i)))
             {
                 builder.AppendLine().Append(GenerateCreateIndex(index, ifNotExists: true));
             }

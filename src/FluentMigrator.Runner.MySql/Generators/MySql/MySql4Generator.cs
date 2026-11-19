@@ -110,7 +110,7 @@ namespace FluentMigrator.Runner.Generators.MySql
             {
                 // MySQL has no conditional DDL outside stored programs. Declared in the CREATE TABLE IF NOT EXISTS, the
                 // indexes and foreign keys are skipped along with the table.
-                foreach (var expressionForNewTable in expression.ExpressionsForNewTable.Where(e => GeneratesWithTable(expression, e)))
+                foreach (var expressionForNewTable in (expression.ExpressionsForNewTable ?? Enumerable.Empty<IMigrationExpression>()).Where(e => GeneratesWithTable(expression, e)))
                 {
                     definitions += ", " + GenerateTableDefinition(expressionForNewTable);
                 }

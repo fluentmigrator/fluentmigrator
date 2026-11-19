@@ -63,6 +63,11 @@ namespace FluentMigrator.Builders.Create.Table
         {
             if (Expression.IfNotExists)
             {
+                if (Expression.ExpressionsForNewTable == null)
+                {
+                    Expression.ExpressionsForNewTable = new List<IMigrationExpression>();
+                }
+
                 Expression.ExpressionsForNewTable.Add(expression);
             }
             else
