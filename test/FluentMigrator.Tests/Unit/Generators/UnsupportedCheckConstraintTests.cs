@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Generators.Generic;
+using SqlGenerator = FluentMigrator.Runner.Generators.Generic.GenericGenerator;
 using FluentMigrator.Runner.Generators.Redshift;
 using FluentMigrator.Runner.Generators.SQLite;
 using FluentMigrator.Runner.Generators.Snowflake;
@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Unit.Generators;
 [TestFixture]
 public class UnsupportedCheckConstraintTests
 {
-    private static IEnumerable<GenericGenerator> Generators()
+    private static IEnumerable<SqlGenerator> Generators()
     {
         yield return new RedshiftGenerator();
         yield return new SQLiteGenerator(new SQLiteQuoter(false), new SQLiteTypeMap(false));
@@ -42,7 +42,7 @@ public class UnsupportedCheckConstraintTests
     }
 
     [TestCaseSource(nameof(Generators))]
-    public void StrictModeRejectsCreateAndDrop(GenericGenerator generator)
+    public void StrictModeRejectsCreateAndDrop(SqlGenerator generator)
     {
         generator.CompatibilityMode = CompatibilityMode.STRICT;
         Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(new CreateCheckConstraintExpression()));
@@ -50,9 +50,9 @@ public class UnsupportedCheckConstraintTests
     }
 
     [TestCaseSource(nameof(Generators))]
-    public void LooseModeSkipsCreateAndDrop(GenericGenerator generator)
+    public void LooseModeSkipsCreateAndDrop(SqlGenerator generator)
     {
-        generator.CompatibilityMode = CompatibilityMode.LOOSLY;
+        generator.CompatibilityMode = CompatibilityMode.LOOSE;
         Assert.That(generator.Generate(new CreateCheckConstraintExpression()), Is.Empty);
         Assert.That(generator.Generate(new DeleteCheckConstraintExpression()), Is.Empty);
     }

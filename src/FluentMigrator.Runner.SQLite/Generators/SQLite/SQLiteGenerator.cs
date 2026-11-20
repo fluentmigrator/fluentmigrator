@@ -39,6 +39,9 @@ namespace FluentMigrator.Runner.Generators.SQLite
     public class SQLiteGenerator : GenericGenerator
     {
         /// <inheritdoc />
+        protected override bool SupportsTableCheckConstraints => false;
+
+        /// <inheritdoc />
         public SQLiteGenerator()
             : this(new SQLiteQuoter())
         {
