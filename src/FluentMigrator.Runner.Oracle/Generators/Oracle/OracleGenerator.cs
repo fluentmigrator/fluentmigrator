@@ -282,19 +282,26 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         /// <summary>
         /// Oracle has no <c>CREATE TABLE IF NOT EXISTS</c> before 23ai. The statement, the table's descriptions and its <see cref="CreateTableExpression.ExpressionsForNewTable"/> run as
-        /// dynamic SQL in a PL/SQL block, once, when the data dictionary has no such table: the same check as
-        /// <c>OracleProcessorBase.TableExists</c>.
+        /// dynamic SQL in a PL/SQL block, once, when the data dictionary has no table of the name the
+        /// <c>CREATE TABLE</c> would store (see <see cref="ToStoredName"/>).
         /// </summary>
         /// <remarks>
+        /// <para>
+        /// The names are compared exactly. <c>USERS</c> and <c>"Users"</c> are different tables, so a case-insensitive
+        /// check, as in <c>OracleProcessorBase.TableExists</c>, would skip the <c>CREATE TABLE</c> for one when the
+        /// other exists, and the migration would be recorded without the table.
+        /// </para>
+        /// <para>
         /// The block has no <c>DECLARE</c>: the loop over a query that returns one row or none needs no variable, and
         /// a <c>DECLARE ... BEGIN</c> would be split into two blocks by <c>OracleSqlParser</c>, which runs scripts.
+        /// </para>
         /// </remarks>
         private string GenerateCreateTableIfNotExists(CreateTableExpression expression, IEnumerable<string> descriptionStatements)
         {
-            var tableName = FormatHelper.FormatSqlEscape(expression.TableName.ToUpperInvariant());
+            var tableName = FormatHelper.FormatSqlEscape(ToStoredName(expression.TableName));
             var catalogQuery = string.IsNullOrEmpty(expression.SchemaName)
-                ? $"SELECT 1 FROM USER_TABLES WHERE upper(TABLE_NAME) = '{tableName}'"
-                : $"SELECT 1 FROM ALL_TABLES WHERE upper(OWNER) = '{FormatHelper.FormatSqlEscape(expression.SchemaName.ToUpperInvariant())}' AND upper(TABLE_NAME) = '{tableName}'";
+                ? $"SELECT 1 FROM USER_TABLES WHERE TABLE_NAME = '{tableName}'"
+                : $"SELECT 1 FROM ALL_TABLES WHERE OWNER = '{FormatHelper.FormatSqlEscape(ToStoredName(expression.SchemaName))}' AND TABLE_NAME = '{tableName}'";
 
             var builder = new StringBuilder();
             builder.AppendLine("BEGIN");
@@ -314,6 +321,21 @@ namespace FluentMigrator.Runner.Generators.Oracle
             builder.Append("END");
             AppendSqlStatementEndToken(builder);
             return builder.ToString();
+        }
+
+        /// <summary>
+        /// The name as the data dictionary stores it: a name the quoter quotes (because it is quoted already, isn't a
+        /// valid unquoted identifier or is a keyword, or because the quoter quotes every name) as written, and any
+        /// other name in upper case.
+        /// </summary>
+        private string ToStoredName(string name)
+        {
+            if (Quoter.IsQuoted(name))
+            {
+                return Quoter.UnQuote(name);
+            }
+
+            return Quoter.IsQuoted(Quoter.Quote(name)) ? name : name.ToUpperInvariant();
         }
 
         /// <inheritdoc />
