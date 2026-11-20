@@ -35,6 +35,52 @@ namespace FluentMigrator.Runner.Generators.MySql
     public class MySql8Generator : MySql5Generator
     {
         /// <inheritdoc />
+        protected override bool SupportsTableCheckConstraints => true;
+
+        /// <inheritdoc />
+        public override string Generate(CreateCheckConstraintExpression expression)
+        {
+            var constraint = expression.Constraint;
+            if (constraint.NoCheck)
+            {
+                return base.Generate(expression);
+            }
+
+            return FormatStatement("ALTER TABLE {0} {1}", Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName),
+                AddCheckClause(constraint));
+        }
+
+        /// <inheritdoc />
+        public override string Generate(AlterCheckConstraintExpression expression)
+        {
+            var constraint = expression.Constraint;
+            if (constraint.NoCheck)
+            {
+                return base.Generate(expression);
+            }
+
+            var table = Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName);
+            var name = Quoter.QuoteConstraintName(constraint.Name);
+            switch (expression.Action)
+            {
+                case CheckConstraintAction.ChangeCondition:
+                    return FormatStatement("ALTER TABLE {0} DROP CONSTRAINT {1}, {2}", table, name, AddCheckClause(constraint));
+                case CheckConstraintAction.Enable:
+                    return FormatStatement("ALTER TABLE {0} ALTER CHECK {1} ENFORCED", table, name);
+                case CheckConstraintAction.Disable:
+                    return FormatStatement("ALTER TABLE {0} ALTER CHECK {1} NOT ENFORCED", table, name);
+                default:
+                    return base.Generate(expression);
+            }
+        }
+
+        private string AddCheckClause(CheckConstraintDefinition constraint)
+        {
+            var enforcement = constraint.Enabled ? string.Empty : " NOT ENFORCED";
+            return $"ADD CONSTRAINT {Quoter.QuoteConstraintName(constraint.Name)} CHECK ({constraint.Condition}){enforcement}";
+        }
+
+        /// <inheritdoc />
         public MySql8Generator()
             : this(new MySqlQuoter())
         {

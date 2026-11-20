@@ -35,6 +35,9 @@ namespace FluentMigrator.Runner.Generators.MySql
     /// </summary>
     public class MySql4Generator : GenericGenerator
     {
+        /// <inheritdoc />
+        protected override bool SupportsTableCheckConstraints => false;
+
 
         /// <inheritdoc />
         /// <remarks>
