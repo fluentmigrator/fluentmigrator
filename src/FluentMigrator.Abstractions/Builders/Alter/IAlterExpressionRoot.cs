@@ -16,6 +16,7 @@
 //
 #endregion
 
+using FluentMigrator.Builders.Alter.CheckConstraint;
 using FluentMigrator.Builders.Alter.Column;
 using FluentMigrator.Builders.Alter.Table;
 using FluentMigrator.Infrastructure;
@@ -40,5 +41,12 @@ namespace FluentMigrator.Builders.Alter
         /// <param name="columnName">The column name</param>
         /// <returns>The interface to specify the table</returns>
         IAlterColumnOnTableSyntax Column(string columnName);
+
+        /// <summary>
+        /// Alters an existing check constraint.
+        /// </summary>
+        /// <param name="constraintName">The constraint name.</param>
+        /// <returns>The syntax for specifying the table.</returns>
+        IAlterCheckOnTableSyntax Check(string constraintName);
     }
 }
