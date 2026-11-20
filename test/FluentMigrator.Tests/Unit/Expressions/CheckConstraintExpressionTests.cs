@@ -41,7 +41,9 @@ public class CheckConstraintExpressionTests
 
         Assert.That(delete.Constraint, Is.EqualTo(new CheckConstraintDefinition
         {
-            Name = "ck_quantity", TableName = "items", SchemaName = "stock"
+            Name = "ck_quantity",
+            TableName = "items",
+            SchemaName = "stock"
         }).UsingPropertiesComparer());
     }
 

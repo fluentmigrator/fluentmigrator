@@ -59,7 +59,8 @@ public class SqlServerCheckConstraintTests
     {
         var expression = new AlterCheckConstraintExpression
         {
-            Action = action, Constraint = { Name = "ck", TableName = "items", NoCheck = noCheck }
+            Action = action,
+            Constraint = { Name = "ck", TableName = "items", NoCheck = noCheck }
         };
         Assert.That(_generator.Generate(expression), Is.EqualTo($"ALTER TABLE [items] {operation} [ck];"));
     }

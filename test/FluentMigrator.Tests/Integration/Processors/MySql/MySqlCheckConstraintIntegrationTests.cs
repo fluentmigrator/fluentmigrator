@@ -55,7 +55,8 @@ public class MySqlCheckConstraintIntegrationTests
             replacement.Condition = "qty > 1";
             var error = Assert.Catch<DbException>(() => processor.Process(new AlterCheckConstraintExpression
             {
-                Action = CheckConstraintAction.ChangeCondition, Constraint = replacement
+                Action = CheckConstraintAction.ChangeCondition,
+                Constraint = replacement
             }));
             Assert.That(error.Message, Does.Contain(definition.Name));
 
