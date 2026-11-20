@@ -1,0 +1,833 @@
+#region License
+#region License
+//
+//
+// Copyright (c) 2026, Fluent Migrator Project
+// Copyright (c) 2026, Fluent Migrator Project
+//
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// You may obtain a copy of the License at
+//
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+//
+// Unless required by applicable law or agreed to in writing, software
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// limitations under the License.
+//
+//
+#endregion
+#endregion
+
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+
+using FluentMigrator.Expressions;
+using FluentMigrator.Generation;
+using FluentMigrator.Infrastructure;
+using FluentMigrator.Infrastructure.Extensions;
+using FluentMigrator.Model;
+using FluentMigrator.Runner.Generators.Base;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
+
+namespace FluentMigrator.Runner.Generators.Generic
+{
+    /// <summary>
+    /// Provides a base implementation for SQL generators.
+    /// </summary>
+    public abstract class GenericGenerator : GeneratorBase
+    {
+        /// <inheritdoc />
+        protected GenericGenerator(
+            IColumn column,
+            IQuoter quoter,
+            IDescriptionGenerator descriptionGenerator,
+            IOptions<GeneratorOptions> generatorOptions)
+            : base(column, quoter, descriptionGenerator)
+        {
+            CompatibilityMode = generatorOptions.Value.CompatibilityMode ?? CompatibilityMode.LOOSE;
+        }
+
+        /// <inheritdoc />
+        public CompatibilityMode CompatibilityMode { get; set; }
+
+        /// <inheritdoc />
+        public virtual string CreateTable => "CREATE TABLE {0} ({1})";
+        /// <inheritdoc />
+        public virtual string CreateTableIfNotExists => "CREATE TABLE IF NOT EXISTS {0} ({1})";
+        /// <inheritdoc />
+        public virtual string DropTable => "DROP TABLE {0}";
+        /// <inheritdoc />
+        public virtual string DropTableIfExists => "DROP TABLE IF EXISTS {0}";
+
+        /// <inheritdoc />
+        public virtual string AddColumn => "ALTER TABLE {0} ADD COLUMN {1}";
+        /// <inheritdoc />
+        public virtual string AddColumnIfExists => "ALTER TABLE IF EXISTS {0} ADD COLUMN {1}";
+        /// <inheritdoc />
+        public virtual string DropColumn => "ALTER TABLE {0} DROP COLUMN {1}";
+        /// <inheritdoc />
+        public virtual string AlterColumn => "ALTER TABLE {0} ALTER COLUMN {1}";
+        /// <inheritdoc />
+        public virtual string AlterColumnIfExists => "ALTER TABLE IF EXISTS {0} ALTER COLUMN {1}";
+        /// <inheritdoc />
+        public virtual string RenameColumn => "ALTER TABLE {0} RENAME COLUMN {1} TO {2}";
+
+        /// <inheritdoc />
+        public virtual string RenameTable => "RENAME TABLE {0} TO {1}";
+
+        /// <inheritdoc />
+        public virtual string CreateSchema => "CREATE SCHEMA {0}";
+        /// <inheritdoc />
+        public virtual string AlterSchema => "ALTER SCHEMA {0} TRANSFER {1}";
+        /// <inheritdoc />
+        public virtual string DropSchema => "DROP SCHEMA {0}";
+
+        /// <inheritdoc />
+        public virtual string CreateIndex => "CREATE {0}{1}INDEX {2} ON {3} ({4})";
+        /// <inheritdoc />
+        public virtual string DropIndex => "DROP INDEX {0}";
+
+        /// <inheritdoc />
+        public virtual string InsertData => "INSERT INTO {0} ({1}) VALUES ({2})";
+        /// <inheritdoc />
+        public virtual string UpdateData => "UPDATE {0} SET {1} WHERE {2}";
+        /// <inheritdoc />
+        public virtual string DeleteData => "DELETE FROM {0} WHERE {1}";
+
+        /// <inheritdoc />
+        public virtual string CreateConstraint => "ALTER TABLE {0} ADD CONSTRAINT {1} {2} ({3})";
+        /// <inheritdoc />
+        public virtual string DeleteConstraint => "ALTER TABLE {0} DROP CONSTRAINT {1}";
+        /// <inheritdoc />
+        public virtual string CreateForeignKeyConstraint => "ALTER TABLE {0} ADD {1}";
+
+        /// <summary>
+        /// Gets a value indicating whether the target database supports guarding
+        /// <c>ALTER TABLE ... ADD/ALTER COLUMN</c> statements with an <c>IF EXISTS</c> table existence check.
+        /// </summary>
+        protected virtual bool SupportsAlterTableIfExistsForColumns => false;
+
+        /// <inheritdoc />
+        [StringFormatMethod("format")]
+        protected string FormatStatement(string format, params object[] args)
+        {
+            var builder = new StringBuilder().AppendFormat(format, args);
+
+            AppendSqlStatementEndToken(builder);
+
+            return builder.ToString();
+        }
+
+        /// <inheritdoc />
+        public virtual string GetUniqueString(CreateIndexExpression column)
+        {
+            return column.Index.IsUnique ? "UNIQUE " : string.Empty;
+        }
+
+        /// <inheritdoc />
+        public virtual string GetClusterTypeString(CreateIndexExpression column)
+        {
+            return string.Empty;
+        }
+
+        /// <inheritdoc />
+        public override string Generate(CreateTableExpression expression)
+        {
+            if (string.IsNullOrEmpty(expression.TableName))
+            {
+                throw new ArgumentNullException(nameof(expression), ErrorMessages.ExpressionTableNameMissing);
+            }
+
+            if (expression.Columns.Count == 0)
+            {
+                throw new ArgumentException("You must specify at least one column");
+            }
+
+            var quotedTableName = Quoter.QuoteTableName(expression.TableName, expression.SchemaName);
+
+            var errors = ValidateAdditionalFeatureCompatibility(expression.Columns.SelectMany(x => x.AdditionalFeatures));
+            if (!string.IsNullOrEmpty(errors))
+            {
+                return errors;
+            }
+
+            if (expression.IfNotExists)
+            {
+                return FormatStatement(CreateTableIfNotExists, quotedTableName, Column.Generate(expression.Columns, quotedTableName));
+            }
+
+            return FormatStatement(CreateTable, quotedTableName, Column.Generate(expression.Columns, quotedTableName));
+        }
+
+        /// <inheritdoc />
+        public override string Generate(DeleteTableExpression expression)
+        {
+            if (expression.IfExists)
+            {
+                return FormatStatement(DropTableIfExists, Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
+            }
+
+            return FormatStatement(DropTable, Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
+        }
+
+        /// <inheritdoc />
+        public override string Generate(RenameTableExpression expression)
+        {
+            return FormatStatement(RenameTable, Quoter.QuoteTableName(expression.OldName, expression.SchemaName), Quoter.Quote(expression.NewName));
+        }
+
+        /// <inheritdoc />
+        public override string Generate(CreateColumnExpression expression)
+        {
+            var errors = ValidateAdditionalFeatureCompatibility(expression.Column.AdditionalFeatures);
+            if (!string.IsNullOrEmpty(errors))
+            {
+                return errors;
+            }
+
+            if (expression.IfExists)
+            {
+                if (!SupportsAlterTableIfExistsForColumns)
+                {
+                    return CompatibilityMode.HandleCompatibility("Alter.Table(...).IfExists() is not supported");
+                }
+
+                return FormatStatement(AddColumnIfExists, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Column));
+            }
+
+            return FormatStatement(AddColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Column));
+        }
+
+        /// <inheritdoc />
+        public override string Generate(AlterColumnExpression expression)
+        {
+            var errors = ValidateAdditionalFeatureCompatibility(expression.Column.AdditionalFeatures);
+            if (!string.IsNullOrEmpty(errors))
+            {
+                return errors;
+            }
+
+            if (expression.IfExists)
+            {
+                if (!SupportsAlterTableIfExistsForColumns)
+                {
+                    return CompatibilityMode.HandleCompatibility("Alter.Table(...).IfExists() is not supported");
+                }
+
+                return FormatStatement(AlterColumnIfExists, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Column));
+            }
+
+            return FormatStatement(AlterColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Column));
+        }
+
+        /// <inheritdoc />
+        public override string Generate(DeleteColumnExpression expression)
+        {
+            var builder = new StringBuilder();
+            foreach (var columnName in expression.ColumnNames)
+            {
+                builder.AppendFormat(
+                    DropColumn,
+                    Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
+                    Quoter.QuoteColumnName(columnName));
+
+                AppendSqlStatementEndToken(builder);
+            }
+
+            return builder.ToString();
+        }
+
+        /// <inheritdoc />
+        public override string Generate(RenameColumnExpression expression)
+        {
+            return FormatStatement(RenameColumn,
+                Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
+                Quoter.QuoteColumnName(expression.OldName),
+                Quoter.QuoteColumnName(expression.NewName)
+            );
+        }
+
+        /// <summary>
+        /// Whether this provider can express the requested unique-index NULL semantics.
+        /// </summary>
+        /// <param name="nullsDistinct"><c>true</c> when NULLs should be distinct</param>
+        /// <returns><c>true</c> when the provider can express it</returns>
+        protected virtual bool IsUniqueIndexNullsDistinctSupported(bool nullsDistinct) => false;
+
+        /// <summary>
+        /// Routes an unsupported unique-index NULL semantics request through the compatibility
+        /// mode, so a provider that cannot express it fails loudly under STRICT rather than
+        /// silently emitting a weaker constraint.
+        /// </summary>
+        /// <param name="expression">The create index expression</param>
+        /// <returns>An empty string, or whatever the compatibility mode returns</returns>
+        protected string ValidateUniqueIndexNullsDistinct(CreateIndexExpression expression)
+        {
+            var nullsDistinct = expression.Index.GetAdditionalFeature(
+                CreateIndexNullSemanticsExtensions.UniqueIndexNullsDistinct, (bool?)null);
+
+            if (nullsDistinct == null || IsUniqueIndexNullsDistinctSupported(nullsDistinct.Value))
+            {
+                return string.Empty;
+            }
+
+            return CompatibilityMode.HandleCompatibility(
+                $"The requested unique index NULL handling (nulls {(nullsDistinct.Value ? "distinct" : "not distinct")}) is not supported by {GeneratorId}");
+        }
+
+        /// <inheritdoc />
+        public override string Generate(CreateIndexExpression expression)
+        {
+            ValidateUniqueIndexNullsDistinct(expression);
+
+            var indexColumns = new string[expression.Index.Columns.Count];
+            IndexColumnDefinition columnDef;
+
+            for (var i = 0; i < expression.Index.Columns.Count; i++)
+            {
+                columnDef = expression.Index.Columns.ElementAt(i);
+                if (columnDef.Direction == Direction.Ascending)
+                {
+                    indexColumns[i] = Quoter.QuoteColumnName(columnDef.Name) + " ASC";
+                }
+                else
+                {
+                    indexColumns[i] = Quoter.QuoteColumnName(columnDef.Name) + " DESC";
+                }
+            }
+
+            return FormatStatement(CreateIndex
+                , GetUniqueString(expression)
+                , GetClusterTypeString(expression)
+                , Quoter.QuoteIndexName(expression.Index.Name)
+                , Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName)
+                , string.Join(", ", indexColumns));
+        }
+
+        /// <inheritdoc />
+        public override string Generate(DeleteIndexExpression expression)
+        {
+            return FormatStatement(DropIndex, Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName));
+        }
+
+        /// <inheritdoc />
+        public override string Generate(CreateForeignKeyExpression expression)
+        {
+            return FormatStatement(
+                CreateForeignKeyConstraint,
+                Quoter.QuoteTableName(expression.ForeignKey.ForeignTable, expression.ForeignKey.ForeignTableSchema),
+                Column.FormatForeignKey(expression.ForeignKey, GenerateForeignKeyName));
+        }
+
+        /// <inheritdoc />
+        public override string Generate(CreateConstraintExpression expression)
+        {
+            var constraintType = (expression.Constraint.IsPrimaryKeyConstraint) ? "PRIMARY KEY" : "UNIQUE";
+
+            var columns = new string[expression.Constraint.Columns.Count];
+
+            for (var i = 0; i < expression.Constraint.Columns.Count; i++)
+            {
+                columns[i] = Quoter.QuoteColumnName(expression.Constraint.Columns.ElementAt(i));
+            }
+
+            return FormatStatement(CreateConstraint, Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName),
+                Quoter.QuoteConstraintName(expression.Constraint.ConstraintName),
+                constraintType,
+                string.Join(", ", columns));
+        }
+
+        /// <inheritdoc />
+        public override string Generate(DeleteConstraintExpression expression)
+        {
+            return FormatStatement(DeleteConstraint, Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName), Quoter.QuoteConstraintName(expression.Constraint.ConstraintName));
+        }
+
+        /// <inheritdoc />
+        public virtual string GenerateForeignKeyName(ForeignKeyDefinition foreignKey)
+        {
+            return Column.GenerateForeignKeyName(foreignKey);
+        }
+
+        /// <inheritdoc />
+        public override string Generate(DeleteForeignKeyExpression expression)
+        {
+            if (expression.ForeignKey.ForeignTable == null)
+            {
+                throw new ArgumentNullException(nameof(expression), ErrorMessages.ExpressionTableNameMissingWithHints);
+            }
+
+            return FormatStatement(DeleteConstraint,
+                Quoter.QuoteTableName(expression.ForeignKey.ForeignTable, expression.ForeignKey.ForeignTableSchema),
+                Quoter.QuoteColumnName(expression.ForeignKey.Name)
+            );
+        }
+
+        /// <inheritdoc />
+        public override string Generate(InsertDataExpression expression)
+        {
+            var errors = ValidateAdditionalFeatureCompatibility(expression.AdditionalFeatures);
+            if (!string.IsNullOrEmpty(errors))
+            {
+                return errors;
+            }
+
+            var output = new StringBuilder();
+            foreach (var pair in GenerateColumnNamesAndValues(expression))
+            {
+                output.AppendFormat(
+                    InsertData,
+                    Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
+                    pair.Key,
+                    pair.Value);
+
+                AppendSqlStatementEndToken(output);
+            }
+
+            return output.ToString();
+        }
+
+        /// <inheritdoc />
+        protected virtual StringBuilder AppendSqlStatementEndToken(StringBuilder stringBuilder)
+        {
+            return stringBuilder.Append(";");
+        }
+
+        /// <inheritdoc />
+        protected List<KeyValuePair<string,string>> GenerateColumnNamesAndValues(InsertDataExpression expression)
+        {
+            var insertStrings = new List<KeyValuePair<string, string>>();
+
+            foreach (InsertionDataDefinition row in expression.Rows)
+            {
+                var columnNames = new List<string>();
+                var columnValues = new List<string>();
+                foreach (KeyValuePair<string, object> item in row)
+                {
+                    columnNames.Add(Quoter.QuoteColumnName(item.Key));
+                    columnValues.Add(Quoter.QuoteValue(item.Value));
+                }
+
+                var columns = string.Join(", ", columnNames.ToArray());
+                var values = string.Join(", ", columnValues.ToArray());
+                insertStrings.Add(new KeyValuePair<string, string>(columns, values));
+            }
+
+            return insertStrings;
+        }
+
+        /// <inheritdoc />
+        protected string ValidateAdditionalFeatureCompatibility(IEnumerable<KeyValuePair<string, object>> features)
+        {
+            if (CompatibilityMode == CompatibilityMode.STRICT) {
+                var unsupportedFeatures =
+                    features.Where(x => !IsAdditionalFeatureSupported(x.Key)).Select(x => x.Key).ToList();
+
+                if (unsupportedFeatures.Count > 0) {
+                    var errorMessage =
+                        string.Format(
+                            "The following database specific additional features are not supported in strict mode [{0}]",
+                            unsupportedFeatures.Aggregate((x, y) => x + ", " + y));
+                    {
+                        return CompatibilityMode.HandleCompatibility(errorMessage);
+                    }
+                }
+            }
+            return string.Empty;
+        }
+
+        /// <inheritdoc />
+        public override string Generate(UpdateDataExpression expression)
+        {
+            var updateItems = new List<string>();
+            var whereClauses = new List<string>();
+
+            GenerateUpdateSet(expression, updateItems);
+
+            if (expression.IsAllRows)
+            {
+                whereClauses.Add("1 = 1");
+            }
+            else
+            {
+                GenerateWhere(expression.Where, whereClauses);
+            }
+
+            return FormatStatement(UpdateData,
+                Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
+                string.Join(", ", updateItems.ToArray()),
+                string.Join(" AND ", whereClauses.ToArray())
+            );
+        }
+
+        /// <summary>
+        /// Generates the SET clause for UPDATE statements
+        /// </summary>
+        /// <param name="expression">The Update expression with a SET</param>
+        /// <param name="updateItems">The key value pair that is going to be populated</param>
+        protected virtual void GenerateUpdateSet(UpdateDataExpression expression, List<string> updateItems)
+        {
+            foreach (var item in expression.Set)
+            {
+                var leftPart = item.Key == "" ? "" : $"{Quoter.QuoteColumnName(item.Key)} = ";
+
+                updateItems.Add($"{leftPart}{Quoter.QuoteValue(item.Value)}");
+            }
+        }
+
+        /// <summary>
+        /// Generates the WHERE clause for UPDATE and DELETE statements
+        /// </summary>
+        /// <param name="where">The where expression</param>
+        /// <param name="whereClauses">The key value pair that is going to be populated</param>
+        protected virtual void GenerateWhere(List<KeyValuePair<string, object>> where, List<string> whereClauses)
+        {
+            foreach (var item in where)
+            {
+                string op;
+
+                if (item.Value == null || item.Value == DBNull.Value)
+                {
+                    op = "IS ";
+                }
+                else if (item.Value is RawSql rawSql)
+                {
+                    // When there's a column name (key is not empty), check if RawSql starts with an operator.
+                    // If not, add "= " for backward compatibility (e.g., RawSql.Insert("(SELECT ...)") should become "= (SELECT ...)").
+                    // If it does start with an operator (e.g., "= 3", "IS NULL", "IN (1,2)"), use it as-is.
+                    op = item.Key != "" && !StartsWithOperator(rawSql.Value) ? "= " : "";
+                }
+                else
+                {
+                    op = "= ";
+                }
+
+                // When the key is an empty string it means the value will contain the column name
+                var columnName = item.Key == "" ? "" : $"{Quoter.QuoteColumnName(item.Key)} ";
+
+                whereClauses.Add($"{columnName}{op}{Quoter.QuoteValue(item.Value)}");
+            }
+        }
+
+        /// <summary>
+        /// Checks if a raw SQL string starts with an operator (=, IS, IN, comparison operators, LIKE, NOT, BETWEEN)
+        /// </summary>
+        /// <param name="rawSqlValue">The raw SQL value to check</param>
+        /// <returns>True if the string starts with an operator, false otherwise</returns>
+        private static bool StartsWithOperator(string rawSqlValue)
+        {
+            if (string.IsNullOrEmpty(rawSqlValue))
+            {
+                return false;
+            }
+
+            var trimmed = rawSqlValue.TrimStart();
+            if (trimmed.Length == 0)
+            {
+                return false;
+            }
+
+            // Check for symbolic operators first (=, <>, !=, <, >, <=, >=)
+            var firstChar = trimmed[0];
+            if (firstChar == '=' || firstChar == '<' || firstChar == '>' || firstChar == '!')
+            {
+                return true;
+            }
+
+            // Check for keyword operators (case-insensitive)
+            // IN can be followed by a space or directly by a parenthesis
+            return StartsWithKeywordOperator(trimmed, "IS ")
+                || StartsWithKeywordOperator(trimmed, "IN ")
+                || StartsWithKeywordOperator(trimmed, "IN(")
+                || StartsWithKeywordOperator(trimmed, "LIKE ")
+                || StartsWithKeywordOperator(trimmed, "NOT ")
+                || StartsWithKeywordOperator(trimmed, "BETWEEN ");
+        }
+
+        /// <summary>
+        /// Checks if a string starts with a specific keyword operator (case-insensitive)
+        /// </summary>
+        private static bool StartsWithKeywordOperator(string value, string keyword)
+        {
+            return value.StartsWith(keyword, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <inheritdoc />
+        public override string Generate(DeleteDataExpression expression)
+        {
+            var deleteItems = new List<string>();
+
+            if (expression.IsAllRows)
+            {
+                deleteItems.Add(string.Format(DeleteData, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), "1 = 1"));
+            }
+            else
+            {
+                foreach (var row in expression.Rows)
+                {
+                    var whereClauses = new List<string>();
+
+                    GenerateWhere(row, whereClauses);
+
+                    deleteItems.Add(string.Format(DeleteData, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), string.Join(" AND ", whereClauses.ToArray())));
+                }
+            }
+
+            var output = new StringBuilder();
+            foreach (var deleteItem in deleteItems)
+            {
+                output.Append(deleteItem);
+                AppendSqlStatementEndToken(output);
+            }
+
+            return output.ToString();
+        }
+
+        /// <inheritdoc />
+        public override string Generate(CreateSchemaExpression expression)
+        {
+            return CompatibilityMode.HandleCompatibility("Schemas are not supported");
+        }
+
+        /// <inheritdoc />
+        public override string Generate(DeleteSchemaExpression expression)
+        {
+            return CompatibilityMode.HandleCompatibility("Schemas are not supported");
+        }
+
+        /// <inheritdoc />
+        public override string Generate(AlterSchemaExpression expression)
+        {
+            return CompatibilityMode.HandleCompatibility("Schemas are not supported");
+        }
+
+        /// <inheritdoc />
+        public override string Generate(CreateSequenceExpression expression)
+        {
+            var result = new StringBuilder("CREATE SEQUENCE ");
+            var seq = expression.Sequence;
+            result.Append(Quoter.QuoteSequenceName(seq.Name, seq.SchemaName));
+
+            if (seq.Increment.HasValue)
+            {
+                result.AppendFormat(CultureInfo.InvariantCulture, " INCREMENT {0}", seq.Increment);
+            }
+
+            if (seq.MinValue.HasValue)
+            {
+                result.AppendFormat(CultureInfo.InvariantCulture, " MINVALUE {0}", seq.MinValue);
+            }
+
+            if (seq.MaxValue.HasValue)
+            {
+                result.AppendFormat(CultureInfo.InvariantCulture, " MAXVALUE {0}", seq.MaxValue);
+            }
+
+            if (seq.StartWith.HasValue)
+            {
+                result.AppendFormat(CultureInfo.InvariantCulture, " START WITH {0}", seq.StartWith);
+            }
+
+            const long MINIMUM_CACHE_VALUE = 2;
+            if (seq.Cache.HasValue)
+            {
+                if (seq.Cache.Value < MINIMUM_CACHE_VALUE)
+                {
+                    return CompatibilityMode.HandleCompatibility("Cache size must be greater than 1; if you intended to disable caching, set Cache to null.");
+                }
+                result.AppendFormat(CultureInfo.InvariantCulture, " CACHE {0}", seq.Cache);
+            }
+            else
+            {
+                result.Append(" NO CACHE");
+            }
+
+            if (seq.Cycle)
+            {
+                result.Append(" CYCLE");
+            }
+
+            AppendSqlStatementEndToken(result);
+
+            return result.ToString();
+        }
+
+        /// <inheritdoc />
+        public override string Generate(DeleteSequenceExpression expression)
+        {
+            return FormatStatement("DROP SEQUENCE {0}", Quoter.QuoteSequenceName(expression.SequenceName, expression.SchemaName));
+        }
+    }
+}
+
+using System;
+using System.Collections.Generic;
+
+using FluentMigrator.Exceptions;
+using FluentMigrator.Expressions;
+using FluentMigrator.Model;
+using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators.Generic;
+
+using Microsoft.Extensions.Options;
+
+using NUnit.Framework;
+
+namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
+{
+    [TestFixture]
+    [Category("Generator")]
+    public class CheckConstraintGeneratorTests
+    {
+        [Test]
+        public void CreateQuotesIdentifiersAndPreservesTheCondition()
+        {
+            var generator = new AnsiGenerator(CompatibilityMode.STRICT);
+            var expression = new CreateCheckConstraintExpression { Constraint = NewConstraint() };
+
+            Assert.That(
+                generator.Generate(expression),
+                Is.EqualTo("ALTER TABLE \"inventory\".\"Order Items\" ADD CONSTRAINT \"Positive Quantity\" CHECK (quantity > 0);"));
+        }
+
+        [Test]
+        public void DeleteQuotesIdentifiers()
+        {
+            var generator = new AnsiGenerator(CompatibilityMode.STRICT);
+            var expression = new DeleteCheckConstraintExpression { Constraint = NewConstraint() };
+
+            Assert.That(
+                generator.Generate(expression),
+                Is.EqualTo("ALTER TABLE \"inventory\".\"Order Items\" DROP CONSTRAINT \"Positive Quantity\";"));
+        }
+
+        [Test]
+        public void AlterChangesTheConditionByDroppingAndRecreatingTheConstraint()
+        {
+            var generator = new AnsiGenerator(CompatibilityMode.STRICT);
+            var expression = new AlterCheckConstraintExpression
+            {
+                Action = CheckConstraintAction.ChangeCondition,
+                Constraint = NewConstraint(),
+            };
+
+            Assert.That(
+                generator.Generate(expression),
+                Is.EqualTo("ALTER TABLE \"inventory\".\"Order Items\" DROP CONSTRAINT \"Positive Quantity\";" + Environment.NewLine
+                    + "ALTER TABLE \"inventory\".\"Order Items\" ADD CONSTRAINT \"Positive Quantity\" CHECK (quantity > 0);"));
+        }
+
+        [TestCase(true, true)]
+        [TestCase(false, false)]
+        public void CreateRejectsUnsupportedOptionsInStrictMode(bool noCheck, bool enabled)
+        {
+            var generator = new AnsiGenerator(CompatibilityMode.STRICT);
+            var expression = new CreateCheckConstraintExpression { Constraint = NewConstraint() };
+            expression.Constraint.NoCheck = noCheck;
+            expression.Constraint.Enabled = enabled;
+
+            Assert.That(() => generator.Generate(expression), Throws.TypeOf<DatabaseOperationNotSupportedException>());
+        }
+
+        [TestCase(true, true)]
+        [TestCase(false, false)]
+        public void AlterSkipsTheWholeReplacementWhenTheNewConstraintIsUnsupported(bool noCheck, bool enabled)
+        {
+            var generator = new AnsiGenerator(CompatibilityMode.LOOSE);
+            var expression = new AlterCheckConstraintExpression
+            {
+                Action = CheckConstraintAction.ChangeCondition,
+                Constraint = NewConstraint(),
+            };
+            expression.Constraint.NoCheck = noCheck;
+            expression.Constraint.Enabled = enabled;
+
+            Assert.That(generator.Generate(expression), Is.Empty);
+        }
+
+        [Test]
+        public void AlterSkipsTheWholeReplacementWhenTheExistingConstraintCannotBeDropped()
+        {
+            var generator = new CreateOnlyGenerator();
+            var expression = new AlterCheckConstraintExpression
+            {
+                Action = CheckConstraintAction.ChangeCondition,
+                Constraint = NewConstraint(),
+            };
+
+            Assert.That(generator.Generate(expression), Is.Empty);
+        }
+
+        [TestCase(CheckConstraintAction.Enable)]
+        [TestCase(CheckConstraintAction.Disable)]
+        public void AlterRejectsUnsupportedActionsInStrictMode(CheckConstraintAction action)
+        {
+            var generator = new AnsiGenerator(CompatibilityMode.STRICT);
+            var expression = new AlterCheckConstraintExpression
+            {
+                Action = action,
+                Constraint = NewConstraint(),
+            };
+            expression.Constraint.Condition = null;
+
+            Assert.That(() => generator.Generate(expression), Throws.TypeOf<DatabaseOperationNotSupportedException>());
+        }
+
+        private static CheckConstraintDefinition NewConstraint()
+        {
+            return new CheckConstraintDefinition
+            {
+                Name = "Positive Quantity",
+                TableName = "Order Items",
+                SchemaName = "inventory",
+                Condition = "quantity > 0",
+            };
+        }
+
+        private class AnsiGenerator : Runner.Generators.Generic.GenericGenerator
+        {
+            public AnsiGenerator(CompatibilityMode mode)
+                : base(null, new GenericQuoter(), null, Options.Create(new GeneratorOptions { CompatibilityMode = mode }))
+            {
+            }
+
+            public override string GeneratorId => "ANSI";
+
+            public override List<string> GeneratorIdAliases { get; } = new List<string>();
+        }
+
+        private sealed class CreateOnlyGenerator : AnsiGenerator
+        {
+            public CreateOnlyGenerator()
+                : base(CompatibilityMode.LOOSE)
+            {
+            }
+
+            public override string Generate(DeleteCheckConstraintExpression expression)
+            {
+                return CompatibilityMode.HandleCompatibility("Dropping check constraints is not supported");
+            }
+        }
+    }
+}
