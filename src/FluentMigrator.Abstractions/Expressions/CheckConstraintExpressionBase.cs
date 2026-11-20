@@ -35,8 +35,14 @@ public abstract class CheckConstraintExpressionBase : MigrationExpressionBase, I
 
     string ISchemaExpression.SchemaName
     {
-        get => Constraint.SchemaName;
-        set => Constraint.SchemaName = value;
+        get => Constraint?.SchemaName;
+        set
+        {
+            if (Constraint != null)
+            {
+                Constraint.SchemaName = value;
+            }
+        }
     }
 
     /// <inheritdoc />
