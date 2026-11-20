@@ -90,6 +90,18 @@ namespace FluentMigrator.Tests.Unit.ConnectionlessPreview
             return Verifier.Verify(script, "sql").UseParameters(provider.Name);
         }
 
+        [Test]
+        public void ScriptsCheckConstraintsWithTheSelectedGenerator()
+        {
+            var script = GenerateScript(builder => builder.AddPostgres(), PreviewFromNothingWithoutConnection,
+                previewOnly: true, typeFilterNamespace: typeof(WithCheckConstraints.ChangeQuantityCheck).Namespace);
+
+            Assert.That(script, Does.Contain("ALTER TABLE \"stock\".\"items\" ADD CONSTRAINT \"ck_quantity\" CHECK (qty > 0) NOT VALID;"));
+            Assert.That(script, Does.Contain("ALTER TABLE \"stock\".\"items\" VALIDATE CONSTRAINT \"ck_quantity\";"));
+            Assert.That(script, Does.Contain("ALTER TABLE \"stock\".\"items\" DROP CONSTRAINT \"ck_quantity\";"));
+            Assert.That(script, Does.Not.Contain("ck_other_provider"));
+        }
+
         /// <summary>
         /// Without a connection string the runner is connectionless even when <see cref="RunnerOptions.NoConnection"/>
         /// is not set (for example the MSBuild task or an in-process runner), and preview mode isn't needed either,
@@ -571,5 +583,24 @@ namespace FluentMigrator.Tests.Unit.ConnectionlessPreview
         public string AppliedOnColumnName => "AppliedOn";
 
         public bool CreateWithPrimaryKey => true;
+    }
+}
+
+namespace FluentMigrator.Tests.Unit.ConnectionlessPreview.WithCheckConstraints
+{
+    [Migration(1)]
+    public class ChangeQuantityCheck : Migration
+    {
+        public override void Up()
+        {
+            IfDatabase("Postgres").Create.Check("ck_quantity").OnTable("items").InSchema("stock").Condition("qty > 0").WithNoCheck();
+            Alter.Check("ck_quantity").OnTable("items").InSchema("stock").Enabled();
+            Delete.Check("ck_quantity").FromTable("items").InSchema("stock");
+            IfDatabase("SqlServer").Create.Check("ck_other_provider").OnTable("items").Condition("qty > 0");
+        }
+
+        public override void Down()
+        {
+        }
     }
 }
