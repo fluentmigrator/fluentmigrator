@@ -17,13 +17,14 @@
 #endregion
 
 using System;
-using System.Data.Common;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
 
 using Microsoft.Extensions.DependencyInjection;
+
+using MySql.Data.MySqlClient;
 
 using NUnit.Framework;
 
@@ -35,7 +36,51 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql;
 public class MySqlCheckConstraintIntegrationTests
 {
     [Test]
+    public void SuccessfulReplacementEnforcesTheNewPredicate()
+    {
+        WithPositiveQuantityCheck((processor, constraint) =>
+        {
+            ReplaceWithQuantityGreaterThanOne(processor, constraint);
+
+            processor.Execute($"INSERT INTO {constraint.TableName} VALUES (2)");
+            AssertCheckViolation(() => processor.Execute($"INSERT INTO {constraint.TableName} VALUES (1)"), constraint.Name);
+        });
+    }
+
+    [Test]
     public void FailedReplacementKeepsEnforcingTheOriginalPredicate()
+    {
+        WithPositiveQuantityCheck((processor, constraint) =>
+        {
+            processor.Execute($"INSERT INTO {constraint.TableName} VALUES (1)");
+            AssertCheckViolation(() => ReplaceWithQuantityGreaterThanOne(processor, constraint), constraint.Name);
+
+            processor.Execute($"INSERT INTO {constraint.TableName} VALUES (1)");
+            AssertCheckViolation(() => processor.Execute($"INSERT INTO {constraint.TableName} VALUES (0)"), constraint.Name);
+        });
+    }
+
+    private static void ReplaceWithQuantityGreaterThanOne(IMigrationProcessor processor, CheckConstraintDefinition constraint)
+    {
+        var replacement = constraint.Clone();
+        replacement.Condition = "qty > 1";
+        processor.Process(new AlterCheckConstraintExpression
+        {
+            Action = CheckConstraintAction.ChangeCondition,
+            Constraint = replacement
+        });
+    }
+
+    private static void AssertCheckViolation(TestDelegate action, string constraintName)
+    {
+        const int mySqlCheckViolation = 3819;
+        const int mariaDbCheckViolation = 4025;
+        var error = Assert.Throws<MySqlException>(action);
+        Assert.That(error.Number, Is.AnyOf(mySqlCheckViolation, mariaDbCheckViolation));
+        Assert.That(error.Message, Does.Contain(constraintName));
+    }
+
+    private static void WithPositiveQuantityCheck(Action<IMigrationProcessor, CheckConstraintDefinition> test)
     {
         IntegrationTestOptions.MySql.IgnoreIfNotEnabled();
         using var services = ServiceCollectionExtensions.CreateServices()
@@ -50,18 +95,7 @@ public class MySqlCheckConstraintIntegrationTests
         try
         {
             processor.Process(new CreateCheckConstraintExpression { Constraint = definition });
-            processor.Execute($"INSERT INTO {table} VALUES (1)");
-            var replacement = definition.Clone();
-            replacement.Condition = "qty > 1";
-            var error = Assert.Catch<DbException>(() => processor.Process(new AlterCheckConstraintExpression
-            {
-                Action = CheckConstraintAction.ChangeCondition,
-                Constraint = replacement
-            }));
-            Assert.That(error.Message, Does.Contain(definition.Name));
-
-            var violation = Assert.Catch<DbException>(() => processor.Execute($"INSERT INTO {table} VALUES (0)"));
-            Assert.That(violation.Message, Does.Contain(definition.Name));
+            test(processor, definition);
         }
         finally
         {
