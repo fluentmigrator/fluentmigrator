@@ -76,7 +76,7 @@ except SQLite. These providers query catalogs that include `CHECK` constraints:
 
 | Provider | Add to existing table | Add without validating existing rows | Add as not enforced | Disable / enable later | Drop | Transactional DDL |
 |---|---|---|---|---|---|---|
-| **SQL Server** (2000–2016+) | `ADD CONSTRAINT c CHECK (...)` | `WITH NOCHECK ADD ...` | Add, then `NOCHECK CONSTRAINT c` | `NOCHECK CONSTRAINT c` / `[WITH CHECK] CHECK CONSTRAINT c` | `DROP CONSTRAINT c` (`IF EXISTS` from 2016) | Yes |
+| **SQL Server** (2000–2016+) | `ADD CONSTRAINT c CHECK (...)` | `WITH NOCHECK ADD ...` | `WITH NOCHECK ADD ...`, then `NOCHECK CONSTRAINT c` | `NOCHECK CONSTRAINT c` / `[WITH CHECK] CHECK CONSTRAINT c` | `DROP CONSTRAINT c` (`IF EXISTS` from 2016) | Yes |
 | **PostgreSQL** (9.2+) | `ADD CONSTRAINT c CHECK (...)` | `... NOT VALID`, later `VALIDATE CONSTRAINT c` | Only from PostgreSQL 18 (`NOT ENFORCED`) | **No** (see notes) | `DROP CONSTRAINT [IF EXISTS] c` | Yes |
 | **MySQL** 8.0.16+ (`MySql8`) | `ADD CONSTRAINT c CHECK (...)` | **No** | `... NOT ENFORCED` | `ALTER CHECK c [NOT] ENFORCED` | `DROP CHECK c` (`DROP CONSTRAINT c` from 8.0.19) | No |
 | **MySQL** < 8.0.16 (`MySql4`, `MySql5`) | Parsed and **ignored** | — | — | — | — | No |
@@ -120,8 +120,14 @@ Summary:
 
 #### PostgreSQL
 - **Add**: `ALTER TABLE "s"."t" ADD CONSTRAINT "c" CHECK (expr) [NO INHERIT] [NOT VALID]`.
-  `NOT VALID` and `NO INHERIT` for check constraints were added in 9.2, so the base
-  `PostgresGenerator` must not emit them and `Postgres92Generator` and later can.
+  `NOT VALID` and `NO INHERIT` for check constraints were added in 9.2.
+- **Generator hierarchy**: `Postgres92Generator` and `Postgres10_0Generator` both derive from
+  `PostgresGenerator`, and `Postgres11_0Generator` and `Postgres15_0Generator` (which
+  `AddPostgres()` uses) derive from `Postgres10_0Generator`. Support added only to
+  `Postgres92Generator` would therefore never reach the default generator. This ADR recommends
+  putting it in `PostgresGenerator`. PostgreSQL 9.1 reached end of life in 2016, and a
+  pre-9.2 server rejects `NOT VALID` with a clear syntax error. The alternative is a protected
+  virtual property that `Postgres92Generator` and `Postgres10_0Generator` both override.
 - **Validate**: `ALTER TABLE "s"."t" VALIDATE CONSTRAINT "c"`. A `NOT VALID` constraint is
   still enforced for new and updated rows.
 - **Disable**: Versions before 18 cannot disable a check constraint. PostgreSQL 18 allows a
@@ -146,8 +152,11 @@ Summary:
     existing rows.
   - Enable/disable: `ALTER TABLE t ALTER CHECK c [NOT] ENFORCED` (8.0.16). `ALTER CONSTRAINT`
     works from 8.0.19.
-  - Drop: `ALTER TABLE t DROP CHECK c`. `DROP CONSTRAINT` works from 8.0.19. Use `DROP CHECK`
-    so that every 8.0.16+ server accepts the statement.
+  - Drop: `ALTER TABLE t DROP CHECK c`. `DROP CONSTRAINT` works from 8.0.19. Use
+    `DROP CONSTRAINT`: `MySql8Generator` also answers to the `MariaDB` generator id, and MariaDB
+    accepts `DROP CONSTRAINT` but rejects `DROP CHECK`. The cost is MySQL 8.0.16 to 8.0.18,
+    which reject `DROP CONSTRAINT`. Those releases are long superseded within 8.0, which itself
+    reached end of life in April 2026.
   - Catalog: `INFORMATION_SCHEMA.CHECK_CONSTRAINTS`, and the `ENFORCED` column of
     `INFORMATION_SCHEMA.TABLE_CONSTRAINTS`.
   - Other: Check constraint names are unique per **schema**, not per table. The condition
@@ -170,14 +179,19 @@ Summary:
   `DROP CONSTRAINT`, and MySQL 8 supports `NOT ENFORCED` and `DROP CHECK`, which MariaDB
   does not. Supporting MariaDB properly needs a dedicated MariaDB generator and id. Until
   then, the MySQL generators cannot tell MariaDB apart, so MariaDB gets whatever the selected
-  MySQL generator emits.
+  MySQL generator emits. With `MySql8Generator`, `Create.Check`, `Delete.Check` and changing the
+  condition work on MariaDB, because they use `ADD CONSTRAINT` and `DROP CONSTRAINT`. `Disabled()`
+  and `Enabled()` emit `NOT ENFORCED` and `ALTER CHECK`, which MariaDB rejects with a syntax
+  error. That fails loudly rather than silently, and should be documented.
 - DDL is not transactional.
 
 #### Oracle
 - **Add**: `ALTER TABLE "s"."t" ADD CONSTRAINT "c" CHECK (expr) [ENABLE | DISABLE] [VALIDATE | NOVALIDATE]`.
   The default is `ENABLE VALIDATE`.
 - **Enable/disable**: `ALTER TABLE "s"."t" MODIFY CONSTRAINT "c" ENABLE [VALIDATE | NOVALIDATE]`
-  and `... MODIFY CONSTRAINT "c" DISABLE`.
+  and `... MODIFY CONSTRAINT "c" DISABLE`. `DISABLE` means `DISABLE NOVALIDATE`, so a disabled
+  constraint is also not validated. `ENABLE NOVALIDATE` marks a constraint `NOT VALIDATED` even
+  if it was validated before, and the optimizer then stops relying on it.
 - **Drop**: `ALTER TABLE "s"."t" DROP CONSTRAINT "c"`.
 - **Catalog**: `ALL_CONSTRAINTS` (`CONSTRAINT_TYPE = 'C'`, `STATUS`, `VALIDATED`,
   `SEARCH_CONDITION`). `NOT NULL` columns are also stored there as type `C` constraints.
@@ -221,7 +235,16 @@ Summary:
   `WithNoCheck()` should go through `CompatibilityMode` on Db2.
 - **Enable/disable**: `ALTER TABLE "s"."t" ALTER CHECK "c" [NOT] ENFORCED`. Whether going back
   to `ENFORCED` checks the existing rows straight away or puts the table in set integrity
-  pending state needs to be verified before implementation.
+  pending state needs to be verified before implementation. Until then, `Enabled()` goes
+  through `CompatibilityMode`: if it puts the table in set integrity pending state, the table
+  cannot be used until someone runs `SET INTEGRITY` by hand.
+- **Query optimization**: The default for a constraint is `ENABLE QUERY OPTIMIZATION`, which
+  stays in effect after `NOT ENFORCED`, so the optimizer still assumes the rows satisfy the
+  condition. After `Disabled()` they may not, and queries could return wrong results, for
+  example `WHERE Quantity <= 0` returning no rows. So `Disabled()` must also emit
+  `DISABLE QUERY OPTIMIZATION`, and `Enabled()`, once supported, `ENABLE QUERY OPTIMIZATION`.
+  Whether one `ALTER CHECK` clause can take both settings, or two clauses are needed, is to be
+  verified.
 - **Drop**: `ALTER TABLE "s"."t" DROP CHECK "c"`, or `DROP CONSTRAINT "c"`.
 - **Catalog**: `SYSCAT.CHECKS`, and the `ENFORCED` column of `SYSCAT.TABCONST`.
 - **Other**: The condition cannot contain subqueries.
@@ -329,10 +352,12 @@ public interface ICreateCheckConditionSyntax : IFluentSyntax
     ICreateCheckOptionsSyntax Condition(string sqlCondition);
 }
 
+// One option or none: Disabled() already leaves the existing rows unchecked, so the two
+// cannot be combined.
 public interface ICreateCheckOptionsSyntax : IFluentSyntax
 {
-    ICreateCheckOptionsSyntax WithNoCheck();
-    ICreateCheckOptionsSyntax Disabled();
+    void WithNoCheck();
+    void Disabled();
 }
 
 public interface IAlterCheckOnTableSyntax : IFluentSyntax
@@ -371,6 +396,15 @@ statement. `Enabled()` means enforced and validated, `Enabled().WithNoCheck()` m
 enforced, so `Enabled()` only has to validate it, and `Enabled().WithNoCheck()` has nothing to
 do.
 
+`Enabled().WithNoCheck()` does not leave a constraint in the same state everywhere. On SQL
+Server, `CHECK CONSTRAINT c` leaves a trusted constraint trusted. On Oracle,
+`ENABLE NOVALIDATE` marks a validated constraint `NOT VALIDATED`. That does not matter for the
+usual pattern of disabling a constraint for a bulk load and enabling it again, because
+`DISABLE` has already left it not validated. It should be documented for the other cases.
+
+`Disabled()` leaves the existing rows unchecked by definition, so `WithNoCheck()` and
+`Disabled()` are alternatives and cannot be chained (see the interface sketch).
+
 "compat" means the generator returns `CompatibilityMode.HandleCompatibility("<reason>")`.
 In strict mode that throws, and in loose mode the statement is skipped.
 
@@ -378,17 +412,16 @@ In strict mode that throws, and in loose mode the statement is skipped.
 |---|---|---|---|---|---|---|---|---|---|
 | `Create.Check(...).Condition(x)` | `ADD CONSTRAINT c CHECK (x)` | same | same | same | same (existing rows not checked) | same | same | same | compat |
 | `.WithNoCheck()` | `WITH NOCHECK ADD ...` | `... NOT VALID` | compat | `... ENABLE NOVALIDATE` | same as default | compat | compat | compat | compat |
-| `.Disabled()` | `WITH NOCHECK ADD ...` + `NOCHECK CONSTRAINT c` | compat (until PG 18) | `... NOT ENFORCED` | `... DISABLE` | compat | `... NOT ENFORCED` | compat | compat | compat |
-| `Alter.Check(...).Disabled()` | `NOCHECK CONSTRAINT c` | compat | `ALTER CHECK c NOT ENFORCED` | `MODIFY CONSTRAINT c DISABLE` | compat | `ALTER CHECK c NOT ENFORCED` | compat | compat | compat |
-| `Alter.Check(...).Enabled()` | `WITH CHECK CHECK CONSTRAINT c` | `VALIDATE CONSTRAINT c` | `ALTER CHECK c ENFORCED` | `MODIFY CONSTRAINT c ENABLE VALIDATE` | compat | `ALTER CHECK c ENFORCED` | compat | compat | compat |
+| `.Disabled()` | `WITH NOCHECK ADD ...` + `NOCHECK CONSTRAINT c` | compat (until PG 18) | `... NOT ENFORCED` | `... DISABLE` | compat | `... NOT ENFORCED DISABLE QUERY OPTIMIZATION` | compat | compat | compat |
+| `Alter.Check(...).Disabled()` | `NOCHECK CONSTRAINT c` | compat | `ALTER CHECK c NOT ENFORCED` | `MODIFY CONSTRAINT c DISABLE` | compat | `ALTER CHECK c NOT ENFORCED` + `DISABLE QUERY OPTIMIZATION` (form to be verified) | compat | compat | compat |
+| `Alter.Check(...).Enabled()` | `WITH CHECK CHECK CONSTRAINT c` | `VALIDATE CONSTRAINT c` | `ALTER CHECK c ENFORCED` | `MODIFY CONSTRAINT c ENABLE VALIDATE` | compat | compat (until verified) | compat | compat | compat |
 | `Alter.Check(...).Enabled().WithNoCheck()` | `CHECK CONSTRAINT c` | nothing to do (a `NOT VALID` constraint is already enforced) | compat | `MODIFY CONSTRAINT c ENABLE NOVALIDATE` | compat | compat | compat | compat | compat |
-| `Alter.Check(...).Condition(x)` | drop + add | drop + add | drop + add | drop + add | drop + add | drop + add | drop + add | drop + add | compat |
-| `Delete.Check(...)` | `DROP CONSTRAINT c` | `DROP CONSTRAINT c` | `DROP CHECK c` | `DROP CONSTRAINT c` | `DROP CONSTRAINT c` | `DROP CHECK c` | `DROP CHECK c` | `DROP CONSTRAINT c` | compat |
+| `Alter.Check(...).Condition(x)` | drop + add | drop + add | one `ALTER TABLE` with both clauses (to be verified) | drop + add in a PL/SQL block | drop + add, run separately | drop + add, run separately | drop + add, run separately | drop + add in a block | compat |
+| `Delete.Check(...)` | `DROP CONSTRAINT c` | `DROP CONSTRAINT c` | `DROP CONSTRAINT c` | `DROP CONSTRAINT c` | `DROP CONSTRAINT c` | `DROP CHECK c` | `DROP CHECK c` | `DROP CONSTRAINT c` | compat |
 
 MariaDB is not a column of its own because FluentMigrator has no MariaDB generator (see
 [MariaDB](#mariadb)). With a dedicated generator, it would be the same as MySQL 8 except
-that `NOT ENFORCED` and enable/disable go through `CompatibilityMode` and `Delete.Check` emits
-`DROP CONSTRAINT c`.
+that `NOT ENFORCED` and enable/disable go through `CompatibilityMode`.
 
 Every statement starts with `ALTER TABLE <Quoter.QuoteTableName(table, schema)>`. The schema
 comes from `IDefaultSchemaNameResolver` when none is given, as for every other expression.
@@ -402,18 +435,52 @@ generators. The new constraint is enabled and validated unless `.WithNoCheck()` 
 or `NOT FOR REPLICATION`, are **not** kept, because FluentMigrator does not read the
 constraint before dropping it. This needs to be documented.
 
-The two statements are only atomic where DDL is transactional and the processor runs them
-in one transaction: SQL Server, PostgreSQL, and Db2. On MySQL 8, Oracle, SAP HANA (with the
-default auto-commit) and Firebird (with the default `AutoCommitBehaviour()`), the drop is
-committed before the add runs. If an existing row violates the new condition, the add
-fails and the table is left with **no constraint**. This is the same problem that
-[TransactionalDataDefinitionLanguage.md](TransactionalDataDefinitionLanguage.md) describes
-for other operations. Alternatives:
+#### How the statements are run
+
+Some processors run the generated SQL as one command, and not every database accepts two
+statements in one command. Oracle, for example, fails with ORA-00911. The output therefore
+depends on the provider:
+
+- **SQL Server and PostgreSQL** run both statements in one command. The same applies to SQL
+  Server's `Create.Check(...).Disabled()`, which is also two statements.
+- **MySQL 8 (and MariaDB)** accept both changes in one statement:
+  `ALTER TABLE t DROP CONSTRAINT c, ADD CONSTRAINT c CHECK (x)`. This makes the change atomic
+  there too. Whether both servers accept dropping and adding a constraint of the same name in one
+  statement needs to be verified. If they don't, the change uses two statements, as on the
+  other providers.
+- **Oracle and SAP HANA** wrap the statements in a block, as `OracleGenerator.WrapInBlock` and
+  `HanaGenerator.WrapInBlock` already do for other multi-statement output.
+- **Firebird and Db2** run the drop and the add as separate statements. One way is for the
+  processor to run them one after the other, as `FirebirdProcessor` already does for an identity
+  column's sequence after `CREATE TABLE`. Db2 LUW may also accept both changes in one
+  `ALTER TABLE`, which is to be verified.
+
+The alternative is for the builder to add a `Delete.Check` expression and a `Create.Check`
+expression to the migration. Each is then a single statement on every provider, and no
+wrapping is needed. The cost is that MySQL can no longer make the change in one atomic
+statement.
+
+#### Atomicity
+
+The change is atomic where DDL is transactional and the processor runs both statements in one
+transaction (SQL Server, PostgreSQL and Db2), and on MySQL 8 and MariaDB if the single
+`ALTER TABLE` above works. On Oracle and SAP HANA (with the default auto-commit), the drop is
+committed before the add runs. If an existing row violates the new condition, the add fails
+and the table is left with **no constraint**.
+
+Firebird behaves differently. `ADD CONSTRAINT` never checks the existing rows, so a violating
+row does not make the add fail. The change succeeds, and the rows that break the new condition
+stay in the table. The drop-then-fail risk remains only for an add that fails for another
+reason, such as an invalid condition, because the default `AutoCommitBehaviour()` has
+committed the drop by then. The documentation should describe both outcomes.
+
+This is the same problem that
+[TransactionalDataDefinitionLanguage.md](TransactionalDataDefinitionLanguage.md) describes for
+other operations. Alternatives for the providers that are left:
 
 - Add the new constraint under a temporary name, drop the old one, then rename the new one.
-  This works only where constraints can be renamed (Oracle, SQL Server, PostgreSQL; see
-  [RenamePrimaryKey.md](RenamePrimaryKey.md)). MySQL and MariaDB cannot rename check
-  constraints, and they are among the providers that need this most.
+  This works only where constraints can be renamed: Oracle, SQL Server and PostgreSQL (see
+  [RenamePrimaryKey.md](RenamePrimaryKey.md)).
 - Accept the risk and document it, and advise users to check their data first. This ADR
   recommends this option to start with.
 
@@ -516,8 +583,10 @@ Recommended:
    operation report it through `CompatibilityMode`.
 2. Support `WithNoCheck()`, `Disabled()` and `Enabled()` where the database supports them
    natively, as the table above shows, and do not emulate them anywhere else.
-3. Implement `Alter.Check(...).Condition(...)` as drop + add, and document that it is not
-   atomic on providers without transactional DDL.
+3. Implement `Alter.Check(...).Condition(...)` as drop + add. Use a single `ALTER TABLE` on
+   MySQL 8 if that is verified, and block or separate statements where a processor runs one
+   statement per command. Document that the change is not atomic on Oracle, SAP HANA and
+   Firebird.
 4. Merge PR #2457 into the core implementation instead of releasing it as a PostgreSQL
    extension.
 
