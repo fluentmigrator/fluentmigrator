@@ -16,8 +16,12 @@
 //
 #endregion
 
+using FluentMigrator.Infrastructure;
+using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
 using NUnit.Framework;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Definitions;
 
@@ -37,5 +41,25 @@ public class CheckConstraintDefinitionTests
 
         Assert.That(clone, Is.Not.SameAs(definition));
         Assert.That(clone, Is.EqualTo(definition).UsingPropertiesComparer());
+    }
+
+    [Test]
+    public void CloneCopiesAdditionalFeaturesWithoutSharingTheDictionaryOrCloneableValues()
+    {
+        const string feature = "Example:Options";
+        var definition = new CheckConstraintDefinition();
+        var featureValue = new[] { "first" };
+        var features = definition.ShouldBeAssignableTo<ISupportAdditionalFeatures>();
+        features.SetAdditionalFeature(feature, featureValue);
+
+        var cloneFeatures = definition.Clone().ShouldBeAssignableTo<ISupportAdditionalFeatures>();
+
+        Assert.Multiple(() =>
+        {
+            cloneFeatures.AdditionalFeatures.ShouldNotBeSameAs(features.AdditionalFeatures);
+            var cloneValue = cloneFeatures.GetAdditionalFeature<string[]>(feature);
+            cloneValue.ShouldBe(featureValue);
+            cloneValue.ShouldNotBeSameAs(featureValue);
+        });
     }
 }

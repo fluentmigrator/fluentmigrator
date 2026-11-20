@@ -24,6 +24,7 @@ using FluentMigrator.Builders.Create;
 using FluentMigrator.Builders.Delete;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
 
 using Moq;
@@ -206,6 +207,42 @@ namespace FluentMigrator.Tests.Unit.Builders
                 expression.Constraint.TableName.ShouldBe("Items");
                 expression.Constraint.SchemaName.ShouldBe("inventory");
             });
+        }
+
+        [Test]
+        public void CreateCheckExtensionsPassOptionsToTheExpression()
+        {
+            ICreateExpressionRoot create = new CreateExpressionRoot(_context);
+            var options = create.Check("CK_Items_Quantity").OnTable("Items").Condition("Quantity > 0");
+
+            options.ShouldBeAssignableTo<ISupportAdditionalFeatures>().SetAdditionalFeature("Example:NoInherit", true);
+
+            var expression = _context.Expressions.Single().ShouldBeAssignableTo<ISupportAdditionalFeatures>();
+            expression.GetAdditionalFeature<bool>("Example:NoInherit").ShouldBeTrue();
+        }
+
+        [Test]
+        public void AlterCheckExtensionsPassOptionsToTheExpression()
+        {
+            IAlterExpressionRoot alter = new AlterExpressionRoot(_context);
+            var options = alter.Check("CK_Items_Quantity").OnTable("Items").Condition("Quantity >= 0");
+
+            options.ShouldBeAssignableTo<ISupportAdditionalFeatures>().SetAdditionalFeature("Example:NoInherit", true);
+
+            var expression = _context.Expressions.Single().ShouldBeAssignableTo<ISupportAdditionalFeatures>();
+            expression.GetAdditionalFeature<bool>("Example:NoInherit").ShouldBeTrue();
+        }
+
+        [Test]
+        public void DeleteCheckExtensionsPassOptionsToTheExpression()
+        {
+            IDeleteExpressionRoot delete = new DeleteExpressionRoot(_context);
+            var options = delete.Check("CK_Items_Quantity").FromTable("Items");
+
+            options.ShouldBeAssignableTo<ISupportAdditionalFeatures>().SetAdditionalFeature("Example:Cascade", true);
+
+            var expression = _context.Expressions.Single().ShouldBeAssignableTo<ISupportAdditionalFeatures>();
+            expression.GetAdditionalFeature<bool>("Example:Cascade").ShouldBeTrue();
         }
     }
 }
