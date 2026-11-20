@@ -15,6 +15,7 @@
 
 using System;
 
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Processors;
@@ -44,14 +45,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
         [TestCase(null, "Check Constraint Default Schema")]
         public void CheckConstraintRejectsRowsThatFailTheCondition(string schemaName, string defaultSchemaName)
         {
-            IntegrationTestOptions.Postgres.IgnoreIfNotEnabled();
-
-            using var serviceProvider = ServiceCollectionExtensions.CreateServices()
-                .AddSingleton<IConventionSet>(new DefaultConventionSet(defaultSchemaName, workingDirectory: null))
-                .ConfigureRunner(builder => builder
-                    .AddPostgres()
-                    .WithGlobalConnectionString(IntegrationTestOptions.Postgres.ConnectionString))
-                .BuildServiceProvider();
+            using var serviceProvider = CreatePostgresServices(defaultSchemaName);
             using var scope = serviceProvider.CreateScope();
             var processor = scope.ServiceProvider.GetRequiredService<PostgresProcessor>();
             using var table = new PostgresTestTable(processor, schemaName ?? defaultSchemaName, "code text");
@@ -59,11 +53,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             var runner = (MigrationRunner)scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
             runner.Up(new AddCodeConstraint(table.Name, schemaName));
 
-            using var insertValid = new NpgsqlCommand($"INSERT INTO {table.NameWithSchema} (code) VALUES ('abc')", table.Connection);
-            insertValid.ExecuteNonQuery();
-
-            using var insertInvalid = new NpgsqlCommand($"INSERT INTO {table.NameWithSchema} (code) VALUES ('a')", table.Connection);
-            var exception = Should.Throw<PostgresException>(() => insertInvalid.ExecuteNonQuery());
+            InsertCode(table, "abc");
+            var exception = Should.Throw<PostgresException>(() => InsertCode(table, "a"));
             Assert.Multiple(() =>
             {
                 exception.SqlState.ShouldBe(PostgresErrorCodes.CheckViolation);
@@ -74,15 +65,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
         [Test]
         public void CheckConstraintUsesTheConfiguredIdentifierQuoting()
         {
-            IntegrationTestOptions.Postgres.IgnoreIfNotEnabled();
-
-            using var serviceProvider = ServiceCollectionExtensions.CreateServices()
-                .AddSingleton<IConventionSet>(new DefaultConventionSet(defaultSchemaName: null, workingDirectory: null))
-                .Configure<ProcessorOptions>(options => options.ProviderSwitches = "Force Quote=false")
-                .ConfigureRunner(builder => builder
-                    .AddPostgres()
-                    .WithGlobalConnectionString(IntegrationTestOptions.Postgres.ConnectionString))
-                .BuildServiceProvider();
+            using var serviceProvider = CreatePostgresServices(providerSwitches: "Force Quote=false");
             using var scope = serviceProvider.CreateScope();
             var processor = scope.ServiceProvider.GetRequiredService<PostgresProcessor>();
             using var table = new PostgresTestTable("items_" + Guid.NewGuid().ToString("N"), processor, null, "code text");
@@ -97,13 +80,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
         [Test]
         public void ReversingACheckConstraintDropsItFromTheSpecifiedSchema()
         {
-            IntegrationTestOptions.Postgres.IgnoreIfNotEnabled();
-
-            using var serviceProvider = ServiceCollectionExtensions.CreateServices()
-                .ConfigureRunner(builder => builder
-                    .AddPostgres()
-                    .WithGlobalConnectionString(IntegrationTestOptions.Postgres.ConnectionString))
-                .BuildServiceProvider();
+            using var serviceProvider = CreatePostgresServices();
             using var scope = serviceProvider.CreateScope();
             var processor = scope.ServiceProvider.GetRequiredService<PostgresProcessor>();
             var schemaName = "Check Rollback " + Guid.NewGuid().ToString("N");
@@ -121,6 +98,117 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
                 processor.ConstraintExists(schemaName, table.Name, ConstraintName).ShouldBeFalse();
                 processor.ConstraintExists(null, publicTable.Name, ConstraintName).ShouldBeTrue();
             });
+        }
+
+        [Test]
+        public void CheckConstraintWithoutValidationSkipsExistingRowsAndEnforcesNewRows()
+        {
+            using var serviceProvider = CreatePostgresServices();
+            using var scope = serviceProvider.CreateScope();
+            var processor = scope.ServiceProvider.GetRequiredService<PostgresProcessor>();
+            using var table = new PostgresTestTable(processor, null, "code text");
+            InsertCode(table, "a");
+            var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+
+            runner.Up(new CheckConstraintMigration(migration => migration.Create
+                .Check(ConstraintName).OnTable(table.Name).Condition("length(code) = 3").WithNoCheck()));
+
+            var exception = Should.Throw<PostgresException>(() => InsertCode(table, "a"));
+            exception.SqlState.ShouldBe(PostgresErrorCodes.CheckViolation);
+        }
+
+        [Test]
+        public void EnablingAnUnvalidatedCheckConstraintChecksExistingRows()
+        {
+            using var serviceProvider = CreatePostgresServices();
+            using var scope = serviceProvider.CreateScope();
+            var processor = scope.ServiceProvider.GetRequiredService<PostgresProcessor>();
+            using var table = new PostgresTestTable(processor, null, "code text");
+            InsertCode(table, "a");
+            var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+            runner.Up(new CheckConstraintMigration(migration => migration.Create
+                .Check(ConstraintName).OnTable(table.Name).Condition("length(code) = 3").WithNoCheck()));
+
+            var exception = Should.Throw<Exception>(() => runner.Up(new CheckConstraintMigration(
+                migration => migration.Alter.Check(ConstraintName).OnTable(table.Name).Enabled())));
+
+            exception.InnerException.ShouldBeOfType<PostgresException>().SqlState.ShouldBe(PostgresErrorCodes.CheckViolation);
+        }
+
+        [Test]
+        public void ChangingAConditionReplacesTheCheckConstraint()
+        {
+            using var serviceProvider = CreatePostgresServices();
+            using var scope = serviceProvider.CreateScope();
+            var processor = scope.ServiceProvider.GetRequiredService<PostgresProcessor>();
+            using var table = new PostgresTestTable(processor, null, "code text");
+            var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+            runner.Up(new AddCodeConstraint(table.Name, null));
+
+            runner.Up(new CheckConstraintMigration(migration => migration.Alter
+                .Check(ConstraintName).OnTable(table.Name).Condition("length(code) = 1")));
+
+            InsertCode(table, "a");
+            var exception = Should.Throw<PostgresException>(() => InsertCode(table, "abc"));
+            exception.SqlState.ShouldBe(PostgresErrorCodes.CheckViolation);
+        }
+
+        [Test]
+        public void FailedConditionChangePreservesTheCheckConstraintWithoutAMigrationTransaction()
+        {
+            using var serviceProvider = CreatePostgresServices();
+            using var scope = serviceProvider.CreateScope();
+            var processor = scope.ServiceProvider.GetRequiredService<PostgresProcessor>();
+            using var table = new PostgresTestTable(processor, null, "code text");
+            var runner = (MigrationRunner)scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+            runner.Up(new AddCodeConstraint(table.Name, null));
+            InsertCode(table, "abc");
+            var migration = new CheckConstraintMigration(step => step.Alter
+                .Check(ConstraintName).OnTable(table.Name).Condition("length(code) = 1"));
+            var migrationInfo = new NonAttributedMigrationToMigrationInfoAdapter(migration, TransactionBehavior.None);
+
+            var changeFailure = Should.Throw<Exception>(() => runner.ApplyMigrationUp(migrationInfo, useTransaction: false));
+            var insertFailure = Should.Throw<PostgresException>(() => InsertCode(table, "a"));
+
+            Assert.Multiple(() =>
+            {
+                changeFailure.InnerException.ShouldBeOfType<PostgresException>().SqlState.ShouldBe(PostgresErrorCodes.CheckViolation);
+                insertFailure.SqlState.ShouldBe(PostgresErrorCodes.CheckViolation);
+            });
+        }
+
+        private static ServiceProvider CreatePostgresServices(string defaultSchemaName = null, string providerSwitches = null)
+        {
+            IntegrationTestOptions.Postgres.IgnoreIfNotEnabled();
+
+            return ServiceCollectionExtensions.CreateServices()
+                .AddSingleton<IConventionSet>(new DefaultConventionSet(defaultSchemaName, workingDirectory: null))
+                .Configure<ProcessorOptions>(options => options.ProviderSwitches = providerSwitches)
+                .ConfigureRunner(builder => builder
+                    .AddPostgres()
+                    .WithGlobalConnectionString(IntegrationTestOptions.Postgres.ConnectionString))
+                .BuildServiceProvider();
+        }
+
+        private static void InsertCode(PostgresTestTable table, string code)
+        {
+            using var command = new NpgsqlCommand($"INSERT INTO {table.NameWithSchema} (code) VALUES (@code)", table.Connection);
+            command.Parameters.AddWithValue("code", code);
+            command.ExecuteNonQuery();
+        }
+
+        private sealed class CheckConstraintMigration : Migration
+        {
+            private readonly Action<Migration> _up;
+
+            public CheckConstraintMigration(Action<Migration> up)
+            {
+                _up = up;
+            }
+
+            public override void Up() => _up(this);
+
+            public override void Down() => throw new NotSupportedException();
         }
 
         private sealed class AddCodeConstraint : AutoReversingMigration
