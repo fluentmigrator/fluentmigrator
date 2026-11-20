@@ -123,6 +123,17 @@ namespace FluentMigrator.Runner
                 expression = (T) autoNameExpression;
             }
 
+            // The indexes and foreign keys of Create.Table(...).IfNotExists() are inside the table's expression, not in
+            // the migration's list, and need their names and schema as much as separate ones do.
+            if (expression is CreateTableExpression createTableExpression && createTableExpression.ExpressionsForNewTable != null)
+            {
+                var expressionsForNewTable = createTableExpression.ExpressionsForNewTable;
+                for (var i = 0; i < expressionsForNewTable.Count; i++)
+                {
+                    expressionsForNewTable[i] = expressionsForNewTable[i].Apply(conventionSet);
+                }
+            }
+
             return expression;
         }
     }

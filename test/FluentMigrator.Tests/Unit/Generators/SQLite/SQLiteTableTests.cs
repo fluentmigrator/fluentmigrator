@@ -1,3 +1,5 @@
+using System;
+
 using FluentMigrator.Builders.Create.Table;
 using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
@@ -70,6 +72,19 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
 
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL);");
+        }
+
+        [Test]
+        public void CanCreateTableIfNotExistsWithIndexAndForeignKey()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableIfNotExistsWithIndexAndForeignKey();
+
+            var result = Generator.Generate(expression);
+
+            // The foreign key is in the CREATE TABLE; SQLite has no block, so the index is IF NOT EXISTS.
+            result.ShouldBe(
+                "CREATE TABLE IF NOT EXISTS \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"FK_TestTable1_TestTable2\" FOREIGN KEY (\"TestColumn2\") REFERENCES \"TestTable2\" (\"TestColumn2\"));" + Environment.NewLine +
+                "CREATE UNIQUE INDEX IF NOT EXISTS \"UX_TestTable1_TestColumn1\" ON \"TestTable1\" (\"TestColumn1\" ASC);");
         }
 
         [Test]

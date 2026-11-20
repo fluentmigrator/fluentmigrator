@@ -179,7 +179,7 @@ namespace FluentMigrator.Builders
                 Name = _builder.Column.Name
             });
 
-            _context.Expressions.Add(index);
+            AddIndex(index);
         }
 
         /// <summary>
@@ -205,6 +205,15 @@ namespace FluentMigrator.Builders
                 Name = _builder.Column.Name
             });
 
+            AddIndex(index);
+        }
+
+        /// <summary>
+        /// Adds the index created by <see cref="Unique"/> or <see cref="Indexed"/> to the migration.
+        /// </summary>
+        /// <param name="index">The new index</param>
+        protected virtual void AddIndex(CreateIndexExpression index)
+        {
             _context.Expressions.Add(index);
         }
 

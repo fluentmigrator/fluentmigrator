@@ -33,6 +33,19 @@ namespace FluentMigrator.Builders.Create.Table
         /// <summary>
         /// Specifies the command should only be applied if the table does not already exist.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Databases with <c>CREATE TABLE IF NOT EXISTS</c> get that statement. SQL Server, Oracle and Firebird get a
+        /// <c>CREATE TABLE</c> guarded by a check of the database's catalog, which also works in a connectionless script.
+        /// </para>
+        /// <para>
+        /// The table's descriptions, and the indexes and foreign keys declared on its columns (<c>Indexed()</c>,
+        /// <c>Unique()</c>, <c>ForeignKey(...)</c>, <c>ReferencedBy(...)</c>), are created only along with the table, so an
+        /// existing table is left as it is. On SQLite the indexes are <c>CREATE INDEX IF NOT EXISTS</c>. On Redshift,
+        /// Snowflake, SAP HANA and Db2, and for a <c>ReferencedBy(...)</c> foreign key on MySQL and SQLite, they are
+        /// separate statements after the table, which fail when they already exist.
+        /// </para>
+        /// </remarks>
         /// <returns>Define the table schema, description or a new column</returns>
         ICreateTableWithColumnOrSchemaOrDescriptionSyntax IfNotExists();
     }

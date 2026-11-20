@@ -16,6 +16,10 @@
 //
 #endregion
 
+using System.Data;
+
+using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Firebird;
@@ -72,6 +76,33 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         {
             using (var table = new FirebirdTestTable(Processor, "id int"))
                 Processor.TableExists("TestSchema", table.Name).ShouldBeTrue();
+        }
+
+        [Test]
+        public void CreateTableIfNotExistsCreatesAQuotedTableWhenOnlyTheUnquotedOneExists()
+        {
+            // FMCASE and "FmCase" are different tables: a case-insensitive check would take one for the other and skip
+            // the CREATE TABLE.
+            Processor.Execute("CREATE TABLE FmCase (Id INTEGER)");
+            var createTable = new CreateTableExpression { TableName = "\"FmCase\"", IfNotExists = true };
+            createTable.Columns.Add(new ColumnDefinition { Name = "Id", Type = DbType.Int32, TableName = createTable.TableName });
+
+            Processor.Process(createTable);
+
+            Processor.Exists("select 1 from rdb$relations where rdb$relation_name = 'FMCASE'").ShouldBeTrue();
+            Processor.Exists("select 1 from rdb$relations where rdb$relation_name = 'FmCase'").ShouldBeTrue();
+        }
+
+        [Test]
+        public void CreateTableIfNotExistsKeepsAnExistingTableOfTheSameStoredName()
+        {
+            Processor.Execute("CREATE TABLE FmKept (Id INTEGER, Marker INTEGER)");
+            var createTable = new CreateTableExpression { TableName = "FmKept", IfNotExists = true };
+            createTable.Columns.Add(new ColumnDefinition { Name = "Id", Type = DbType.Int32, TableName = createTable.TableName });
+
+            Processor.Process(createTable);
+
+            Processor.ColumnExists(null, "FmKept", "Marker").ShouldBeTrue();
         }
 
         [SetUp]

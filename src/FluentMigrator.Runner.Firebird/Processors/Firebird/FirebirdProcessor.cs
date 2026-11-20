@@ -782,6 +782,21 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public override void Process(CreateTableExpression expression)
         {
             Truncator.Truncate(expression);
+            var expressionsForNewTable = expression.ExpressionsForNewTable?.ToList() ?? new List<IMigrationExpression>();
+
+            if (expression.IfNotExists)
+            {
+                // Checked here rather than with the generator's EXECUTE BLOCK, so that an existing table also keeps
+                // its identity sequences and triggers, indexes and foreign keys, which are created below.
+                if (TableToCreateExists(expression.TableName))
+                {
+                    Logger.LogSay($"Table {expression.TableName} already exists; Create.Table(...).IfNotExists() leaves it as it is");
+                    return;
+                }
+
+                expression = FirebirdGenerator.CopyWithoutIfNotExists(expression);
+            }
+
             LockTable(expression.TableName);
             RegisterTableCreation(expression.TableName);
             InternalProcess(Generator.Generate(expression));
@@ -793,6 +808,25 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
             if (FBOptions.TransactionModel != FirebirdTransactionModel.None)
                 CommitRetaining();
+
+            // The indexes and foreign keys of Create.Table(...).IfNotExists(), as the separate expressions they are
+            // without it: the table is new.
+            foreach (var expressionForNewTable in expressionsForNewTable)
+            {
+                expressionForNewTable.ExecuteWith(this);
+            }
+        }
+
+        /// <summary>
+        /// Whether the table that a <c>CREATE TABLE</c> of <paramref name="tableName"/> would create exists: the name as
+        /// Firebird stores it, compared exactly. Unlike <see cref="TableExists"/>, it tells <c>USERS</c> from
+        /// <c>"Users"</c>, which are different tables.
+        /// </summary>
+        private bool TableToCreateExists(string tableName)
+        {
+            return Exists(
+                "select rdb$relation_name from rdb$relations where (rdb$flags IS NOT NULL) and (rdb$relation_name = '{0}')",
+                FormatHelper.FormatSqlEscape(_quoter.ToFbObjectName(tableName)));
         }
 
         /// <inheritdoc />

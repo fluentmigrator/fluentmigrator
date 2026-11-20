@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
@@ -36,7 +37,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
     /// The SQLite SQL generator for FluentMigrator.
     /// </summary>
     // ReSharper disable once InconsistentNaming
-    public class SQLiteGenerator : GenericGenerator
+    public class SQLiteGenerator : GenericGenerator, ICreateTableIfNotExistsGenerator
     {
         /// <inheritdoc />
         public SQLiteGenerator()
@@ -116,19 +117,50 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
             var createTable = base.Generate(expression);
 
-            if (!withoutRowId || string.IsNullOrEmpty(createTable))
+            if (withoutRowId && !string.IsNullOrEmpty(createTable))
+            {
+                // Remove trailing semicolon (if any) before appending WITHOUT ROWID
+                var trimmed = createTable.TrimEnd();
+                if (trimmed.EndsWith(";"))
+                {
+                    trimmed = trimmed.Substring(0, trimmed.Length - 1);
+                }
+
+                createTable = trimmed + " WITHOUT ROWID;";
+            }
+
+            if (!expression.IfNotExists || string.IsNullOrEmpty(createTable))
             {
                 return createTable;
             }
 
-            // Remove trailing semicolon (if any) before appending WITHOUT ROWID
-            var trimmed = createTable.TrimEnd();
-            if (trimmed.EndsWith(";"))
+            // SQLite has no conditional block. The foreign keys are in the CREATE TABLE IF NOT EXISTS already; the indexes
+            // follow it as CREATE INDEX IF NOT EXISTS, so they are not created twice.
+            var builder = new StringBuilder(createTable);
+            foreach (var index in (expression.ExpressionsForNewTable ?? Enumerable.Empty<IMigrationExpression>()).OfType<CreateIndexExpression>().Where(i => GeneratesWithTable(expression, i)))
             {
-                trimmed = trimmed.Substring(0, trimmed.Length - 1);
+                builder.AppendLine().Append(GenerateCreateIndex(index, ifNotExists: true));
             }
 
-            return trimmed + " WITHOUT ROWID;";
+            return builder.ToString();
+        }
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// The table's own indexes, and its own foreign keys, which <see cref="SQLiteColumn"/> declares in the
+        /// <c>CREATE TABLE</c>. SQLite can't add a foreign key to another table (<c>ReferencedBy(...)</c>).
+        /// </remarks>
+        public virtual bool GeneratesWithTable(CreateTableExpression expression, IMigrationExpression expressionForNewTable)
+        {
+            switch (expressionForNewTable)
+            {
+                case CreateIndexExpression index:
+                    return index.Index.TableName == expression.TableName;
+                case CreateForeignKeyExpression foreignKey:
+                    return foreignKey.ForeignKey.ForeignTable == expression.TableName;
+                default:
+                    return false;
+            }
         }
 
         /// <inheritdoc />
@@ -350,6 +382,11 @@ namespace FluentMigrator.Runner.Generators.SQLite
         /// <inheritdoc />
         public override string Generate(CreateIndexExpression expression)
         {
+            return GenerateCreateIndex(expression, ifNotExists: false);
+        }
+
+        private string GenerateCreateIndex(CreateIndexExpression expression, bool ifNotExists)
+        {
             ValidateUniqueIndexNullsDistinct(expression);
 
             // SQLite prefixes the index name, rather than the table name with the schema
@@ -370,7 +407,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
                 }
             }
 
-            return FormatStatement(CreateIndex
+            return FormatStatement(ifNotExists ? "CREATE {0}{1}INDEX IF NOT EXISTS {2} ON {3} ({4})" : CreateIndex
                 , GetUniqueString(expression)
                 , GetClusterTypeString(expression)
                 , Quoter.QuoteIndexName(expression.Index.Name, expression.Index.SchemaName)

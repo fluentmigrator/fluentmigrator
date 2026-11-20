@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Data;
 
 using FluentMigrator.Builders;
@@ -812,6 +813,52 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             builder.IfNotExists();
 
             expression.IfNotExists.ShouldBeTrue();
+        }
+
+        [Test]
+        public void IndexesAndForeignKeysOfIfNotExistsBelongToTheTable()
+        {
+            var contextExpressions = new List<IMigrationExpression>();
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.SetupGet(x => x.Expressions).Returns(contextExpressions);
+
+            var expression = new CreateTableExpression { TableName = "Widget" };
+
+            new CreateTableExpressionBuilder(expression, contextMock.Object)
+                .IfNotExists()
+                .WithColumn("Id").AsInt32().PrimaryKey().ReferencedBy("FK_Part_Widget", "Part", "WidgetId")
+                .WithColumn("Name").AsString().Unique("UX_Widget_Name")
+                .WithColumn("KindId").AsInt32().Indexed("IX_Widget_KindId").ForeignKey("FK_Widget_Kind", "Kind", "Id");
+
+            // Created only along with the table, not as separate expressions of the migration.
+            contextExpressions.ShouldBeEmpty();
+            expression.ExpressionsForNewTable.Select(e => e.GetType().Name + " " + Name(e)).ShouldBe(
+            [
+                "CreateForeignKeyExpression FK_Part_Widget",
+                "CreateIndexExpression UX_Widget_Name",
+                "CreateIndexExpression IX_Widget_KindId",
+                "CreateForeignKeyExpression FK_Widget_Kind",
+            ]);
+
+            static string Name(IMigrationExpression e) =>
+                e is CreateIndexExpression index ? index.Index.Name : ((CreateForeignKeyExpression) e).ForeignKey.Name;
+        }
+
+        [Test]
+        public void IndexesAndForeignKeysWithoutIfNotExistsAreSeparateExpressions()
+        {
+            var contextExpressions = new List<IMigrationExpression>();
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.SetupGet(x => x.Expressions).Returns(contextExpressions);
+
+            var expression = new CreateTableExpression { TableName = "Widget" };
+
+            new CreateTableExpressionBuilder(expression, contextMock.Object)
+                .WithColumn("Name").AsString().Unique("UX_Widget_Name")
+                .WithColumn("KindId").AsInt32().Indexed("IX_Widget_KindId").ForeignKey("FK_Widget_Kind", "Kind", "Id");
+
+            expression.ExpressionsForNewTable.ShouldBeEmpty();
+            contextExpressions.Count.ShouldBe(3);
         }
 
         [Test]

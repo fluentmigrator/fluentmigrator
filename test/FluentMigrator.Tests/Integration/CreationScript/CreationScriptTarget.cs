@@ -128,6 +128,8 @@ namespace FluentMigrator.Tests.Integration.CreationScript
             return string.IsNullOrWhiteSpace(withoutComments);
         }
 
+        private static readonly Regex DollarQuoteTag = new Regex(@"\G\$[A-Za-z_]*\$");
+
         /// <summary>
         /// Splits a script at each <c>;</c> outside string literals, quoted identifiers and comments, as psql, the
         /// mysql client and the Db2 command line processor do. Each statement then runs on its own, in autocommit.
@@ -182,6 +184,20 @@ namespace FluentMigrator.Tests.Integration.CreationScript
                     statement.Append(script, i, end - i);
                     i = end - 1;
                     continue;
+                }
+
+                // A PostgreSQL dollar-quoted body, such as a DO block's, is one token for psql.
+                if (c == '$')
+                {
+                    var tag = DollarQuoteTag.Match(script, i);
+                    if (tag.Success)
+                    {
+                        var end = script.IndexOf(tag.Value, i + tag.Length, StringComparison.Ordinal);
+                        end = end < 0 ? script.Length : end + tag.Length;
+                        statement.Append(script, i, end - i);
+                        i = end - 1;
+                        continue;
+                    }
                 }
 
                 if (c == ';')

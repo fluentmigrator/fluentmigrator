@@ -18,6 +18,7 @@
 
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
@@ -51,6 +52,17 @@ namespace FluentMigrator.Expressions
         /// Specifies the command should only be applied if the table does not already exist.
         /// </summary>
         public virtual bool IfNotExists { get; set; }
+
+        /// <summary>
+        /// With <see cref="IfNotExists"/>, the indexes and foreign keys declared on the table's columns
+        /// (<c>Indexed()</c>, <c>Unique()</c>, <c>ForeignKey(...)</c> and <c>ReferencedBy(...)</c>), which are created only
+        /// along with the table. Without <see cref="IfNotExists"/> they are separate expressions of the migration.
+        /// </summary>
+        /// <remarks>
+        /// Generators that implement <c>ICreateTableIfNotExistsGenerator</c> write them inside the table's own existence
+        /// check. The processor runs the others as separate statements after the table.
+        /// </remarks>
+        public virtual IList<IMigrationExpression> ExpressionsForNewTable { get; set; } = new List<IMigrationExpression>();
 
         /// <inheritdoc />
         public IDictionary<string, object> AdditionalFeatures { get; } = new Dictionary<string, object>();
@@ -86,6 +98,6 @@ namespace FluentMigrator.Expressions
         }
 
         /// <inheritdoc />
-        IEnumerable<object> IValidationChildren.Children => Columns;
+        IEnumerable<object> IValidationChildren.Children => Columns.Cast<object>().Concat(ExpressionsForNewTable ?? Enumerable.Empty<IMigrationExpression>());
     }
 }

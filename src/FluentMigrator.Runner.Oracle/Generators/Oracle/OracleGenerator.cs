@@ -35,7 +35,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
     /// <summary>
     /// The Oracle SQL generator for FluentMigrator.
     /// </summary>
-    public class OracleGenerator : GenericGenerator, IOracleGenerator
+    public class OracleGenerator : GenericGenerator, IOracleGenerator, ICreateTableIfNotExistsGenerator
     {
         /// <inheritdoc />
         public OracleGenerator()
@@ -244,17 +244,17 @@ namespace FluentMigrator.Runner.Generators.Oracle
         /// <inheritdoc />
         public override string Generate(CreateTableExpression expression)
         {
-            if (expression.IfNotExists)
-            {
-                return CompatibilityMode.HandleCompatibility("Create.Table(...).IfNotExists() is not supported");
-            }
-
             if (expression.Columns.Any(x => x.ExpressionStored))
             {
                 CompatibilityMode.HandleCompatibility("Stored computed columns are not supported");
             }
             var descriptionStatements = DescriptionGenerator.GenerateDescriptionStatements(expression);
             var statements = descriptionStatements as string[] ?? descriptionStatements.ToArray();
+
+            if (expression.IfNotExists)
+            {
+                return GenerateCreateTableIfNotExists(expression, statements);
+            }
 
             if (!statements.Any())
             {
@@ -274,6 +274,68 @@ namespace FluentMigrator.Runner.Generators.Oracle
             }
 
             return WrapInBlock(createTableWithDescriptionsBuilder.ToString());
+        }
+
+        /// <inheritdoc />
+        public virtual bool GeneratesWithTable(CreateTableExpression expression, IMigrationExpression expressionForNewTable) =>
+            IsIndexOrForeignKey(expressionForNewTable);
+
+        /// <summary>
+        /// Oracle has no <c>CREATE TABLE IF NOT EXISTS</c> before 23ai. The statement, the table's descriptions and its <see cref="CreateTableExpression.ExpressionsForNewTable"/> run as
+        /// dynamic SQL in a PL/SQL block, once, when the data dictionary has no table of the name the
+        /// <c>CREATE TABLE</c> would store (see <see cref="ToStoredName"/>).
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// The names are compared exactly. <c>USERS</c> and <c>"Users"</c> are different tables, so a case-insensitive
+        /// check, as in <c>OracleProcessorBase.TableExists</c>, would skip the <c>CREATE TABLE</c> for one when the
+        /// other exists, and the migration would be recorded without the table.
+        /// </para>
+        /// <para>
+        /// The block has no <c>DECLARE</c>: the loop over a query that returns one row or none needs no variable, and
+        /// a <c>DECLARE ... BEGIN</c> would be split into two blocks by <c>OracleSqlParser</c>, which runs scripts.
+        /// </para>
+        /// </remarks>
+        private string GenerateCreateTableIfNotExists(CreateTableExpression expression, IEnumerable<string> descriptionStatements)
+        {
+            var tableName = FormatHelper.FormatSqlEscape(ToStoredName(expression.TableName));
+            var catalogQuery = string.IsNullOrEmpty(expression.SchemaName)
+                ? $"SELECT 1 FROM USER_TABLES WHERE TABLE_NAME = '{tableName}'"
+                : $"SELECT 1 FROM ALL_TABLES WHERE OWNER = '{FormatHelper.FormatSqlEscape(ToStoredName(expression.SchemaName))}' AND TABLE_NAME = '{tableName}'";
+
+            var builder = new StringBuilder();
+            builder.AppendLine("BEGIN");
+            builder.AppendLine($"FOR missing_table IN (SELECT 1 FROM DUAL WHERE NOT EXISTS ({catalogQuery})) LOOP");
+            builder.AppendLine(WrapStatementInExecuteImmediateBlock(InnerGenerate(expression)));
+            foreach (var descriptionStatement in descriptionStatements.Where(s => !string.IsNullOrEmpty(s)))
+            {
+                builder.AppendLine(WrapStatementInExecuteImmediateBlock(descriptionStatement));
+            }
+
+            foreach (var statement in GenerateExpressionsForNewTable(expression, IsIndexOrForeignKey))
+            {
+                builder.AppendLine(WrapStatementInExecuteImmediateBlock(statement));
+            }
+
+            builder.AppendLine("END LOOP;");
+            builder.Append("END");
+            AppendSqlStatementEndToken(builder);
+            return builder.ToString();
+        }
+
+        /// <summary>
+        /// The name as the data dictionary stores it: a name the quoter quotes (because it is quoted already, isn't a
+        /// valid unquoted identifier or is a keyword, or because the quoter quotes every name) as written, and any
+        /// other name in upper case.
+        /// </summary>
+        private string ToStoredName(string name)
+        {
+            if (Quoter.IsQuoted(name))
+            {
+                return Quoter.UnQuote(name);
+            }
+
+            return Quoter.IsQuoted(Quoter.Quote(name)) ? name : name.ToUpperInvariant();
         }
 
         /// <inheritdoc />
