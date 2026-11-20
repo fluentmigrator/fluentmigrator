@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Data;
 
 using FirebirdSql.Data.FirebirdClient;
@@ -103,9 +104,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                 },
             }.ExecuteWith(Processor);
 
-            using var command = new FbCommand($"INSERT INTO {tableName} (id) VALUES (0)", table.Connection, table.Transaction);
-            Assert.That(() => command.ExecuteNonQuery(), Throws.TypeOf<FbException>()
-                .With.Message.Contains("POSITIVEID").IgnoreCase);
+            var exception = Should.Throw<Exception>(() => Processor.Execute($"INSERT INTO {tableName} (id) VALUES (0)"));
+            Assert.That(exception.InnerException.ShouldBeOfType<FbException>().Message, Does.Contain("POSITIVEID").IgnoreCase);
         }
 
         [Test]
@@ -133,9 +133,40 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             }.ExecuteWith(Processor);
 
             Processor.Execute($"INSERT INTO {tableName} (code) VALUES ('one;two')");
-            using var command = new FbCommand($"INSERT INTO {tableName} (code) VALUES ('first')", table.Connection, table.Transaction);
-            Assert.That(() => command.ExecuteNonQuery(), Throws.TypeOf<FbException>()
-                .With.Message.Contains("VALIDCODE").IgnoreCase);
+            var exception = Should.Throw<Exception>(() => Processor.Execute($"INSERT INTO {tableName} (code) VALUES ('first')"));
+            Assert.That(exception.InnerException.ShouldBeOfType<FbException>().Message, Does.Contain("VALIDCODE").IgnoreCase);
+        }
+
+        [Test]
+        public void LooseModeKeepsTheExistingCheckWhenTheReplacementIsUnsupported()
+        {
+            using var table = new FirebirdTestTable(Processor, "id int");
+            var tableName = Quoter.QuoteTableName(table.Name);
+
+            new CreateCheckConstraintExpression
+            {
+                Constraint =
+                {
+                    Name = "PositiveId",
+                    TableName = table.Name,
+                    Condition = "id > 0",
+                },
+            }.ExecuteWith(Processor);
+
+            new AlterCheckConstraintExpression
+            {
+                Action = CheckConstraintAction.ChangeCondition,
+                Constraint =
+                {
+                    Name = "PositiveId",
+                    TableName = table.Name,
+                    Condition = "id > 1",
+                    Enabled = false,
+                },
+            }.ExecuteWith(Processor);
+
+            var exception = Should.Throw<Exception>(() => Processor.Execute($"INSERT INTO {tableName} (id) VALUES (0)"));
+            Assert.That(exception.InnerException.ShouldBeOfType<FbException>().Message, Does.Contain("POSITIVEID").IgnoreCase);
         }
 
         private void AddTestData(FirebirdTestTable table)

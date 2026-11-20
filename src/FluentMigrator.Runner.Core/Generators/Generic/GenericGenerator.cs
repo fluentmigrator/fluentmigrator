@@ -376,14 +376,23 @@ namespace FluentMigrator.Runner.Generators.Generic
                 return CompatibilityMode.HandleCompatibility($"The {expression.Action} operation for CHECK constraints is not supported");
             }
 
-            var constraint = expression.Constraint;
-            var createSql = Generate(new CreateCheckConstraintExpression { Constraint = constraint });
+            var statements = GenerateCheckConstraintReplacementStatements(this, expression.Constraint);
+            return statements.HasValue
+                ? JoinCheckConstraintReplacementStatements(statements.Value.DeleteSql, statements.Value.CreateSql)
+                : string.Empty;
+        }
+
+        internal static (string DeleteSql, string CreateSql)? GenerateCheckConstraintReplacementStatements(
+            IMigrationGenerator generator,
+            CheckConstraintDefinition constraint)
+        {
+            var createSql = generator.Generate(new CreateCheckConstraintExpression { Constraint = constraint });
             if (string.IsNullOrEmpty(createSql))
             {
-                return string.Empty;
+                return null;
             }
 
-            var deleteSql = Generate(new DeleteCheckConstraintExpression
+            var deleteSql = generator.Generate(new DeleteCheckConstraintExpression
             {
                 Constraint = new CheckConstraintDefinition
                 {
@@ -393,9 +402,7 @@ namespace FluentMigrator.Runner.Generators.Generic
                 },
             });
 
-            return string.IsNullOrEmpty(deleteSql)
-                ? string.Empty
-                : JoinCheckConstraintReplacementStatements(deleteSql, createSql);
+            return string.IsNullOrEmpty(deleteSql) ? null : (deleteSql, createSql);
         }
 
         /// <summary>
