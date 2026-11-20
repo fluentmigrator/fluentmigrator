@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### New
 
-- Create, alter and drop named table CHECK constraints through the migration DSL. The [constraints guide](docs-website/basics/constraints.md#check-constraints) lists provider support for enforcement and validation.
+- Create, alter and drop named table CHECK constraints through the migration DSL. The [constraints guide](docs-website/basics/constraints.md#check-constraints) lists provider support for enforcement and validation ([issue #1021](https://github.com/fluentmigrator/fluentmigrator/issues/1021)).
 
 - Application locking: register an `IApplicationLocker` with `ConfigureApplicationLocker<T>()` so that only one application instance migrates a database at a time. The lock covers version-table creation as well as every runner operation and migration scope (Issue #1949 by @cristiproj; design review by @RaphaelFakhri)
   - Ownership is per dependency-injection scope (`IApplicationLockLease`), counted, and independent of threads and `ExecutionContext`, so implementations do not need to be reentrant

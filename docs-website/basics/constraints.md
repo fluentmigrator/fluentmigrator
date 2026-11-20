@@ -68,7 +68,7 @@ public class CompositeUnique : Migration
 
 ## CHECK constraints
 
-Use a named CHECK constraint to enforce a SQL predicate on a table. Supply the predicate in the database's SQL dialect, including any identifier quoting it requires. FluentMigrator quotes the table, schema and constraint names and passes the predicate through as written.
+Use a named CHECK constraint to enforce a SQL predicate on a table. Supply the predicate in the database's SQL dialect, including any identifier quoting it requires. The provider quotes identifiers and passes the predicate through as written. The SAP HANA provider uses the connection's current schema even when a migration specifies one.
 
 ```csharp
 public override void Up()
