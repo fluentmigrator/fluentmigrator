@@ -260,6 +260,24 @@ namespace FluentMigrator.Runner.Processors
         }
 
         /// <inheritdoc />
+        public virtual void Process(CreateCheckConstraintExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
+
+        /// <inheritdoc />
+        public virtual void Process(AlterCheckConstraintExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
+
+        /// <inheritdoc />
+        public virtual void Process(DeleteCheckConstraintExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
+
+        /// <inheritdoc />
         public virtual void Process(DeleteDefaultConstraintExpression expression)
         {
             Process(Generator.Generate(expression));
