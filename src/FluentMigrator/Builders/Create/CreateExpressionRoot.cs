@@ -16,6 +16,7 @@
 //
 #endregion
 
+using FluentMigrator.Builders.Create.CheckConstraint;
 using FluentMigrator.Builders.Create.Column;
 using FluentMigrator.Builders.Create.Constraint;
 using FluentMigrator.Builders.Create.ForeignKey;
@@ -144,6 +145,14 @@ namespace FluentMigrator.Builders.Create
             expression.Constraint.ConstraintName = primaryKeyName;
             _context.Expressions.Add(expression);
             return new CreateConstraintExpressionBuilder(expression);
+        }
+
+        /// <inheritdoc />
+        public ICreateCheckOnTableSyntax Check(string constraintName)
+        {
+            var expression = new CreateCheckConstraintExpression { Constraint = { Name = constraintName } };
+            _context.Expressions.Add(expression);
+            return new CreateCheckConstraintExpressionBuilder(expression);
         }
     }
 }

@@ -73,6 +73,17 @@ namespace FluentMigrator.Tests
         }
 
         [Test]
+        public void NullCheckConstraintReportsMigrationValidationError()
+        {
+            var expression = new CreateCheckConstraintExpression { Constraint = null };
+
+            var exception = Assert.Throws<InvalidMigrationException>(() =>
+                _migrationValidator.ApplyConventionsToAndValidateExpressions(_migration, new[] { expression }));
+
+            Assert.That(exception.Message, Does.Contain("A CHECK constraint requires a name."));
+        }
+
+        [Test]
         public void ItThrowsInvalidMigrationExceptionIfExpressionsContainsMultipleInvalidOfSameType()
         {
             Assert.Throws<InvalidMigrationException>(

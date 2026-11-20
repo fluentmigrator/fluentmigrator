@@ -23,6 +23,7 @@ using System.Text;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Generation;
+using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.SqlServer;
 
@@ -140,6 +141,42 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             var statement = GenerateCreateConstraintPart(expression);
 
             return AppendSqlStatementEndToken(statement).ToString();
+        }
+
+        /// <inheritdoc />
+        public override string Generate(CreateCheckConstraintExpression expression)
+        {
+            var constraint = expression.Constraint;
+            if (constraint.Enabled && !constraint.NoCheck)
+            {
+                return base.Generate(expression);
+            }
+
+            var table = Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName);
+            var name = Quoter.QuoteConstraintName(constraint.Name);
+            var add = FormatStatement("ALTER TABLE {0} WITH NOCHECK ADD CONSTRAINT {1} CHECK ({2})", table, name, constraint.Condition);
+            return constraint.Enabled ? add : add + Environment.NewLine + FormatStatement("ALTER TABLE {0} NOCHECK CONSTRAINT {1}", table, name);
+        }
+
+        /// <inheritdoc />
+        public override string Generate(AlterCheckConstraintExpression expression)
+        {
+            var constraint = expression.Constraint;
+            string operation;
+            switch (expression.Action)
+            {
+                case CheckConstraintAction.Enable:
+                    operation = constraint.NoCheck ? "CHECK" : "WITH CHECK CHECK";
+                    break;
+                case CheckConstraintAction.Disable:
+                    operation = "NOCHECK";
+                    break;
+                default:
+                    return base.Generate(expression);
+            }
+
+            return FormatStatement("ALTER TABLE {0} {1} CONSTRAINT {2}", Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName),
+                operation, Quoter.QuoteConstraintName(constraint.Name));
         }
 
         /// <inheritdoc />

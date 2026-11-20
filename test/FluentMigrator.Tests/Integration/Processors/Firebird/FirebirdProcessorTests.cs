@@ -16,9 +16,13 @@
 //
 #endregion
 
+using System;
 using System.Data;
 
+using FirebirdSql.Data.FirebirdClient;
+
 using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Initialization;
@@ -80,6 +84,89 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     ds.Tables[0].Rows[2][0].ShouldBe(2);
                 }
             }
+        }
+
+        [Test]
+        public void AddingACheckLeavesExistingRowsUnvalidatedAndEnforcesNewRows()
+        {
+            using var table = new FirebirdTestTable(Processor, "id int");
+            var tableName = Quoter.QuoteTableName(table.Name);
+            Processor.Execute($"INSERT INTO {tableName} (id) VALUES (0)");
+
+            new CreateCheckConstraintExpression
+            {
+                Constraint =
+                {
+                    Name = "PositiveId",
+                    TableName = table.Name,
+                    Condition = "id > 0",
+                    NoCheck = true,
+                },
+            }.ExecuteWith(Processor);
+
+            var exception = Should.Throw<Exception>(() => Processor.Execute($"INSERT INTO {tableName} (id) VALUES (0)"));
+            Assert.That(exception.InnerException.ShouldBeOfType<FbException>().Message, Does.Contain("POSITIVEID").IgnoreCase);
+        }
+
+        [Test]
+        public void ChangingACheckConditionExecutesBothStatements()
+        {
+            using var table = new FirebirdTestTable(Processor, "code varchar(16)");
+            var tableName = Quoter.QuoteTableName(table.Name);
+            var constraint = new CheckConstraintDefinition
+            {
+                Name = "ValidCode",
+                TableName = table.Name,
+                Condition = "code = 'first'",
+            };
+            new CreateCheckConstraintExpression { Constraint = constraint }.ExecuteWith(Processor);
+
+            new AlterCheckConstraintExpression
+            {
+                Action = CheckConstraintAction.ChangeCondition,
+                Constraint =
+                {
+                    Name = constraint.Name,
+                    TableName = table.Name,
+                    Condition = "code = 'one;two'",
+                },
+            }.ExecuteWith(Processor);
+
+            Processor.Execute($"INSERT INTO {tableName} (code) VALUES ('one;two')");
+            var exception = Should.Throw<Exception>(() => Processor.Execute($"INSERT INTO {tableName} (code) VALUES ('first')"));
+            Assert.That(exception.InnerException.ShouldBeOfType<FbException>().Message, Does.Contain("VALIDCODE").IgnoreCase);
+        }
+
+        [Test]
+        public void LooseModeKeepsTheExistingCheckWhenTheReplacementIsUnsupported()
+        {
+            using var table = new FirebirdTestTable(Processor, "id int");
+            var tableName = Quoter.QuoteTableName(table.Name);
+
+            new CreateCheckConstraintExpression
+            {
+                Constraint =
+                {
+                    Name = "PositiveId",
+                    TableName = table.Name,
+                    Condition = "id > 0",
+                },
+            }.ExecuteWith(Processor);
+
+            new AlterCheckConstraintExpression
+            {
+                Action = CheckConstraintAction.ChangeCondition,
+                Constraint =
+                {
+                    Name = "PositiveId",
+                    TableName = table.Name,
+                    Condition = "id > 1",
+                    Enabled = false,
+                },
+            }.ExecuteWith(Processor);
+
+            var exception = Should.Throw<Exception>(() => Processor.Execute($"INSERT INTO {tableName} (id) VALUES (0)"));
+            Assert.That(exception.InnerException.ShouldBeOfType<FbException>().Message, Does.Contain("POSITIVEID").IgnoreCase);
         }
 
         private void AddTestData(FirebirdTestTable table)

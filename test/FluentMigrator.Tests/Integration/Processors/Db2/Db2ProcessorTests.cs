@@ -19,10 +19,14 @@
 #if !NETFRAMEWORK
 using System.Diagnostics;
 
+using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.DB2;
 using FluentMigrator.Tests.Helpers;
+
+using IBM.Data.Db2;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -37,6 +41,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
     [Category("Db2")]
     public class Db2ProcessorTests
     {
+        private const string CheckSchema = "CHECK_TEST_SCHEMA";
+        private const string CheckName = "POSITIVE_ID";
+
         static Db2ProcessorTests()
         {
             try { EnsureReference(); } catch { /* ignore */ }
@@ -72,6 +79,130 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
             {
                 Processor.TableExists("DNE", table.Name).ShouldBeFalse();
             }
+        }
+
+        [Test]
+        public void ACheckCreatedDisabledIsExcludedFromQueryOptimisation()
+        {
+            using var table = new Db2TestTable(Processor, CheckSchema, "ID INT");
+            new CreateCheckConstraintExpression
+            {
+                Constraint =
+                {
+                    Name = CheckName,
+                    TableName = table.Name,
+                    SchemaName = CheckSchema,
+                    Condition = "ID > 0",
+                    Enabled = false,
+                },
+            }.ExecuteWith(Processor);
+
+            AssertCheckEnforcementAndOptimisation(table, "N");
+        }
+
+        [TestCase(CheckConstraintAction.Disable, "N")]
+        [TestCase(CheckConstraintAction.Enable, "Y")]
+        public void ChangingEnforcementAlsoChangesQueryOptimisation(CheckConstraintAction action, string expected)
+        {
+            using var table = new Db2TestTable(Processor, CheckSchema, "ID INT");
+            new CreateCheckConstraintExpression
+            {
+                Constraint =
+                {
+                    Name = CheckName,
+                    TableName = table.Name,
+                    SchemaName = CheckSchema,
+                    Condition = "ID > 0",
+                    Enabled = action == CheckConstraintAction.Disable,
+                },
+            }.ExecuteWith(Processor);
+
+            new AlterCheckConstraintExpression
+            {
+                Action = action,
+                Constraint = { Name = CheckName, TableName = table.Name, SchemaName = CheckSchema },
+            }.ExecuteWith(Processor);
+
+            AssertCheckEnforcementAndOptimisation(table, expected);
+        }
+
+        [Test]
+        public void EnablingACheckValidatesExistingRows()
+        {
+            using var table = new Db2TestTable(Processor, CheckSchema, "ID INT");
+            new CreateCheckConstraintExpression
+            {
+                Constraint =
+                {
+                    Name = CheckName,
+                    TableName = table.Name,
+                    SchemaName = CheckSchema,
+                    Condition = "ID > 0",
+                    Enabled = false,
+                },
+            }.ExecuteWith(Processor);
+            Processor.Execute($"INSERT INTO {table.NameWithSchema} (ID) VALUES (0)");
+
+            var expression = new AlterCheckConstraintExpression
+            {
+                Action = CheckConstraintAction.Enable,
+                Constraint = { Name = CheckName, TableName = table.Name, SchemaName = CheckSchema },
+            };
+
+            var exception = Should.Throw<DB2Exception>(() => expression.ExecuteWith(Processor));
+            exception.Errors[0].SQLState.ShouldBe("23512");
+        }
+
+        [Test]
+        public void ChangingAConditionReplacesTheCheckWithinTheMigrationTransaction()
+        {
+            using var table = new Db2TestTable(Processor, CheckSchema, "ID INT");
+            new CreateCheckConstraintExpression
+            {
+                Constraint =
+                {
+                    Name = CheckName,
+                    TableName = table.Name,
+                    SchemaName = CheckSchema,
+                    Condition = "ID > 0",
+                },
+            }.ExecuteWith(Processor);
+
+            Processor.BeginTransaction();
+            try
+            {
+                new AlterCheckConstraintExpression
+                {
+                    Action = CheckConstraintAction.ChangeCondition,
+                    Constraint =
+                    {
+                        Name = CheckName,
+                        TableName = table.Name,
+                        SchemaName = CheckSchema,
+                        Condition = "ID < 0",
+                    },
+                }.ExecuteWith(Processor);
+
+                Processor.Execute($"INSERT INTO {table.NameWithSchema} (ID) VALUES (-1)");
+                var exception = Should.Throw<DB2Exception>(
+                    () => Processor.Execute($"INSERT INTO {table.NameWithSchema} (ID) VALUES (1)"));
+                exception.Errors[0].SQLState.ShouldBe("23513");
+            }
+            finally
+            {
+                Processor.RollbackTransaction();
+            }
+        }
+
+        private void AssertCheckEnforcementAndOptimisation(Db2TestTable table, string expected)
+        {
+            using var result = Processor.Read(
+                "SELECT ENFORCED, ENABLEQUERYOPT FROM SYSCAT.TABCONST WHERE TABSCHEMA = '{0}' AND TABNAME = '{1}' AND CONSTNAME = '{2}' AND TYPE = 'K'",
+                CheckSchema,
+                table.Name.ToUpperInvariant(),
+                CheckName);
+            var row = result.Tables[0].Rows[0];
+            Assert.That(((string)row["ENFORCED"], (string)row["ENABLEQUERYOPT"]), Is.EqualTo((expected, expected)));
         }
 
         [OneTimeSetUp]

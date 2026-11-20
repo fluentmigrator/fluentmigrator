@@ -243,6 +243,24 @@ namespace FluentMigrator
         void Process(DeleteConstraintExpression expression);
 
         /// <summary>
+        /// Executes an operation to add a CHECK constraint.
+        /// </summary>
+        /// <param name="expression">The CHECK constraint expression</param>
+        void Process(CreateCheckConstraintExpression expression);
+
+        /// <summary>
+        /// Executes an operation to alter a CHECK constraint.
+        /// </summary>
+        /// <param name="expression">The CHECK constraint expression</param>
+        void Process(AlterCheckConstraintExpression expression);
+
+        /// <summary>
+        /// Executes an operation to drop a CHECK constraint.
+        /// </summary>
+        /// <param name="expression">The CHECK constraint expression</param>
+        void Process(DeleteCheckConstraintExpression expression);
+
+        /// <summary>
         /// Executes an SQL expression to drop a default constraint
         /// </summary>
         /// <param name="expression">The expression to execute</param>

@@ -205,6 +205,27 @@ namespace FluentMigrator
         string Generate(DeleteConstraintExpression expression);
 
         /// <summary>
+        /// Generates SQL for an operation to add a CHECK constraint.
+        /// </summary>
+        /// <param name="expression">The CHECK constraint expression</param>
+        /// <returns>The generated SQL</returns>
+        string Generate(CreateCheckConstraintExpression expression);
+
+        /// <summary>
+        /// Generates SQL for an operation to alter a CHECK constraint.
+        /// </summary>
+        /// <param name="expression">The CHECK constraint expression</param>
+        /// <returns>The generated SQL</returns>
+        string Generate(AlterCheckConstraintExpression expression);
+
+        /// <summary>
+        /// Generates SQL for an operation to drop a CHECK constraint.
+        /// </summary>
+        /// <param name="expression">The CHECK constraint expression</param>
+        /// <returns>The generated SQL</returns>
+        string Generate(DeleteCheckConstraintExpression expression);
+
+        /// <summary>
         /// Generates an SQL statement to drop a default constraint
         /// </summary>
         /// <param name="expression">The expression to create the SQL for</param>

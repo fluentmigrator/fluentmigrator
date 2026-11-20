@@ -18,6 +18,7 @@
 
 using System.Collections.Generic;
 
+using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
 using FluentMigrator.Generation;
 
@@ -90,6 +91,24 @@ namespace FluentMigrator.Runner.Generators.Base
         public abstract string Generate(CreateConstraintExpression expression);
         /// <inheritdoc />
         public abstract string Generate(DeleteConstraintExpression expression);
+
+        /// <inheritdoc />
+        public virtual string Generate(CreateCheckConstraintExpression expression)
+        {
+            throw new DatabaseOperationNotSupportedException("Adding CHECK constraints is not supported");
+        }
+
+        /// <inheritdoc />
+        public virtual string Generate(AlterCheckConstraintExpression expression)
+        {
+            throw new DatabaseOperationNotSupportedException("Altering CHECK constraints is not supported");
+        }
+
+        /// <inheritdoc />
+        public virtual string Generate(DeleteCheckConstraintExpression expression)
+        {
+            throw new DatabaseOperationNotSupportedException("Dropping CHECK constraints is not supported");
+        }
         /// <inheritdoc />
         public abstract string Generate(DeleteDefaultConstraintExpression expression);
 

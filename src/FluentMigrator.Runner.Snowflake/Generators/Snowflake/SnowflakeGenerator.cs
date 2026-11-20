@@ -37,6 +37,9 @@ namespace FluentMigrator.Runner.Generators.Snowflake
     public class SnowflakeGenerator : GenericGenerator
     {
         /// <inheritdoc />
+        protected override bool SupportsTableCheckConstraints => false;
+
+        /// <inheritdoc />
         public SnowflakeGenerator(
             [NotNull] SnowflakeOptions sfOptions)
             : this(sfOptions, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions())) { }

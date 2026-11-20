@@ -1033,6 +1033,12 @@ namespace FluentMigrator.Runner.Processors.Firebird
         }
 
         /// <inheritdoc />
+        public override void Process(AlterCheckConstraintExpression expression)
+        {
+            ProcessCheckConstraintAlterationInSeparateCommands(expression);
+        }
+
+        /// <inheritdoc />
         public override void Process(PerformDBOperationExpression expression)
         {
             var message = string.IsNullOrEmpty(expression.Description) 

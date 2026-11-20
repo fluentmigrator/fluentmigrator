@@ -16,6 +16,7 @@
 //
 #endregion
 
+using FluentMigrator.Builders.Create.CheckConstraint;
 using FluentMigrator.Builders.Create.Column;
 using FluentMigrator.Builders.Create.Constraint;
 using FluentMigrator.Builders.Create.ForeignKey;
@@ -111,5 +112,12 @@ namespace FluentMigrator.Builders.Create
         /// <param name="constraintName">The unique constraint name</param>
         /// <returns>Additional information about the unique constraint creation</returns>
         ICreateConstraintOnTableSyntax UniqueConstraint(string constraintName);
+
+        /// <summary>
+        /// Creates a check constraint on an existing table.
+        /// </summary>
+        /// <param name="constraintName">The constraint name.</param>
+        /// <returns>The syntax for specifying the table.</returns>
+        ICreateCheckOnTableSyntax Check(string constraintName);
     }
 }
