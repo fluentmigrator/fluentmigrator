@@ -16,10 +16,15 @@
 //
 #endregion
 
+using System.Collections.Generic;
+
+using FluentMigrator.Infrastructure;
+using FluentMigrator.Infrastructure.Extensions;
+
 namespace FluentMigrator.Model;
 
 /// <summary>A named CHECK constraint on a table.</summary>
-public sealed class CheckConstraintDefinition
+public sealed class CheckConstraintDefinition : ISupportAdditionalFeatures
 {
     /// <summary>The constraint name.</summary>
     public string Name { get; set; }
@@ -39,6 +44,23 @@ public sealed class CheckConstraintDefinition
     /// <summary>Whether the constraint is enforced when created.</summary>
     public bool Enabled { get; set; } = true;
 
+    /// <inheritdoc />
+    public IDictionary<string, object> AdditionalFeatures { get; } = new Dictionary<string, object>();
+
     /// <summary>Copies the constraint definition.</summary>
-    public CheckConstraintDefinition Clone() => (CheckConstraintDefinition)MemberwiseClone();
+    public CheckConstraintDefinition Clone()
+    {
+        var clone = new CheckConstraintDefinition
+        {
+            Name = Name,
+            TableName = TableName,
+            SchemaName = SchemaName,
+            Condition = Condition,
+            NoCheck = NoCheck,
+            Enabled = Enabled,
+        };
+
+        AdditionalFeatures.CloneTo(clone.AdditionalFeatures);
+        return clone;
+    }
 }

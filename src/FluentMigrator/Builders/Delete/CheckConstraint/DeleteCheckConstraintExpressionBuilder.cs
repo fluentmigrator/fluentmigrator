@@ -16,7 +16,10 @@
 //
 #endregion
 
+using System.Collections.Generic;
+
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Delete.CheckConstraint
 {
@@ -25,7 +28,8 @@ namespace FluentMigrator.Builders.Delete.CheckConstraint
     /// </summary>
     public class DeleteCheckConstraintExpressionBuilder : ExpressionBuilderBase<DeleteCheckConstraintExpression>,
         IDeleteCheckFromTableSyntax,
-        IInSchemaSyntax
+        IInSchemaSyntax,
+        ISupportAdditionalFeatures
     {
         /// <summary>
         /// Initialises a new instance of the <see cref="DeleteCheckConstraintExpressionBuilder"/> class.
@@ -35,6 +39,9 @@ namespace FluentMigrator.Builders.Delete.CheckConstraint
             : base(expression)
         {
         }
+
+        /// <inheritdoc />
+        public IDictionary<string, object> AdditionalFeatures => Expression.AdditionalFeatures;
 
         /// <inheritdoc />
         public IInSchemaSyntax FromTable(string tableName)

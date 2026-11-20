@@ -16,7 +16,10 @@
 //
 #endregion
 
+using System.Collections.Generic;
+
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Create.CheckConstraint
 {
@@ -26,7 +29,8 @@ namespace FluentMigrator.Builders.Create.CheckConstraint
     public class CreateCheckConstraintExpressionBuilder : ExpressionBuilderBase<CreateCheckConstraintExpression>,
         ICreateCheckOnTableSyntax,
         ICreateCheckInSchemaOrConditionSyntax,
-        ICreateCheckOptionsSyntax
+        ICreateCheckOptionsSyntax,
+        ISupportAdditionalFeatures
     {
         /// <summary>
         /// Initialises a new instance of the <see cref="CreateCheckConstraintExpressionBuilder"/> class.
@@ -36,6 +40,9 @@ namespace FluentMigrator.Builders.Create.CheckConstraint
             : base(expression)
         {
         }
+
+        /// <inheritdoc />
+        public IDictionary<string, object> AdditionalFeatures => Expression.AdditionalFeatures;
 
         /// <inheritdoc />
         public ICreateCheckInSchemaOrConditionSyntax OnTable(string tableName)

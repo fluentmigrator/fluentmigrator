@@ -16,8 +16,11 @@
 //
 #endregion
 
+using System.Collections.Generic;
+
 using FluentMigrator.Builders.Create.CheckConstraint;
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Alter.CheckConstraint
@@ -29,7 +32,8 @@ namespace FluentMigrator.Builders.Alter.CheckConstraint
         IAlterCheckOnTableSyntax,
         IAlterCheckInSchemaOrActionSyntax,
         IAlterCheckEnableOptionsSyntax,
-        ICreateCheckOptionsSyntax
+        ICreateCheckOptionsSyntax,
+        ISupportAdditionalFeatures
     {
         /// <summary>
         /// Initialises a new instance of the <see cref="AlterCheckConstraintExpressionBuilder"/> class.
@@ -39,6 +43,9 @@ namespace FluentMigrator.Builders.Alter.CheckConstraint
             : base(expression)
         {
         }
+
+        /// <inheritdoc />
+        public IDictionary<string, object> AdditionalFeatures => Expression.AdditionalFeatures;
 
         /// <inheritdoc />
         public IAlterCheckInSchemaOrActionSyntax OnTable(string tableName)

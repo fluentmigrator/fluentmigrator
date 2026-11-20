@@ -25,10 +25,13 @@ using FluentMigrator.Model;
 namespace FluentMigrator.Expressions;
 
 /// <summary>A migration operation on a named table CHECK constraint.</summary>
-public abstract class CheckConstraintExpressionBase : MigrationExpressionBase, ISchemaExpression, IValidatableObject
+public abstract class CheckConstraintExpressionBase : MigrationExpressionBase, ISchemaExpression, ISupportAdditionalFeatures, IValidatableObject
 {
     /// <summary>The target constraint and its options.</summary>
     public CheckConstraintDefinition Constraint { get; set; } = new CheckConstraintDefinition();
+
+    /// <inheritdoc />
+    public IDictionary<string, object> AdditionalFeatures => Constraint.AdditionalFeatures;
 
     string ISchemaExpression.SchemaName
     {
