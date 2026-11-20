@@ -19,6 +19,7 @@
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -33,8 +34,12 @@ public class CheckConstraintDefinitionTests
     {
         var definition = new CheckConstraintDefinition
         {
-            Name = "ck_quantity", SchemaName = "stock", TableName = "items",
-            Condition = "quantity > 0", NoCheck = true, Enabled = false
+            Name = "ck_quantity",
+            SchemaName = "stock",
+            TableName = "items",
+            Condition = "quantity > 0",
+            NoCheck = true,
+            Enabled = false
         };
 
         var clone = definition.Clone();
