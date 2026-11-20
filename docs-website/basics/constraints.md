@@ -95,7 +95,7 @@ Create.Check("ck_order_items_quantity").OnTable("order_items")
 Alter.Check("ck_order_items_quantity").OnTable("order_items").Enabled();
 ```
 
-To suspend enforcement on a provider that supports it, use `Alter.Check(...).OnTable(...).Disabled()`. To replace the predicate, use `Alter.Check(...).OnTable(...).Condition("quantity >= 0")`. Replacing a condition drops the old constraint and adds its replacement. On databases that commit DDL between those operations, a failed replacement can leave the original constraint absent. Check existing data before applying the replacement.
+To suspend enforcement on a provider that supports it, use `Alter.Check(...).OnTable(...).Disabled()`. To replace the predicate, use `Alter.Check(...).OnTable(...).Condition("quantity >= 0")`. Replacing a condition drops the old constraint and adds its replacement. Oracle DDL and Firebird's default per-command commit can leave the original constraint absent when the replacement fails. On SQL Server and Db2, keep both commands in the migration transaction. MySQL 8 uses a single ALTER TABLE statement. Check existing data before applying the replacement.
 
 | Provider | Create, replace and drop | Skip existing rows on create | Change enforcement or validate |
 | --- | --- | --- | --- |
@@ -108,7 +108,7 @@ To suspend enforcement on a provider that supports it, use `Alter.Check(...).OnT
 | Db2 for i, SAP HANA | Yes | Unsupported | Unsupported |
 | MySQL 4/5, SQLite, Snowflake, Redshift | Unsupported | Unsupported | Unsupported |
 
-MySQL versions before 8.0.16 do not enforce CHECK constraints. On Oracle, enabling with `.WithNoCheck()` marks a previously validated constraint as unvalidated. On SQL Server, enabling without validation preserves an already enabled, trusted constraint's trust state.
+A Db2 LUW table already in the set-integrity-pending state still requires its usual `SET INTEGRITY` operation. MySQL versions before 8.0.16 do not enforce CHECK constraints. On Oracle, enabling with `.WithNoCheck()` marks a previously validated constraint as unvalidated. On SQL Server, enabling without validation preserves an already enabled, trusted constraint's trust state.
 
 `AutoReversingMigration` reverses a create by dropping the named constraint. Supply an explicit `Down()` when altering or deleting a check, since the previous predicate and enforcement state are needed to restore it. Strict compatibility mode throws for unsupported operations. Loose mode skips them. If a provider supports dropping a check but skips the create options you selected, automatic rollback still issues the drop by name. Scope that create with `IfDatabase(...)` so rollback uses the same provider selection.
 
