@@ -22,6 +22,7 @@ using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using SqlGenerator = FluentMigrator.Runner.Generators.Generic.GenericGenerator;
+using FluentMigrator.Runner.Generators.MySql;
 using FluentMigrator.Runner.Generators.Redshift;
 using FluentMigrator.Runner.Generators.SQLite;
 using FluentMigrator.Runner.Generators.Snowflake;
@@ -36,6 +37,8 @@ public class UnsupportedCheckConstraintTests
 {
     private static IEnumerable<SqlGenerator> Generators()
     {
+        yield return new MySql4Generator();
+        yield return new MySql5Generator();
         yield return new RedshiftGenerator();
         yield return new SQLiteGenerator(new SQLiteQuoter(false), new SQLiteTypeMap(false));
         yield return new SnowflakeGenerator(SnowflakeOptions.QuotingEnabled());
