@@ -263,14 +263,23 @@ Summary:
   condition. After `Disabled()` they may not, and queries could return wrong results, for
   example `WHERE Quantity <= 0` returning no rows. So `Disabled()` must also emit
   `DISABLE QUERY OPTIMIZATION`, and `Enabled()` must emit `ENABLE QUERY OPTIMIZATION`.
-  Whether one `ALTER CHECK` clause can take both settings, or two clauses are needed, is to be
-  verified. The syntax diagram has no repeat marker, but it has this footnote:
+  One `ALTER CHECK` clause takes both settings, for example
+  `ALTER CHECK "c" NOT ENFORCED DISABLE QUERY OPTIMIZATION`. The constraint-alteration syntax
+  diagram lets its options repeat, and its footnote rules out only giving the same option twice:
 
   > The same clause must not be specified more than once.
   >
   > — [Source](https://www.ibm.com/docs/en/db2/11.5.x?topic=statements-alter-table#:~:text=The%20same%20clause%20must%20not%20be%20specified%20more%20than%20once)
+- **Trusted**: A `NOT ENFORCED` constraint is `TRUSTED` by default, which means the data is
+  assumed to satisfy it. `NOT TRUSTED` would describe a disabled check better, but Db2 allows it
+  only for foreign keys:
 
-  The footnote suggests that different clauses can be combined, but it does not say so.
+  > NOT TRUSTED can be specified only for foreign keys (SQLSTATE 42601).
+  >
+  > — [Source](https://www.ibm.com/docs/en/db2/11.5.x?topic=statements-alter-table#:~:text=NOT%20TRUSTED%20can%20be%20specified%20only%20for%20foreign%20keys)
+
+  So `Disabled()` does not emit it. `DISABLE QUERY OPTIMIZATION` already stops the optimizer
+  from relying on the constraint.
 - **Drop**: `ALTER TABLE "s"."t" DROP CHECK "c"`, or `DROP CONSTRAINT "c"`.
 - **Catalog**: `SYSCAT.CHECKS`, and the `ENFORCED` column of `SYSCAT.TABCONST`.
 - **Other**: The condition cannot contain subqueries.
@@ -439,8 +448,8 @@ In strict mode that throws, and in loose mode the statement is skipped.
 | `Create.Check(...).Condition(x)` | `ADD CONSTRAINT c CHECK (x)` | same | same | same | same (existing rows not checked) | same | same | same | compat |
 | `.WithNoCheck()` | `WITH NOCHECK ADD ...` | `... NOT VALID` | compat | `... ENABLE NOVALIDATE` | same as default | compat | compat | compat | compat |
 | `.Disabled()` | `WITH NOCHECK ADD ...` + `NOCHECK CONSTRAINT c` | compat (until PG 18) | `... NOT ENFORCED` | `... DISABLE` | compat | `... NOT ENFORCED DISABLE QUERY OPTIMIZATION` | compat | compat | compat |
-| `Alter.Check(...).Disabled()` | `NOCHECK CONSTRAINT c` | compat | `ALTER CHECK c NOT ENFORCED` | `MODIFY CONSTRAINT c DISABLE` | compat | `ALTER CHECK c NOT ENFORCED` + `DISABLE QUERY OPTIMIZATION` (form to be verified) | compat | compat | compat |
-| `Alter.Check(...).Enabled()` | `WITH CHECK CHECK CONSTRAINT c` | `VALIDATE CONSTRAINT c` | `ALTER CHECK c ENFORCED` | `MODIFY CONSTRAINT c ENABLE VALIDATE` | compat | `ALTER CHECK c ENFORCED` + `ENABLE QUERY OPTIMIZATION` (form to be verified) | compat | compat | compat |
+| `Alter.Check(...).Disabled()` | `NOCHECK CONSTRAINT c` | compat | `ALTER CHECK c NOT ENFORCED` | `MODIFY CONSTRAINT c DISABLE` | compat | `ALTER CHECK c NOT ENFORCED DISABLE QUERY OPTIMIZATION` | compat | compat | compat |
+| `Alter.Check(...).Enabled()` | `WITH CHECK CHECK CONSTRAINT c` | `VALIDATE CONSTRAINT c` | `ALTER CHECK c ENFORCED` | `MODIFY CONSTRAINT c ENABLE VALIDATE` | compat | `ALTER CHECK c ENFORCED ENABLE QUERY OPTIMIZATION` | compat | compat | compat |
 | `Alter.Check(...).Enabled().WithNoCheck()` | `CHECK CONSTRAINT c` | nothing to do (a `NOT VALID` constraint is already enforced) | compat | `MODIFY CONSTRAINT c ENABLE NOVALIDATE` | compat | compat | compat | compat | compat |
 | `Alter.Check(...).Condition(x)` | drop + add | drop + add | one `ALTER TABLE` with both clauses (to be verified) | drop + add in a PL/SQL block | drop + add, run separately | drop + add, run separately | drop + add, run separately | drop + add in a block | compat |
 | `Delete.Check(...)` | `DROP CONSTRAINT c` | `DROP CONSTRAINT c` | `DROP CONSTRAINT c` | `DROP CONSTRAINT c` | `DROP CONSTRAINT c` | `DROP CHECK c` | `DROP CHECK c` | `DROP CONSTRAINT c` | compat |
