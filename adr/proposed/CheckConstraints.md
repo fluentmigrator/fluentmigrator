@@ -525,12 +525,163 @@ other operations. Alternatives for the providers that are left:
   bulk load and enables it again should write `Down()` itself (see
   [Open questions](#open-questions)).
 
+## Naming Convention
+
+`docs-website/intro/configuration.md` already lists `CK_<TableName>_<ColumnName>` as the
+default name of a check constraint, but nothing produces that name. PR #2457 requires a name,
+and its expressions don't go through any naming convention. This section makes the documented
+name real.
+
+### Syntax
+
+The name becomes optional when the constraint names its columns, as with
+`Create.UniqueConstraint()`:
+
+```csharp
+Create.Check().OnTable("Items").Column("Quantity").Condition("Quantity > 0");
+// CK_Items_Quantity
+
+Create.Check().OnTable("Bookings").Columns("StartDate", "EndDate").Condition("EndDate > StartDate");
+// CK_Bookings_StartDate_EndDate
+
+Alter.Check().OnTable("Items").Column("Quantity").Disabled();
+Delete.Check().FromTable("Items").Column("Quantity");
+```
+
+Each root gets a `Check()` overload next to `Check(string constraintName)`. After `OnTable` (or
+`FromTable`) and `InSchema`, the overload without a name requires `Column(string)` or
+`Columns(params string[])` before `Condition` (create), before the action (alter), or at the end
+of the chain (delete). The overload with a name doesn't offer them.
+
+- **The columns are used only for the name.** They are not checked against the condition, and
+  they don't appear in the SQL. `CheckConstraintDefinition` gets a `Columns` collection, which
+  `Clone()` copies.
+- **An explicit name always wins.** The convention fills the name only when it is empty, as
+  `DefaultConstraintNameConvention` does.
+- **A constraint with neither a name nor a column is rejected.** The validation message is
+  "A CHECK constraint requires a name or at least one column." Conventions run before
+  validation (`MigrationValidator.ApplyConventionsToAndValidateExpressions`), so a custom
+  convention can still name such a constraint, for example from the condition.
+- **`Alter.Check()` and `Delete.Check()` must give the same columns as `Create.Check()`**, so that
+  the convention produces the same name, as with `Delete.UniqueConstraint()`.
+- **Two checks on one column get the same name**, for example `Quantity > 0` and
+  `Quantity <= 1000`. The second one fails with the provider's duplicate-name error, so one of
+  them needs an explicit name.
+- **The convention doesn't shorten long names**, like the other naming conventions. Oracle
+  before 12.2 allows 30 bytes, and PostgreSQL truncates names to 63 bytes.
+
+### Convention
+
+A check constraint gets its own convention, not a `ConstraintType.Check` handled by
+`DefaultConstraintNameConvention`:
+
+- `DefaultConstraintNameConvention` works on `IConstraintExpression`, whose
+  `ConstraintDefinition` is a primary key or unique constraint with a column list.
+  `CheckConstraintDefinition` is a different type, and [Current state](#current-state) explains
+  why there is no `ConstraintType.Check`.
+- Foreign keys and indexes already have their own conventions (`IForeignKeyConvention`,
+  `IIndexConvention`). 9.0 moves primary keys out of `DefaultConstraintNameConvention` into
+  `IPrimaryKeyNameConvention` (Issue #1800). Unique constraints are the last kind left in the
+  shared convention.
+
+```csharp
+// FluentMigrator.Abstractions, next to IConstraintExpression
+public interface ICheckConstraintExpression : IMigrationExpression
+{
+    CheckConstraintDefinition Constraint { get; }
+}
+
+// FluentMigrator.Runner.Conventions
+public interface ICheckConstraintConvention
+{
+    ICheckConstraintExpression Apply(ICheckConstraintExpression expression);
+}
+
+public class DefaultCheckConstraintNameConvention : ICheckConstraintConvention
+{
+    public ICheckConstraintExpression Apply(ICheckConstraintExpression expression)
+    {
+        var constraint = expression.Constraint;
+        if (string.IsNullOrEmpty(constraint.ConstraintName) && constraint.Columns.Count > 0)
+        {
+            constraint.ConstraintName = "CK_" + constraint.TableName + "_" + string.Join("_", constraint.Columns);
+        }
+
+        return expression;
+    }
+}
+
+// IConventionSet
+IList<ICheckConstraintConvention> CheckConstraintConventions { get; }
+```
+
+`CheckConstraintExpressionBase` implements `ICheckConstraintExpression`, and
+`ConventionSetExtensions.Apply` runs `CheckConstraintConventions` on it, as it does the other
+lists. `DefaultConventionSet` puts `DefaultCheckConstraintNameConvention` in the list, and
+`ConventionSet` starts with an empty list. The default schema still comes from
+`SchemaConvention` through `ISchemaExpression`, as in PR #2457.
+
+### Breaking change to IConventionSet
+
+Adding `CheckConstraintConventions` to `IConventionSet` breaks every class that implements the
+interface. Such a class no longer compiles, and an assembly built against 8.x fails to load
+with a `TypeLoadException`. The pattern in `docs-website/intro/configuration.md`
+(`YourConventionSet`, which wraps an inner convention set) is exactly such a class. `net48` and
+`netstandard2.0` have no default interface methods, so, as with `IMigrationGenerator`, the
+break is accepted in the 9.0 major release, with a `CompatibilitySuppressions.xml` entry. The
+alternative, an optional interface checked at run time, avoids the break but is hard to find.
+
+The fix for an affected class is one line:
+
+```csharp
+CheckConstraintConventions = innerConventionSet.CheckConstraintConventions;
+// or, without an inner convention set:
+CheckConstraintConventions = new List<ICheckConstraintConvention> { new DefaultCheckConstraintNameConvention() };
+```
+
+### Tasks for the implementation PR (#2457)
+
+1. **`CHANGELOG.md`**, under `### Breaking` in `9.0.0-prerelease`:
+
+   > `IConventionSet` has a new member, `CheckConstraintConventions`. Custom implementations
+   > must add it. To keep the default name for an unnamed check constraint
+   > (`CK_<Table>_<Column>`, from the new `DefaultCheckConstraintNameConvention`), set it to the
+   > inner convention set's list, as the configuration docs show, or to a list containing
+   > `new DefaultCheckConstraintNameConvention()` (PR #2457)
+
+   The `### New` entry for `Create.Check` should also say that a constraint given columns but no
+   name is named by `DefaultCheckConstraintNameConvention`, which a custom
+   `ICheckConstraintConvention` can replace.
+2. **Release notes draft.** The maintainer who merges the PR adds it to the draft release in the
+   format of [ReleaseManagement.md](ReleaseManagement.md), and states the break in the same line:
+
+   > PR #2457 : `Create.Check` / `Alter.Check` / `Delete.Check` for CHECK constraints
+   > (@ScottishTapWater) [Fixes Issue #1021 (@sariyandath)]. **Breaking:** custom
+   > `IConventionSet` implementations must add `CheckConstraintConventions`. The default,
+   > `DefaultCheckConstraintNameConvention`, names a check constraint without a name
+   > `CK_<Table>_<Column>`.
+3. **`docs-website/intro/configuration.md`.**
+   - Add `CheckConstraintConventions` to the `YourConventionSet` example, which no longer
+     compiles without it.
+   - Add check constraints to the list of things a convention can change.
+   - Show how to implement `ICheckConstraintConvention`, for example a lower-case
+     `ck_<table>_<column>` for PostgreSQL. Show how to register it in place of
+     `DefaultCheckConstraintNameConvention` in `CheckConstraintConventions`.
+   - Keep the existing `CK_<TableName>_<ColumnName>` line, which becomes true.
+4. **`docs-website/basics/constraints.md`.** Show the form without a name, say that the columns
+   are used only for the name, and warn about two checks on one column.
+5. **Tests.** Unit tests for `DefaultCheckConstraintNameConvention`: one column, several columns,
+   and an explicit name kept. Also tests for the validation message, for `Clone()` copying
+   `Columns`, and for `DefaultConventionSet` containing the convention
+   (`test/FluentMigrator.Tests/ConventionSets.cs`).
+
 ## Implementation Notes
 
 - **Expressions and definition.** Add `CreateCheckConstraintExpression`,
   `AlterCheckConstraintExpression` and `DeleteCheckConstraintExpression` to
   `FluentMigrator.Abstractions`, backed by a new `CheckConstraintDefinition`
-  (`ConstraintName`, `TableName`, `SchemaName`, `Condition`, `NoCheck`, `Enabled`). Do not add
+  (`ConstraintName`, `TableName`, `SchemaName`, `Columns`, `Condition`, `NoCheck`, `Enabled`;
+  see [Naming Convention](#naming-convention) for `Columns`). Do not add
   `ConstraintType.Check`, for the reason given in [Current state](#current-state).
   `CheckConstraintDefinition.Clone()` must copy every member, with a test in
   `Unit/Definitions/`. `AlterCheckConstraintExpression` needs an explicit action
@@ -574,7 +725,10 @@ other operations. Alternatives for the providers that are left:
   `CHECK`, and on SQLite it is the only option. It is a separate feature, and it raises the same
   design questions about chaining column and table constraints as
   [TableLevelForeignKeys.md](TableLevelForeignKeys.md). The expressions and definition proposed
-  here should be designed so that `CreateTableExpression` can use them later.
+  here should be designed so that `CreateTableExpression` can use them later. A check declared on
+  a column would be named by the same convention, with that column.
+- **A separate convention for unique constraints.** `DefaultConstraintNameConvention` keeps
+  naming them `UC_<Table>_<Column>`.
 - **`IF EXISTS` on `Delete.Check`.** It is available on SQL Server 2016+, PostgreSQL and MariaDB,
   and can be added later in the same way as `Delete.Table(...).IfExists()`.
 - **Rebuilding SQLite tables** to emulate `ALTER TABLE ... ADD/DROP CONSTRAINT`.
@@ -615,6 +769,10 @@ Recommended:
    Firebird.
 4. Merge PR #2457 into the core implementation instead of releasing it as a PostgreSQL
    extension.
+5. Name a check constraint that has columns but no name `CK_<Table>_<Column>`, through a new
+   `ICheckConstraintConvention` in `IConventionSet`. Accept the break to custom
+   `IConventionSet` implementations in 9.0, and document it in `CHANGELOG.md`, the release
+   notes and the configuration docs.
 
 ## References
 - [#1021 — How to add a CHECK constraint using fluentmigrator?](https://github.com/fluentmigrator/fluentmigrator/issues/1021)
