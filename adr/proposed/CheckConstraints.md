@@ -233,18 +233,44 @@ Summary:
   statement fails if a row violates it. To skip that check, the table must first be put in
   set integrity pending state with `SET INTEGRITY FOR t OFF`. That affects the whole table, so
   `WithNoCheck()` should go through `CompatibilityMode` on Db2.
-- **Enable/disable**: `ALTER TABLE "s"."t" ALTER CHECK "c" [NOT] ENFORCED`. Whether going back
-  to `ENFORCED` checks the existing rows straight away or puts the table in set integrity
-  pending state needs to be verified before implementation. Until then, `Enabled()` goes
-  through `CompatibilityMode`: if it puts the table in set integrity pending state, the table
-  cannot be used until someone runs `SET INTEGRITY` by hand.
+- **Enable/disable**: `ALTER TABLE "s"."t" ALTER CHECK "c" [NOT] ENFORCED`. Going back to
+  `ENFORCED` checks the existing rows straight away, and the statement fails if a row violates
+  the constraint:
+
+  > altering the existing check or referential constraint from NOT ENFORCED to ENFORCED […]
+  > causes the existing rows in the table to be immediately evaluated against the constraint.
+  > If the verification fails, an error is returned (SQLSTATE 23512).
+  >
+  > — [Source](https://www.ibm.com/docs/en/db2/11.5.x?topic=statements-alter-table#:~:text=altering%20the%20existing%20check%20or%20referential%20constraint%20from%20NOT%20ENFORCED%20to%20ENFORCED,an%20error%20is%20returned%20%28SQLSTATE%2023512%29)
+
+  So `Enabled()` emits `ALTER CHECK "c" ENFORCED` and means the same as on the other
+  providers: enforced, with the existing rows validated. The one exception is a table that is
+  already in set integrity pending state:
+
+  > If a table is in set integrity pending state, adding a check or referential constraint, or
+  > altering a constraint from NOT ENFORCED to ENFORCED does not immediately lead to the
+  > enforcement of the constraint. Issue the SET INTEGRITY statement with the IMMEDIATE CHECKED
+  > option to begin enforcing the constraint.
+  >
+  > — [Source](https://www.ibm.com/docs/en/db2/11.5.x?topic=statements-alter-table#:~:text=If%20a%20table%20is%20in%20set%20integrity%20pending%20state%2C%20adding%20a%20check,option%20to%20begin%20enforcing%20the%20constraint)
+
+  FluentMigrator never puts a table in that state, because `WithNoCheck()` goes through
+  `CompatibilityMode`. So the table is only in that state if something outside FluentMigrator put
+  it there, and the documentation for `Enabled()` should mention this case. Because `ENFORCED`
+  always checks the existing rows, `Enabled().WithNoCheck()` goes through `CompatibilityMode`.
 - **Query optimization**: The default for a constraint is `ENABLE QUERY OPTIMIZATION`, which
   stays in effect after `NOT ENFORCED`, so the optimizer still assumes the rows satisfy the
   condition. After `Disabled()` they may not, and queries could return wrong results, for
   example `WHERE Quantity <= 0` returning no rows. So `Disabled()` must also emit
-  `DISABLE QUERY OPTIMIZATION`, and `Enabled()`, once supported, `ENABLE QUERY OPTIMIZATION`.
+  `DISABLE QUERY OPTIMIZATION`, and `Enabled()` must emit `ENABLE QUERY OPTIMIZATION`.
   Whether one `ALTER CHECK` clause can take both settings, or two clauses are needed, is to be
-  verified.
+  verified. The syntax diagram has no repeat marker, but it has this footnote:
+
+  > The same clause must not be specified more than once.
+  >
+  > — [Source](https://www.ibm.com/docs/en/db2/11.5.x?topic=statements-alter-table#:~:text=The%20same%20clause%20must%20not%20be%20specified%20more%20than%20once)
+
+  The footnote suggests that different clauses can be combined, but it does not say so.
 - **Drop**: `ALTER TABLE "s"."t" DROP CHECK "c"`, or `DROP CONSTRAINT "c"`.
 - **Catalog**: `SYSCAT.CHECKS`, and the `ENFORCED` column of `SYSCAT.TABCONST`.
 - **Other**: The condition cannot contain subqueries.
@@ -414,7 +440,7 @@ In strict mode that throws, and in loose mode the statement is skipped.
 | `.WithNoCheck()` | `WITH NOCHECK ADD ...` | `... NOT VALID` | compat | `... ENABLE NOVALIDATE` | same as default | compat | compat | compat | compat |
 | `.Disabled()` | `WITH NOCHECK ADD ...` + `NOCHECK CONSTRAINT c` | compat (until PG 18) | `... NOT ENFORCED` | `... DISABLE` | compat | `... NOT ENFORCED DISABLE QUERY OPTIMIZATION` | compat | compat | compat |
 | `Alter.Check(...).Disabled()` | `NOCHECK CONSTRAINT c` | compat | `ALTER CHECK c NOT ENFORCED` | `MODIFY CONSTRAINT c DISABLE` | compat | `ALTER CHECK c NOT ENFORCED` + `DISABLE QUERY OPTIMIZATION` (form to be verified) | compat | compat | compat |
-| `Alter.Check(...).Enabled()` | `WITH CHECK CHECK CONSTRAINT c` | `VALIDATE CONSTRAINT c` | `ALTER CHECK c ENFORCED` | `MODIFY CONSTRAINT c ENABLE VALIDATE` | compat | compat (until verified) | compat | compat | compat |
+| `Alter.Check(...).Enabled()` | `WITH CHECK CHECK CONSTRAINT c` | `VALIDATE CONSTRAINT c` | `ALTER CHECK c ENFORCED` | `MODIFY CONSTRAINT c ENABLE VALIDATE` | compat | `ALTER CHECK c ENFORCED` + `ENABLE QUERY OPTIMIZATION` (form to be verified) | compat | compat | compat |
 | `Alter.Check(...).Enabled().WithNoCheck()` | `CHECK CONSTRAINT c` | nothing to do (a `NOT VALID` constraint is already enforced) | compat | `MODIFY CONSTRAINT c ENABLE NOVALIDATE` | compat | compat | compat | compat | compat |
 | `Alter.Check(...).Condition(x)` | drop + add | drop + add | one `ALTER TABLE` with both clauses (to be verified) | drop + add in a PL/SQL block | drop + add, run separately | drop + add, run separately | drop + add, run separately | drop + add in a block | compat |
 | `Delete.Check(...)` | `DROP CONSTRAINT c` | `DROP CONSTRAINT c` | `DROP CONSTRAINT c` | `DROP CONSTRAINT c` | `DROP CONSTRAINT c` | `DROP CHECK c` | `DROP CHECK c` | `DROP CONSTRAINT c` | compat |
@@ -602,7 +628,7 @@ Recommended:
 - [Oracle constraint clause](https://docs.oracle.com/en/database/oracle/oracle-database/19/sqlrf/constraint.html)
 - [SQLite CREATE TABLE — CHECK constraints](https://www.sqlite.org/lang_createtable.html#check_constraints)
 - [Firebird 4.0 Language Reference — ALTER TABLE](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html#fblangref40-ddl-tbl-alter)
-- [Db2 LUW ALTER TABLE](https://www.ibm.com/docs/en/db2/11.5?topic=statements-alter-table)
+- [Db2 LUW ALTER TABLE](https://www.ibm.com/docs/en/db2/11.5.x?topic=statements-alter-table)
 - [Db2 for i ALTER TABLE](https://www.ibm.com/docs/en/i/7.5?topic=statements-alter-table)
 - [SAP HANA ALTER TABLE](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/20d329a6751910149d5fdbc4800f92ff.html)
 - [Snowflake constraints overview](https://docs.snowflake.com/en/sql-reference/constraints-overview)
