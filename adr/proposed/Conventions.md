@@ -223,6 +223,135 @@ each target, which one runner can't do either, so the Host's runtime has to
 build a runner per module anyway. The convention set follows the version
 table.
 
+### 7. Names that are too long: an opt-in fallback pattern with a hash
+
+A pattern can produce a name longer than the database allows. A foreign key
+between two long table names with several columns passes SQL Server's 128
+characters easily. A kind can declare a fallback:
+
+```xml
+<SqlObjectNaming Update="ForeignKey"
+                 Pattern="FK_{ForeignTable}_{ForeignColumns}_{PrimaryTable}_{PrimaryColumns}"
+                 OverflowPattern="FK_{ForeignTable}_{Hash}" />
+```
+
+The rule has three steps:
+
+1. If the name from `Pattern` fits the dialect's limit, it's used unchanged.
+2. Otherwise the name comes from `OverflowPattern`. `{Hash}` is the first 8
+   hexadecimal digits of the SHA-256 hash of the UTF-8 bytes of the full name
+   from step 1.
+3. If that's still too long, for example because the table name alone is
+   long, the text before `{Hash}` is cut from the right until it fits. `{Hash}`
+   itself is never cut.
+
+Names given with `WithName(...)` are never rewritten. The user chose them, and
+a convention only fills in what was left empty.
+
+**Why a hash, and not only cutting.** Cutting alone makes different names
+equal. Two foreign keys from the same long table whose names differ only after
+the limit become the same name, and the second `CREATE` fails. FluentMigrator
+already has this bug: `FirebirdTruncator.Truncate` is
+`name.Substring(0, 31)`.
+
+**Why a hash of the full name, and not a counter.** EF Core keeps shortened
+names unique by numbering them, because it has the whole model and can see
+every other name. FluentMigrator runs one migration at a time and has no model
+of the database. A hash of the full name is unique without knowing the other
+names, and it's deterministic: `Delete.ForeignKey().FromTable(...)` computes
+the same name its `Create` did. Rails 7.1 uses the same approach for generated
+index names that are too long, falling back to a short `idx_on_..._<hash>`
+form.
+
+**Why a fallback pattern, and not quantifiers on tokens.** One proposal marked
+the tokens that may shrink, as in `{Columns*}` or `{Id+}`. Rejected for three
+reasons:
+
+- Readers know `+`, `*` and `?` from regular expressions as counts.
+  `{Columns+}` reads as "one or more columns", not "may be shortened".
+- Quantifiers say which parts may shrink, but not what keeps the result
+  unique, so they produce the collisions above.
+- With several shrinkable tokens, the order they shrink in has to be specified,
+  and every detail of it becomes part of every generated name.
+
+A fallback pattern shows the short form as the user will see it in the
+database, and the only cutting rule is step 3.
+
+**Why the algorithm is fixed in this ADR.** The hash is part of the name, and
+`Delete` recomputes the name. Changing the algorithm, the digest length or the
+input encoding later would make every `Delete` that relies on the convention
+miss an object created under the old rule. 9.0 took that kind of break once
+already (decision 2). SHA-256 and not MD5, because MD5 is unavailable on
+FIPS-restricted systems. Eight hex digits, because the shortest limit FluentMigrator
+supports is Oracle's 30 bytes, and `FK_` plus a 9-character `_<hash>` still
+leaves 18 bytes for the readable part.
+
+**Why fallback is opt-in.** PostgreSQL silently cuts long names to 63 bytes,
+in `CREATE` and in `DROP` alike, so long convention names work there today by
+accident. If the fallback were on by default, a `Delete` for an object created
+before the upgrade would compute the hashed name, while the database holds
+PostgreSQL's cut one. Projects without `OverflowPattern` keep today's
+behavior, which is to send the full name and let the database decide.
+
+**What `FirebirdTruncator.Pack` teaches.** FluentMigrator already shortens with
+a hash for Firebird (`PackKeyNames`). Each of its problems is a rule here:
+
+- It hashes `Encoding.ASCII` bytes, which turn every non-ASCII character into
+  `?`, so different names can hash alike. This ADR hashes UTF-8.
+- It starts every packed name with `fk_`, including indexes and primary keys.
+  Here the prefix is part of each kind's pattern.
+- Its limit is a fixed 31 (`FirebirdOptions.MaxNameLength`), although
+  Firebird 4.0 allows 63 characters. Here the limit is a setting (below).
+- It applies to `Delete` expressions as well as `Create`. That's right, and
+  this design keeps it: the name is computed the same way for both.
+
+#### The limit is pinned in the project, not read from the server
+
+The SDK declares one limit per dialect, with its unit:
+
+```xml
+<ItemGroup>
+  <SqlIdentifierLimit Include="sqlserver" MaxLength="128" Unit="Characters" />
+  <SqlIdentifierLimit Include="postgres"  MaxLength="63"  Unit="Bytes" />
+  <SqlIdentifierLimit Include="oracle"    MaxLength="128" Unit="Bytes" />
+  <SqlIdentifierLimit Include="mysql"     MaxLength="64"  Unit="Characters" />
+  <SqlIdentifierLimit Include="db2"       MaxLength="128" Unit="Bytes" />
+  <SqlIdentifierLimit Include="firebird"  MaxLength="63"  Unit="Characters" />
+</ItemGroup>
+```
+
+A project on an older server changes its entry:
+`<SqlIdentifierLimit Update="oracle" MaxLength="30" />`, or
+`<SqlIdentifierLimit Update="firebird" MaxLength="31" Unit="Bytes" />`.
+Entries match the running processor the same way naming entries do
+(decision 3). SQLite has no limit and no entry.
+
+| Dialect | Limit | When it differs | Source |
+|---|---|---|---|
+| SQL Server | 128 characters | | [Database identifiers](https://learn.microsoft.com/en-us/sql/relational-databases/databases/database-identifiers#:~:text=Both%20regular%20and%20delimited%20identifiers%20must%20contain%20from%201%20through%20128%20characters) |
+| PostgreSQL | 63 bytes, longer names silently cut | `NAMEDATALEN` is set when PostgreSQL is compiled | [Lexical structure](https://www.postgresql.org/docs/current/sql-syntax-lexical.html#:~:text=longer%20names%20can%20be%20written%20in%20commands%2C%20but%20they%20will%20be%20truncated) |
+| Oracle | 128 bytes | 30 bytes when `COMPATIBLE` is lower than 12.2 | [Database object names and qualifiers](https://docs.oracle.com/en/database/oracle/oracle-database/19/sqlrf/Database-Object-Names-and-Qualifiers.html#:~:text=If%20COMPATIBLE%20is%20set%20to%20a%20value%20of%2012.2%20or%20higher%2C%20then%20names%20must%20be%20from%201%20to%20128%20bytes%20long) |
+| MySQL | 64 characters | | [Identifier length limits](https://dev.mysql.com/doc/refman/8.0/en/identifier-length.html) |
+| Db2 LUW | 128 bytes; longer is an error | | [SQL and XML limits](https://www.ibm.com/docs/en/db2/11.5.x?topic=sql-xml-limits#:~:text=If%20an%20attempt%20is%20made%20to%20create%20an%20identifier%20whose%20name%20is%20longer%20than%20the%20limit) |
+| Firebird | 63 characters | 31 bytes before 4.0 or on databases older than ODS 13; server settings can lower it | [Firebird 4.0 release notes](https://firebirdsql.org/file/documentation/release_notes/html/en/4_0/rlsnotes40.html#:~:text=Object%20identifiers%20in%20an%20ODS%2013%20database%20can%20be%20up%20to%2063%20characters%20in%20length) |
+
+**Why pinned and not detected.** Every "when it differs" entry in that table can
+change under an existing database. An Oracle database raises `COMPATIBLE`, or
+a Firebird database moves to ODS 13. If the limit were read from the server,
+a foreign key created at 30 bytes would get the hashed name, and its `Delete`,
+run years later at 128 bytes, would compute the full name and miss it. A
+limit in the project only changes when someone edits the project.
+
+**Why the unit matters.** At 63 bytes, a PostgreSQL name in Japanese fits about
+21 characters. Counting characters there would produce names longer than 63
+bytes, which PostgreSQL then cuts by itself, from the end, where the hash is.
+Step 3 counts in the dialect's unit, measuring bytes as UTF-8, and only cuts
+between characters.
+
+`FirebirdTruncator` still runs later, inside the Firebird generator. With the
+Firebird limit set to 31 bytes, convention names already fit, and it leaves
+them alone.
+
 ### What stays in code, and why
 
 - **`RootPathConvention`.** The SDK already decides whether a script is
@@ -283,7 +412,16 @@ table.
   - a module with a fixed `DatabaseDialect` and an `@dialect` entry that can
     never match it (warning);
   - a `ConventionSetType` that doesn't exist, doesn't implement
-    `IConventionSet`, or has no `(IConventionSet)` constructor (error).
+    `IConventionSet`, or has no `(IConventionSet)` constructor (error);
+  - an `OverflowPattern` without `{Hash}` (error, because cutting without a
+    hash makes different names equal; decision 7);
+  - a `SqlIdentifierLimit` with a `Unit` other than `Characters` or `Bytes`,
+    or a `MaxLength` too small to hold the kind's prefix and `_<hash>`
+    (error).
+- **Generator input, limits.** `SqlIdentifierLimit` items reach the generator
+  the same way as `SqlObjectNaming`, and the generated factory passes them to
+  `PatternConventionSet`. No processor or generator gains a "maximum
+  identifier length" API; the project is the only source of the limit.
 
 ## Alternatives considered
 
@@ -305,6 +443,20 @@ all of which MSBuild items already have.
 **Loading `ConventionSetType` by reflection.** Rejected; see decision 5.
 
 **Splitting `IConventionSet` into the three kinds.** Rejected; see decision 1.
+
+**Quantifiers on tokens (`{Columns*}`, `{Id+}`) to shorten long names.**
+Rejected; see decision 7.
+
+**Cutting long names without a hash.** Rejected because different names become
+equal; see decision 7.
+
+**Reading the identifier limit from the server.** Rejected because the limit
+can change under an existing database, and with it every computed name; see
+decision 7.
+
+**Hashing long names by default.** Rejected because it would rename what
+PostgreSQL currently cuts silently, and break `Delete` for those objects; see
+decision 7.
 
 ## Open questions
 
