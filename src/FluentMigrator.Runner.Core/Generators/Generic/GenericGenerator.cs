@@ -382,7 +382,8 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         /// <summary>
         /// Generates the commands to replace a CHECK constraint, in execution order.
-        /// Both commands are generated before the previous constraint can be dropped.
+        /// Override this method to customise replacement for both script generation and live execution.
+        /// Some drivers execute each command separately, so generate all commands before returning.
         /// </summary>
         protected internal virtual IReadOnlyList<string> GenerateCheckConstraintReplacement(AlterCheckConstraintExpression expression)
         {
