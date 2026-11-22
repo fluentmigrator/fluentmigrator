@@ -25,7 +25,7 @@ using FluentMigrator.Model;
 namespace FluentMigrator.Expressions;
 
 /// <summary>A migration operation on a named table CHECK constraint.</summary>
-public abstract class CheckConstraintExpressionBase : MigrationExpressionBase, ISchemaExpression, ISupportAdditionalFeatures, IValidatableObject
+public abstract class CheckConstraintExpressionBase : MigrationExpressionBase, ICheckConstraintExpression, ISchemaExpression, ISupportAdditionalFeatures, IValidatableObject
 {
     /// <summary>The target constraint and its options.</summary>
     public CheckConstraintDefinition Constraint { get; set; } = new CheckConstraintDefinition();
@@ -50,7 +50,7 @@ public abstract class CheckConstraintExpressionBase : MigrationExpressionBase, I
     {
         if (Constraint == null || string.IsNullOrWhiteSpace(Constraint.Name))
         {
-            yield return new ValidationResult("A CHECK constraint requires a name.");
+            yield return new ValidationResult("A CHECK constraint requires a name or at least one column.");
         }
 
         if (Constraint == null || string.IsNullOrWhiteSpace(Constraint.TableName))

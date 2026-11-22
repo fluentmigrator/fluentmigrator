@@ -83,6 +83,16 @@ namespace FluentMigrator.Runner
                 expression = (T) constraintExpression;
             }
 
+            if (expression is ICheckConstraintExpression checkConstraintExpression)
+            {
+                foreach (var convention in conventionSet.CheckConstraintConventions)
+                {
+                    checkConstraintExpression = convention.Apply(checkConstraintExpression);
+                }
+
+                expression = (T) checkConstraintExpression;
+            }
+
             if (expression is IForeignKeyExpression foreignKeyExpression)
             {
                 foreach (var convention in conventionSet.ForeignKeyConventions)

@@ -29,6 +29,9 @@ public sealed class CheckConstraintDefinition : ISupportAdditionalFeatures
     /// <summary>The constraint name.</summary>
     public string Name { get; set; }
 
+    /// <summary>The columns used to name the constraint, in order.</summary>
+    public List<string> Columns { get; } = new List<string>();
+
     /// <summary>The table containing the constraint.</summary>
     public string TableName { get; set; }
 
@@ -60,6 +63,7 @@ public sealed class CheckConstraintDefinition : ISupportAdditionalFeatures
             Enabled = Enabled,
         };
 
+        clone.Columns.AddRange(Columns);
         AdditionalFeatures.CloneTo(clone.AdditionalFeatures);
         return clone;
     }

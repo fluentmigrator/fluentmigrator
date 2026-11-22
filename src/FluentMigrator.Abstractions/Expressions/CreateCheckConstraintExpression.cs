@@ -30,15 +30,23 @@ public sealed class CreateCheckConstraintExpression : CheckConstraintExpressionB
     public override void ExecuteWith(IMigrationProcessor processor) => processor.Process(this);
 
     /// <inheritdoc />
-    public override IMigrationExpression Reverse() => new DeleteCheckConstraintExpression
+    public override IMigrationExpression Reverse()
     {
-        Constraint = new CheckConstraintDefinition
+        var identity = new CheckConstraintDefinition
         {
             Name = Constraint.Name,
             TableName = Constraint.TableName,
             SchemaName = Constraint.SchemaName
+        };
+        identity.Columns.AddRange(Constraint.Columns);
+        if (string.IsNullOrEmpty(identity.Name))
+        {
+            // Auto-reversing migrations run conventions after reversal. A custom name may use the predicate.
+            identity.Condition = Constraint.Condition;
         }
-    };
+
+        return new DeleteCheckConstraintExpression { Constraint = identity };
+    }
 
     /// <inheritdoc />
     protected override IEnumerable<ValidationResult> ValidateOperation()

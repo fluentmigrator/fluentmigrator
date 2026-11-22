@@ -117,6 +117,9 @@ namespace FluentMigrator.Builders.Delete
         /// <returns>The next step</returns>
         IDeleteDefaultConstraintOnTableSyntax DefaultConstraint();
 
+        /// <summary>Specifies a CHECK constraint named from its table and columns.</summary>
+        IDeleteCheckUnnamedFromTableSyntax Check();
+
         /// <summary>
         /// Deletes a named check constraint from a table.
         /// </summary>

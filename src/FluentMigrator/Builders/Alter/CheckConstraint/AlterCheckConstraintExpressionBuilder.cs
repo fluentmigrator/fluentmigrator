@@ -33,6 +33,8 @@ namespace FluentMigrator.Builders.Alter.CheckConstraint
         IAlterCheckInSchemaOrActionSyntax,
         IAlterCheckEnableOptionsSyntax,
         ICreateCheckOptionsSyntax,
+        IAlterCheckUnnamedOnTableSyntax,
+        IAlterCheckInSchemaOrColumnsSyntax,
         ISupportAdditionalFeatures
     {
         /// <summary>
@@ -46,6 +48,34 @@ namespace FluentMigrator.Builders.Alter.CheckConstraint
 
         /// <inheritdoc />
         public IDictionary<string, object> AdditionalFeatures => Expression.AdditionalFeatures;
+
+        /// <inheritdoc />
+        IAlterCheckInSchemaOrColumnsSyntax IAlterCheckUnnamedOnTableSyntax.OnTable(string tableName)
+        {
+            OnTable(tableName);
+            return this;
+        }
+
+        /// <inheritdoc />
+        IAlterCheckColumnsSyntax IAlterCheckInSchemaOrColumnsSyntax.InSchema(string schemaName)
+        {
+            InSchema(schemaName);
+            return this;
+        }
+
+        /// <inheritdoc />
+        public IAlterCheckActionSyntax Column(string columnName)
+        {
+            Expression.Constraint.Columns.Add(columnName);
+            return this;
+        }
+
+        /// <inheritdoc />
+        public IAlterCheckActionSyntax Columns(params string[] columnNames)
+        {
+            Expression.Constraint.Columns.AddRange(columnNames);
+            return this;
+        }
 
         /// <inheritdoc />
         public IAlterCheckInSchemaOrActionSyntax OnTable(string tableName)

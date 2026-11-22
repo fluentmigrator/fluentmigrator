@@ -113,6 +113,9 @@ namespace FluentMigrator.Builders.Create
         /// <returns>Additional information about the unique constraint creation</returns>
         ICreateConstraintOnTableSyntax UniqueConstraint(string constraintName);
 
+        /// <summary>Specifies a CHECK constraint named from its table and columns.</summary>
+        ICreateCheckUnnamedOnTableSyntax Check();
+
         /// <summary>
         /// Creates a check constraint on an existing table.
         /// </summary>

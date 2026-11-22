@@ -156,7 +156,12 @@ namespace FluentMigrator.Builders.Delete
         }
 
         /// <inheritdoc />
-        public IDeleteCheckFromTableSyntax Check(string constraintName)
+        public IDeleteCheckUnnamedFromTableSyntax Check() => BuildCheck(null);
+
+        /// <inheritdoc />
+        public IDeleteCheckFromTableSyntax Check(string constraintName) => BuildCheck(constraintName);
+
+        private DeleteCheckConstraintExpressionBuilder BuildCheck(string constraintName)
         {
             var expression = new DeleteCheckConstraintExpression { Constraint = { Name = constraintName } };
             _context.Expressions.Add(expression);

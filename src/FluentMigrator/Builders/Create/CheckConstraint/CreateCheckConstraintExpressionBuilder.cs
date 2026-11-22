@@ -30,6 +30,8 @@ namespace FluentMigrator.Builders.Create.CheckConstraint
         ICreateCheckOnTableSyntax,
         ICreateCheckInSchemaOrConditionSyntax,
         ICreateCheckOptionsSyntax,
+        ICreateCheckUnnamedOnTableSyntax,
+        ICreateCheckInSchemaOrColumnsSyntax,
         ISupportAdditionalFeatures
     {
         /// <summary>
@@ -43,6 +45,34 @@ namespace FluentMigrator.Builders.Create.CheckConstraint
 
         /// <inheritdoc />
         public IDictionary<string, object> AdditionalFeatures => Expression.AdditionalFeatures;
+
+        /// <inheritdoc />
+        ICreateCheckInSchemaOrColumnsSyntax ICreateCheckUnnamedOnTableSyntax.OnTable(string tableName)
+        {
+            OnTable(tableName);
+            return this;
+        }
+
+        /// <inheritdoc />
+        ICreateCheckColumnsSyntax ICreateCheckInSchemaOrColumnsSyntax.InSchema(string schemaName)
+        {
+            InSchema(schemaName);
+            return this;
+        }
+
+        /// <inheritdoc />
+        public ICreateCheckConditionSyntax Column(string columnName)
+        {
+            Expression.Constraint.Columns.Add(columnName);
+            return this;
+        }
+
+        /// <inheritdoc />
+        public ICreateCheckConditionSyntax Columns(params string[] columnNames)
+        {
+            Expression.Constraint.Columns.AddRange(columnNames);
+            return this;
+        }
 
         /// <inheritdoc />
         public ICreateCheckInSchemaOrConditionSyntax OnTable(string tableName)

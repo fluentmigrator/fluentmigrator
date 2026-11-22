@@ -42,6 +42,9 @@ namespace FluentMigrator.Builders.Alter
         /// <returns>The interface to specify the table</returns>
         IAlterColumnOnTableSyntax Column(string columnName);
 
+        /// <summary>Specifies a CHECK constraint named from its table and columns.</summary>
+        IAlterCheckUnnamedOnTableSyntax Check();
+
         /// <summary>
         /// Alters an existing check constraint.
         /// </summary>

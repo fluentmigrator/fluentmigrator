@@ -68,6 +68,8 @@ namespace FluentMigrator.Runner
                 primaryKeyNameConvention,
             };
 
+            CheckConstraintConventions = new List<ICheckConstraintConvention> { new DefaultCheckConstraintNameConvention() };
+
             ConstraintConventions = new List<IConstraintConvention>()
             {
                 primaryKeyNameConvention,
@@ -112,6 +114,9 @@ namespace FluentMigrator.Runner
 
         /// <inheritdoc />
         public IList<IConstraintConvention> ConstraintConventions { get; }
+
+        /// <inheritdoc />
+        public IList<ICheckConstraintConvention> CheckConstraintConventions { get; }
 
         /// <inheritdoc />
         public IList<IForeignKeyConvention> ForeignKeyConventions { get; }

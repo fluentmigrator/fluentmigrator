@@ -60,7 +60,12 @@ namespace FluentMigrator.Builders.Alter
         }
 
         /// <inheritdoc />
-        public IAlterCheckOnTableSyntax Check(string constraintName)
+        public IAlterCheckUnnamedOnTableSyntax Check() => BuildCheck(null);
+
+        /// <inheritdoc />
+        public IAlterCheckOnTableSyntax Check(string constraintName) => BuildCheck(constraintName);
+
+        private AlterCheckConstraintExpressionBuilder BuildCheck(string constraintName)
         {
             var expression = new AlterCheckConstraintExpression { Constraint = { Name = constraintName } };
             _context.Expressions.Add(expression);

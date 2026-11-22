@@ -50,6 +50,11 @@ namespace FluentMigrator.Runner.Conventions
         IList<IConstraintConvention> ConstraintConventions { get; }
 
         /// <summary>
+        /// Gets the conventions to be applied to <see cref="ICheckConstraintExpression"/> implementations
+        /// </summary>
+        IList<ICheckConstraintConvention> CheckConstraintConventions { get; }
+
+        /// <summary>
         /// Gets the conventions to be applied to <see cref="IForeignKeyExpression"/> implementations
         /// </summary>
         IList<IForeignKeyConvention> ForeignKeyConventions { get; }

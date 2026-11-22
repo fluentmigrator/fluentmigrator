@@ -148,7 +148,12 @@ namespace FluentMigrator.Builders.Create
         }
 
         /// <inheritdoc />
-        public ICreateCheckOnTableSyntax Check(string constraintName)
+        public ICreateCheckUnnamedOnTableSyntax Check() => BuildCheck(null);
+
+        /// <inheritdoc />
+        public ICreateCheckOnTableSyntax Check(string constraintName) => BuildCheck(constraintName);
+
+        private CreateCheckConstraintExpressionBuilder BuildCheck(string constraintName)
         {
             var expression = new CreateCheckConstraintExpression { Constraint = { Name = constraintName } };
             _context.Expressions.Add(expression);

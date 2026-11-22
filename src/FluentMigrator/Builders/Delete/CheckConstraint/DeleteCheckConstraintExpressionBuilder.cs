@@ -29,6 +29,8 @@ namespace FluentMigrator.Builders.Delete.CheckConstraint
     public class DeleteCheckConstraintExpressionBuilder : ExpressionBuilderBase<DeleteCheckConstraintExpression>,
         IDeleteCheckFromTableSyntax,
         IInSchemaSyntax,
+        IDeleteCheckUnnamedFromTableSyntax,
+        IDeleteCheckInSchemaOrColumnsSyntax,
         ISupportAdditionalFeatures
     {
         /// <summary>
@@ -42,6 +44,32 @@ namespace FluentMigrator.Builders.Delete.CheckConstraint
 
         /// <inheritdoc />
         public IDictionary<string, object> AdditionalFeatures => Expression.AdditionalFeatures;
+
+        /// <inheritdoc />
+        IDeleteCheckInSchemaOrColumnsSyntax IDeleteCheckUnnamedFromTableSyntax.FromTable(string tableName)
+        {
+            FromTable(tableName);
+            return this;
+        }
+
+        /// <inheritdoc />
+        IDeleteCheckColumnsSyntax IDeleteCheckInSchemaOrColumnsSyntax.InSchema(string schemaName)
+        {
+            InSchema(schemaName);
+            return this;
+        }
+
+        /// <inheritdoc />
+        public void Column(string columnName)
+        {
+            Expression.Constraint.Columns.Add(columnName);
+        }
+
+        /// <inheritdoc />
+        public void Columns(params string[] columnNames)
+        {
+            Expression.Constraint.Columns.AddRange(columnNames);
+        }
 
         /// <inheritdoc />
         public IInSchemaSyntax FromTable(string tableName)
