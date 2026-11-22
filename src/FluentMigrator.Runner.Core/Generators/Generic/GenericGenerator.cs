@@ -22,6 +22,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
+using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
 using FluentMigrator.Generation;
 using FluentMigrator.Infrastructure;
@@ -362,7 +363,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 
             if (!expression.Constraint.Enabled || expression.Constraint.NoCheck)
             {
-                return CompatibilityMode.HandleCompatibility("Adding a CHECK constraint with the requested validation or enforcement options is not supported");
+                throw new DatabaseOperationNotSupportedException("Adding a CHECK constraint with the requested validation or enforcement options is not supported");
             }
 
             return GenerateCreateCheckConstraint(expression.Constraint);
