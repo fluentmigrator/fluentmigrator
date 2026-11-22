@@ -64,7 +64,9 @@ deployable host and is covered in
    MSBuild project lives on the filesystem; what distinguishes this provider is
    that its sources are SQL text.
 3. **Convention** — a layout dialect *within* a provider: how paths and
-   filenames map to the object model.
+   filenames map to the object model. This is a *source convention*, not the
+   runner's `IConventionSet`; [`Conventions.md`](Conventions.md) names the three
+   kinds of convention and which of them the project file configures.
 
 The proof that these axes are orthogonal: ReadyRoll/SCA, RoundhousE, Flyway and
 SSDT are all the *same provider* with different conventions.
@@ -251,6 +253,9 @@ Open questions before this moves to `implemented`:
 - The `Seed/**/*.cs` pivot classifies seeds today but nothing enforces
   conformance, because `ISeed` does not exist yet. Its design is settled and
   written up below; the implementation is not in this change.
+- `$(DefaultSchema)` is compiler-visible, but no generator reads it yet, so
+  the runner's default schema can silently differ from the manifest's. The
+  fix is proposed in [`Conventions.md`](Conventions.md), decision 4.
 - The manifest's relationship to a committed baseline is settled (see *Lock
   file*) but not implemented.
 
