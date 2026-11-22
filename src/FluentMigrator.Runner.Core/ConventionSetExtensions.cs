@@ -99,7 +99,7 @@ namespace FluentMigrator.Runner
                     checkConstraintExpression = convention.Apply(checkConstraintExpression);
                 }
 
-                expression = (T) checkConstraintExpression;
+                expression = (T)checkConstraintExpression;
             }
 
             if (expression is IForeignKeyExpression foreignKeyExpression)
