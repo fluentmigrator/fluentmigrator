@@ -17,14 +17,12 @@ using System;
 using System.Collections.Generic;
 
 using FluentMigrator.Exceptions;
-
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Postgres;
 using FluentMigrator.Tests.Helpers;
-
 using FluentMigrator.Tests.Unit;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -189,7 +187,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
         {
             IntegrationTestOptions.Postgres.IgnoreIfNotEnabled();
             var versionTable = new TestVersionTableMetaData { SchemaName = "versions_" + Guid.NewGuid().ToString("N") };
-            using var services = ServiceCollectionExtensions.CreateServices()
+            using var services = ServiceCollectionExtensions.CreateServices(addAssemblySource: false)
                 .ConfigureRunner(builder => builder.AddPostgres().WithGlobalConnectionString(IntegrationTestOptions.Postgres.ConnectionString)
                     .WithVersionTable(versionTable))
                 .BuildServiceProvider();
