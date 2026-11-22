@@ -54,6 +54,11 @@ namespace FluentMigrator.Runner.Generators.MySql
         public override string Generate(AlterCheckConstraintExpression expression)
         {
             var constraint = expression.Constraint;
+            if (constraint.NoCheck && expression.Action == CheckConstraintAction.Enable)
+            {
+                return CompatibilityMode.HandleCompatibility("MySQL cannot enforce a CHECK constraint without validating existing rows.");
+            }
+
             if (constraint.NoCheck)
             {
                 return base.Generate(expression);
