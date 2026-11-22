@@ -150,13 +150,13 @@ public class Db2CheckConstraintGeneratorTests
     }
 
     [Test]
-    public void Db2ForISkipsAReplacementWithADisabledConstraintInLooseMode()
+    public void Db2ForIRejectsAReplacementWithADisabledConstraintInLooseMode()
     {
         var generator = new Db2ISeriesGenerator { CompatibilityMode = CompatibilityMode.LOOSE };
         var expression = new AlterCheckConstraintExpression { Action = CheckConstraintAction.ChangeCondition, Constraint = NewConstraint() };
         expression.Constraint.Enabled = false;
 
-        Assert.That(generator.Generate(expression), Is.Empty);
+        Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(expression));
     }
 
     private static CheckConstraintDefinition NewConstraint()

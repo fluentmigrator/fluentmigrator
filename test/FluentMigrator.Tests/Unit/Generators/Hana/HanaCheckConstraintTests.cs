@@ -99,7 +99,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
 
         [TestCase(true, true)]
         [TestCase(false, false)]
-        public void LooseModeSkipsTheWholeReplacementWhenAnOptionIsUnsupported(bool enabled, bool noCheck)
+        public void LooseModeRejectsTheReplacementWhenAnOptionIsUnsupported(bool enabled, bool noCheck)
         {
             var expression = new AlterCheckConstraintExpression
             {
@@ -108,7 +108,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             };
 
             var generator = new HanaGenerator { CompatibilityMode = CompatibilityMode.LOOSE };
-            generator.Generate(expression).ShouldBeEmpty();
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(expression));
         }
     }
 }

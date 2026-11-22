@@ -14,6 +14,9 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
+
+using FluentMigrator.Exceptions;
 
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
@@ -22,7 +25,11 @@ using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Postgres;
 using FluentMigrator.Tests.Helpers;
 
+using FluentMigrator.Tests.Unit;
+
 using Microsoft.Extensions.DependencyInjection;
+
+using Moq;
 
 using Npgsql;
 
@@ -175,6 +182,60 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
                 changeFailure.InnerException.ShouldBeOfType<PostgresException>().SqlState.ShouldBe(PostgresErrorCodes.CheckViolation);
                 insertFailure.SqlState.ShouldBe(PostgresErrorCodes.CheckViolation);
             });
+        }
+
+        [Test]
+        public void UnsupportedCreateLeavesTheMigrationUnappliedAndTheOriginalCheckEnforcedAfterRollback()
+        {
+            IntegrationTestOptions.Postgres.IgnoreIfNotEnabled();
+            var versionTable = new TestVersionTableMetaData { SchemaName = "versions_" + Guid.NewGuid().ToString("N") };
+            using var services = ServiceCollectionExtensions.CreateServices()
+                .ConfigureRunner(builder => builder.AddPostgres().WithGlobalConnectionString(IntegrationTestOptions.Postgres.ConnectionString)
+                    .WithVersionTable(versionTable))
+                .BuildServiceProvider();
+            using var scope = services.CreateScope();
+            var processor = scope.ServiceProvider.GetRequiredService<PostgresProcessor>();
+            using var table = new PostgresTestTable(processor, null, "code text");
+            var runner = (MigrationRunner)scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+            runner.Up(new AddCodeConstraint(table.Name, null));
+
+            const long version = 1;
+            var migration = new MigrationInfo(version, TransactionBehavior.Default, new AddDisabledCodeConstraint(table.Name));
+            var migrations = new SortedList<long, IMigrationInfo> { { version, migration } };
+            runner.MigrationLoader = Mock.Of<IMigrationInformationLoader>(loader => loader.LoadMigrations() == migrations);
+            try
+            {
+                Assert.Throws<DatabaseOperationNotSupportedException>(() => runner.MigrateUp(version));
+                runner.VersionLoader.LoadVersionInfo();
+                Assert.That(runner.VersionLoader.VersionInfo.HasAppliedMigration(version), Is.False);
+
+                runner.RollbackToVersion(0);
+
+                var violation = Assert.Throws<PostgresException>(() => InsertCode(table, "a"));
+                Assert.That(violation.ConstraintName, Is.EqualTo(ConstraintName));
+            }
+            finally
+            {
+                if (processor.SchemaExists(versionTable.SchemaName))
+                {
+                    runner.VersionLoader.RemoveVersionTable();
+                }
+            }
+        }
+
+        private sealed class AddDisabledCodeConstraint : AutoReversingMigration
+        {
+            private readonly string _tableName;
+
+            public AddDisabledCodeConstraint(string tableName)
+            {
+                _tableName = tableName;
+            }
+
+            public override void Up()
+            {
+                Create.Check(ConstraintName).OnTable(_tableName).Condition("length(code) = 1").Disabled();
+            }
         }
 
         private static ServiceProvider CreatePostgresServices(string defaultSchemaName = null, string providerSwitches = null)

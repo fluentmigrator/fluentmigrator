@@ -101,13 +101,13 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CreatingDisabledCheckConstraintUsesCompatibilityMode([Values] CompatibilityMode compatibilityMode)
+        public void CreatingDisabledCheckConstraintFailsInBothModes([Values] CompatibilityMode compatibilityMode)
         {
             var expression = new CreateCheckConstraintExpression { Constraint = CreateDefinition(Condition) };
             expression.Constraint.Enabled = false;
             _generator.CompatibilityMode = compatibilityMode;
 
-            AssertUnsupported(() => _generator.Generate(expression), compatibilityMode);
+            Should.Throw<DatabaseOperationNotSupportedException>(() => _generator.Generate(expression));
         }
 
         [Test]
@@ -124,7 +124,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void ReplacingCheckConstraintWithDisabledConstraintUsesCompatibilityMode([Values] CompatibilityMode compatibilityMode)
+        public void ReplacingCheckConstraintWithDisabledConstraintFailsInBothModes([Values] CompatibilityMode compatibilityMode)
         {
             var expression = new AlterCheckConstraintExpression
             {
@@ -134,7 +134,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             expression.Constraint.Enabled = false;
             _generator.CompatibilityMode = compatibilityMode;
 
-            AssertUnsupported(() => _generator.Generate(expression), compatibilityMode);
+            Should.Throw<DatabaseOperationNotSupportedException>(() => _generator.Generate(expression));
         }
 
         private static CheckConstraintDefinition CreateDefinition(string condition = null) => new()

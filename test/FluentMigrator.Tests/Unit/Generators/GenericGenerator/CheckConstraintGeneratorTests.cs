@@ -74,11 +74,13 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
                     + "ALTER TABLE \"inventory\".\"Order Items\" ADD CONSTRAINT \"Positive Quantity\" CHECK (quantity > 0);"));
         }
 
-        [TestCase(true, true)]
-        [TestCase(false, false)]
-        public void CreateRejectsUnsupportedOptionsInStrictMode(bool noCheck, bool enabled)
+        [TestCase(true, true, CompatibilityMode.STRICT)]
+        [TestCase(true, true, CompatibilityMode.LOOSE)]
+        [TestCase(false, false, CompatibilityMode.STRICT)]
+        [TestCase(false, false, CompatibilityMode.LOOSE)]
+        public void CreateRejectsUnsupportedOptionsInBothModes(bool noCheck, bool enabled, CompatibilityMode mode)
         {
-            var generator = new AnsiGenerator(CompatibilityMode.STRICT);
+            var generator = new AnsiGenerator(mode);
             var expression = new CreateCheckConstraintExpression { Constraint = NewConstraint() };
             expression.Constraint.NoCheck = noCheck;
             expression.Constraint.Enabled = enabled;
@@ -88,7 +90,7 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
 
         [TestCase(true, true)]
         [TestCase(false, false)]
-        public void AlterSkipsTheWholeReplacementWhenTheNewConstraintIsUnsupported(bool noCheck, bool enabled)
+        public void AlterRejectsTheReplacementWhenTheNewConstraintIsUnsupported(bool noCheck, bool enabled)
         {
             var generator = new AnsiGenerator(CompatibilityMode.LOOSE);
             var expression = new AlterCheckConstraintExpression
@@ -99,7 +101,7 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
             expression.Constraint.NoCheck = noCheck;
             expression.Constraint.Enabled = enabled;
 
-            Assert.That(generator.Generate(expression), Is.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(expression));
         }
 
         [Test]

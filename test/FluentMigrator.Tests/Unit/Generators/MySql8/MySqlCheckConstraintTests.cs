@@ -80,7 +80,7 @@ public class MySqlCheckConstraintTests
     }
 
     [Test]
-    public void UnsupportedReplacementOptionLeavesTheOriginalCheckAlone()
+    public void UnsupportedReplacementOptionFailsInLooseMode()
     {
         var generator = new MySql8Generator { CompatibilityMode = CompatibilityMode.LOOSE };
         var alter = new AlterCheckConstraintExpression
@@ -88,6 +88,6 @@ public class MySqlCheckConstraintTests
             Action = CheckConstraintAction.ChangeCondition,
             Constraint = { Name = "ck", TableName = "items", Condition = "qty > 0", NoCheck = true }
         };
-        Assert.That(generator.Generate(alter), Is.Empty);
+        Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(alter));
     }
 }
