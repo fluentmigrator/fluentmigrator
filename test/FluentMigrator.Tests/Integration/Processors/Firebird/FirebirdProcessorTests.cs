@@ -21,6 +21,7 @@ using System.Data;
 
 using FirebirdSql.Data.FirebirdClient;
 
+using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
@@ -153,7 +154,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                 },
             }.ExecuteWith(Processor);
 
-            new AlterCheckConstraintExpression
+            var replacement = new AlterCheckConstraintExpression
             {
                 Action = CheckConstraintAction.ChangeCondition,
                 Constraint =
@@ -163,7 +164,10 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     Condition = "id > 1",
                     Enabled = false,
                 },
-            }.ExecuteWith(Processor);
+            };
+
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => replacement.ExecuteWith(Processor));
+            Processor.Execute($"INSERT INTO {tableName} (id) VALUES (1)");
 
             var exception = Should.Throw<Exception>(() => Processor.Execute($"INSERT INTO {tableName} (id) VALUES (0)"));
             Assert.That(exception.InnerException.ShouldBeOfType<FbException>().Message, Does.Contain("POSITIVEID").IgnoreCase);
