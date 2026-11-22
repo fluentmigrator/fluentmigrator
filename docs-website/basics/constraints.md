@@ -85,6 +85,18 @@ public override void Down()
 }
 ```
 
+To use the default naming convention, supply the columns in the order they should appear in the name:
+
+```csharp
+Create.Check().OnTable("bookings").Columns("starts_at", "ends_at")
+    .Condition("ends_at > starts_at");
+// CK_bookings_starts_at_ends_at
+
+Delete.Check().FromTable("bookings").Columns("starts_at", "ends_at");
+```
+
+Use `.Column("quantity")` for a single column. The columns supply the name only. Give `Alter.Check()` and `Delete.Check()` the same columns in the same order as the create operation. Two checks on the same columns receive the same default name, so give at least one an explicit name. You can override the [naming convention](../intro/configuration.md).
+
 To enforce the rule on new writes while you correct existing rows, add it with `.WithNoCheck()`. Once the existing rows satisfy the condition, validate them with `.Enabled()`.
 
 ```csharp
