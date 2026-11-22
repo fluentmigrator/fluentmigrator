@@ -53,6 +53,15 @@ namespace FluentMigrator.Runner
         public static T Apply<T>(this T expression, IConventionSet conventionSet)
             where T : IMigrationExpression
         {
+            if (expression is DeleteCheckConstraintExpression { NamingSource: { } create } delete)
+            {
+                var constraint = create.Apply(conventionSet).Constraint;
+                delete.Constraint.ConstraintName = constraint.ConstraintName;
+                delete.Constraint.TableName = constraint.TableName;
+                delete.Constraint.SchemaName = constraint.SchemaName;
+                return expression;
+            }
+
             if (conventionSet.SchemaConvention != null && expression is ISchemaExpression schemaExpression)
             {
                 expression = (T) conventionSet.SchemaConvention.Apply(schemaExpression);

@@ -39,13 +39,13 @@ public sealed class CreateCheckConstraintExpression : CheckConstraintExpressionB
             SchemaName = Constraint.SchemaName
         };
         identity.Columns.AddRange(Constraint.Columns);
-        if (string.IsNullOrEmpty(identity.ConstraintName))
+        return new DeleteCheckConstraintExpression
         {
-            // Auto-reversing migrations run conventions after reversal. A custom name may use the predicate.
-            identity.Condition = Constraint.Condition;
-        }
-
-        return new DeleteCheckConstraintExpression { Constraint = identity };
+            Constraint = identity,
+            NamingSource = string.IsNullOrEmpty(identity.ConstraintName)
+                ? new CreateCheckConstraintExpression { Constraint = Constraint.Clone() }
+                : null
+        };
     }
 
     /// <inheritdoc />

@@ -21,6 +21,9 @@ namespace FluentMigrator.Expressions;
 /// <summary>Drops a named CHECK constraint from an existing table.</summary>
 public sealed class DeleteCheckConstraintExpression : CheckConstraintExpressionBase
 {
+    // Auto-reversing migrations collect the delete before conventions have named the create.
+    internal CreateCheckConstraintExpression NamingSource { get; set; }
+
     /// <inheritdoc />
     public override void ExecuteWith(IMigrationProcessor processor) => processor.Process(this);
 }
