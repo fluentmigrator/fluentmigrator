@@ -71,7 +71,7 @@ public class MySqlCheckConstraintIntegrationTests
         });
     }
 
-    private static void AssertCheckViolation(TestDelegate action, string constraintName)
+    private static void AssertCheckViolation(Action action, string constraintName)
     {
         const int mySqlCheckViolation = 3819;
         const int mariaDbCheckViolation = 4025;
