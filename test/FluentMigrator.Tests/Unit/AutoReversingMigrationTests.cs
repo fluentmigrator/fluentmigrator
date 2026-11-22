@@ -45,7 +45,7 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [TestCase(false, "CK_Bookings_Start_End")]
-        [TestCase(true, "custom_End_gt_Start")]
+        [TestCase(true, "custom_window_End_gt_Start")]
         public void DownDropsTheCheckNamedByTheCreateConvention(bool custom, string expected)
         {
             var conventions = new DefaultConventionSet();
@@ -66,19 +66,25 @@ namespace FluentMigrator.Tests.Unit
 
             Assert.That(create.Constraint.ConstraintName, Is.EqualTo(expected));
             Assert.That(delete.Constraint.ConstraintName, Is.EqualTo(expected));
+            Assert.That(delete.Constraint.Condition, Is.Null);
+            Assert.That(delete.Constraint.AdditionalFeatures, Is.Empty);
         }
 
         private sealed class CheckMigration : AutoReversingMigration
         {
-            public override void Up() =>
-                Create.Check().OnTable("Bookings").Columns("Start", "End").Condition("End > Start");
+            public override void Up()
+            {
+                var options = Create.Check().OnTable("Bookings").Columns("Start", "End").Condition("End > Start");
+                ((ISupportAdditionalFeatures)options).AdditionalFeatures["NamingGroup"] = "window";
+            }
         }
 
         private sealed class ConditionNameConvention : ICheckConstraintConvention
         {
             public ICheckConstraintExpression Apply(ICheckConstraintExpression expression)
             {
-                expression.Constraint.ConstraintName = "custom_" + expression.Constraint.Condition.Replace(" > ", "_gt_");
+                expression.Constraint.ConstraintName = "custom_" + expression.Constraint.AdditionalFeatures["NamingGroup"]
+                    + "_" + expression.Constraint.Condition.Replace(" > ", "_gt_");
                 return expression;
             }
         }
