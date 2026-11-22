@@ -55,6 +55,30 @@ namespace FluentMigrator.Tests
         }
 
         [Test]
+        public void CheckWithoutNameOrColumnsReportsValidationError()
+        {
+            var expression = new DeleteCheckConstraintExpression { Constraint = { TableName = "Items" } };
+
+            var exception = Assert.Throws<InvalidMigrationException>(() =>
+                _migrationValidator.ApplyConventionsToAndValidateExpressions(_migration, new[] { expression }));
+
+            Assert.That(exception.Message, Does.Contain("A CHECK constraint requires a name or at least one column."));
+        }
+
+        [TestCase(null, "CK_Items_Quantity", "Quantity")]
+        [TestCase(null, "CK_Items_End_Start", "End", "Start")]
+        [TestCase("explicit_name", "explicit_name", "Quantity")]
+        public void DefaultConventionNamesChecksBeforeValidation(string name, string expected, params string[] columns)
+        {
+            var expression = new DeleteCheckConstraintExpression { Constraint = { Name = name, TableName = "Items" } };
+            expression.Constraint.Columns.AddRange(columns);
+
+            _migrationValidator.ApplyConventionsToAndValidateExpressions(_migration, new[] { expression });
+
+            Assert.That(expression.Constraint.Name, Is.EqualTo(expected));
+        }
+
+        [Test]
         public void ItDoesNotThrowIfExpressionsAreValid()
         {
             Assert.DoesNotThrow(
@@ -80,7 +104,7 @@ namespace FluentMigrator.Tests
             var exception = Assert.Throws<InvalidMigrationException>(() =>
                 _migrationValidator.ApplyConventionsToAndValidateExpressions(_migration, new[] { expression }));
 
-            Assert.That(exception.Message, Does.Contain("A CHECK constraint requires a name."));
+            Assert.That(exception.Message, Does.Contain("A CHECK constraint requires a name or at least one column."));
         }
 
         [Test]

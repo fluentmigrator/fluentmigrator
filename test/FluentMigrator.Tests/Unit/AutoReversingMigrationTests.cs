@@ -21,6 +21,8 @@ using System.Linq;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Runner;
+using FluentMigrator.Runner.Conventions;
 
 using NUnit.Framework;
 
@@ -40,6 +42,45 @@ namespace FluentMigrator.Tests.Unit
         {
             _context = new Mock<IMigrationContext>();
             _context.SetupAllProperties();
+        }
+
+        [TestCase(false, "CK_Bookings_Start_End")]
+        [TestCase(true, "custom_End_gt_Start")]
+        public void DownDropsTheCheckNamedByTheCreateConvention(bool custom, string expected)
+        {
+            var conventions = new DefaultConventionSet();
+            if (custom)
+            {
+                conventions.CheckConstraintConventions.Clear();
+                conventions.CheckConstraintConventions.Add(new ConditionNameConvention());
+            }
+
+            var migration = new CheckMigration();
+            _context.Object.Expressions = new Collection<IMigrationExpression>();
+            migration.GetUpExpressions(_context.Object);
+            var create = (CreateCheckConstraintExpression)_context.Object.Expressions.Single().Apply(conventions);
+
+            _context.Object.Expressions = new Collection<IMigrationExpression>();
+            migration.GetDownExpressions(_context.Object);
+            var delete = (DeleteCheckConstraintExpression)_context.Object.Expressions.Single().Apply(conventions);
+
+            Assert.That(create.Constraint.Name, Is.EqualTo(expected));
+            Assert.That(delete.Constraint.Name, Is.EqualTo(expected));
+        }
+
+        private sealed class CheckMigration : AutoReversingMigration
+        {
+            public override void Up() =>
+                Create.Check().OnTable("Bookings").Columns("Start", "End").Condition("End > Start");
+        }
+
+        private sealed class ConditionNameConvention : ICheckConstraintConvention
+        {
+            public ICheckConstraintExpression Apply(ICheckConstraintExpression expression)
+            {
+                expression.Constraint.Name = "custom_" + expression.Constraint.Condition.Replace(" > ", "_gt_");
+                return expression;
+            }
         }
 
         [Test]

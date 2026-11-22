@@ -50,6 +50,42 @@ namespace FluentMigrator.Tests.Unit.Builders
         }
 
         [Test]
+        public void CreateUnnamedCheckRecordsColumnsAndCondition()
+        {
+            ICreateExpressionRoot create = new CreateExpressionRoot(_context);
+            create.Check().OnTable("Bookings").InSchema("inventory")
+                .Columns("StartDate", "EndDate").Condition("EndDate > StartDate");
+
+            var constraint = _context.Expressions.Single().ShouldBeOfType<CreateCheckConstraintExpression>().Constraint;
+            constraint.Columns.ShouldBe(new[] { "StartDate", "EndDate" });
+            constraint.SchemaName.ShouldBe("inventory");
+            constraint.Condition.ShouldBe("EndDate > StartDate");
+        }
+
+        [Test]
+        public void AlterUnnamedCheckSelectsAnActionAfterTheColumn()
+        {
+            IAlterExpressionRoot alter = new AlterExpressionRoot(_context);
+            alter.Check().OnTable("Items").InSchema("inventory").Column("Quantity").Disabled();
+
+            var expression = _context.Expressions.Single().ShouldBeOfType<AlterCheckConstraintExpression>();
+            expression.Constraint.Columns.ShouldBe(new[] { "Quantity" });
+            expression.Constraint.SchemaName.ShouldBe("inventory");
+            expression.Action.ShouldBe(CheckConstraintAction.Disable);
+        }
+
+        [Test]
+        public void DeleteUnnamedCheckRecordsTheColumnsInOrder()
+        {
+            IDeleteExpressionRoot delete = new DeleteExpressionRoot(_context);
+            delete.Check().FromTable("Bookings").InSchema("inventory").Columns("StartDate", "EndDate");
+
+            var constraint = _context.Expressions.Single().ShouldBeOfType<DeleteCheckConstraintExpression>().Constraint;
+            constraint.Columns.ShouldBe(new[] { "StartDate", "EndDate" });
+            constraint.SchemaName.ShouldBe("inventory");
+        }
+
+        [Test]
         public void CreateCheckAddsNamedConstraintWithTableSchemaAndCondition()
         {
             ICreateExpressionRoot create = new CreateExpressionRoot(_context);

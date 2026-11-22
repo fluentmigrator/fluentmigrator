@@ -30,6 +30,17 @@ namespace FluentMigrator.Tests.Unit.Definitions;
 public class CheckConstraintDefinitionTests
 {
     [Test]
+    public void CloneCopiesNamingColumnsInOrderWithoutSharingThem()
+    {
+        var definition = new CheckConstraintDefinition { Columns = { "StartDate", "EndDate" } };
+
+        var clone = definition.Clone();
+        definition.Columns.Clear();
+
+        Assert.That(clone.Columns, Is.EqualTo(new[] { "StartDate", "EndDate" }));
+    }
+
+    [Test]
     public void CloneCopiesEachSettingToAnIndependentDefinition()
     {
         var definition = new CheckConstraintDefinition
