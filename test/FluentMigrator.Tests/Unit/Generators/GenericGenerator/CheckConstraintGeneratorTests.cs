@@ -163,6 +163,29 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
             }
         }
 
+        [Test]
+        public void ReplacementPassesAdditionalFeaturesToBothCommands()
+        {
+            var generator = new FeatureGenerator();
+            var expression = new AlterCheckConstraintExpression { Action = CheckConstraintAction.ChangeCondition, Constraint = NewConstraint() };
+            expression.Constraint.AdditionalFeatures["ProviderOption"] = "custom";
+
+            Assert.That(generator.Generate(expression), Is.EqualTo("drop custom" + Environment.NewLine + "add custom"));
+        }
+
+        private sealed class FeatureGenerator : AnsiGenerator
+        {
+            public FeatureGenerator() : base(CompatibilityMode.STRICT)
+            {
+            }
+
+            public override string Generate(DeleteCheckConstraintExpression expression) =>
+                "drop " + expression.Constraint.AdditionalFeatures["ProviderOption"];
+
+            public override string Generate(CreateCheckConstraintExpression expression) =>
+                "add " + expression.Constraint.AdditionalFeatures["ProviderOption"];
+        }
+
         private sealed class CreateOnlyGenerator : AnsiGenerator
         {
             public CreateOnlyGenerator()

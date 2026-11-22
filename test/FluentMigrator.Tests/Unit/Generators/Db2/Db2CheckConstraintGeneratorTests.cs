@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 
 using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
@@ -24,6 +25,16 @@ using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.DB2;
 using FluentMigrator.Runner.Generators.DB2.iSeries;
+
+using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Processors.DB2;
+
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
+
+using Moq;
 
 using NUnit.Framework;
 
@@ -34,6 +45,32 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2;
 [Category("Db2")]
 public class Db2CheckConstraintGeneratorTests
 {
+    [Test]
+    public void ConnectionlessAndConnectedProcessingHonourTheReplacementGenerator()
+    {
+        var generator = new DecliningGenerator();
+        var options = Mock.Of<IOptionsSnapshot<ProcessorOptions>>(o => o.Value == new ProcessorOptions());
+        var preview = new ConnectionlessProcessor(Mock.Of<IGeneratorAccessor>(a => a.Generator == generator),
+            NullLogger.Instance, options, Array.Empty<string>());
+        using var processor = new Db2Processor(null, generator, new Db2Quoter(), NullLogger<Db2Processor>.Instance,
+            options, Mock.Of<IMigrationConnectionFactory>());
+        var expression = new AlterCheckConstraintExpression { Action = CheckConstraintAction.ChangeCondition, Constraint = NewConstraint() };
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(() => preview.Process(expression), Throws.TypeOf<DatabaseOperationNotSupportedException>().With.Message.EqualTo("Replacement declined"));
+            Assert.That(() => processor.Process(expression), Throws.TypeOf<DatabaseOperationNotSupportedException>().With.Message.EqualTo("Replacement declined"));
+        });
+    }
+
+    private sealed class DecliningGenerator : Db2Generator
+    {
+        protected internal override IReadOnlyList<string> GenerateCheckConstraintReplacement(AlterCheckConstraintExpression expression)
+        {
+            throw new DatabaseOperationNotSupportedException("Replacement declined");
+        }
+    }
+
     [TestCase(false, "\"Good-Check\"")]
     [TestCase(true, "\"App-Schema\".\"Good-Check\"")]
     public void CreateQuotesTheConstraintUsingTheProviderNamingRules(bool iSeries, string constraintName)
