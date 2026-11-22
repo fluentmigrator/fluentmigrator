@@ -79,8 +79,9 @@ exactly what `DefaultConventionSet` generates today:
 ```
 
 `{Columns}`, `{ForeignColumns}` and `{PrimaryColumns}` join the column names
-with `_`, as the current conventions do. A project changes a pattern with
-`Update`, in the project file or in `Directory.Build.props`:
+with `_`, as the current conventions do. A pattern is changed with `Update`,
+in `Directory.Build.props` for a whole repository or in the project file for
+one module:
 
 ```xml
 <ItemGroup>
@@ -110,10 +111,21 @@ advance. Items already have the operations needed: `Update` changes one entry,
 `Include` adds one, and the pivots in `SourceControlledDatabaseModel.md` use
 the same shape, so there's one rule to learn.
 
-**Why the SDK declares the defaults in its props.** `Update` only changes an
-item that already exists. This is the constraint the SDK ADR records for
-pivots: declared before the project body, or body-level edits silently do
-nothing.
+**Why the defaults are imported first, before `Microsoft.NET.Sdk`.** `Update`
+only changes an item declared earlier in evaluation, and does nothing,
+silently, otherwise. `Directory.Build.props` is imported from inside
+`Microsoft.NET.Sdk`'s props, which `Sdk.props` imports at line 25, and the
+SDK's convention props come later, at line 67. Declared there, the defaults
+wouldn't exist yet when a repository-wide `Update` in `Directory.Build.props`
+runs. So the `SqlObjectNaming` and `SqlIdentifierLimit` defaults go in their
+own props file, imported at the top of `Sdk.props`. That's possible because
+they're literals that depend on no property. Evaluation order then matches
+precedence: the SDK's default, then the repository's `Update`, then the
+module's own `Update`, each overriding the one before.
+
+`Directory.Build.targets` would also see the defaults, but it's imported after
+the project body, so a repository-wide `Update` there would override a module's
+own `Update`. That's backwards: the more specific setting has to win.
 
 **Why patterns and not code.** Most teams that change naming change a prefix or
 drop a column list. A pattern covers that without a C# file. Logic beyond a
@@ -171,10 +183,27 @@ ignored. This is longest-prefix matching, as in network routing.
 
 **Why aliases are an error and not a tie.** `postgres` and `postgresql` both
 match `PostgreSQL15_0`, but neither is more specific. The SDK's runner
-registry maps both to `FluentMigrator.Runner.Postgres`. Whichever one won,
-the choice would be arbitrary. Two entries for the same kind whose dialects
-map to the same runner package are a build error that asks the user to keep
-one. Length then only decides between a general entry and a specific one.
+registry lists both as names for the same dialect. Whichever one won, the
+choice would be arbitrary.
+
+So the SDK normalizes each entry's dialect before comparing:
+
+1. It splits the dialect into the longest registry name it starts with and a
+   version suffix, which may be empty: `sqlserver2016` is `sqlserver` and
+   `2016`.
+2. It replaces the registry name with the first registry entry for the same
+   runner package, and keeps the suffix: `postgresql` becomes `postgres`.
+
+Two entries for the same kind with the same normalized dialect are a build
+error that asks the user to keep one. `postgres` and `postgresql` normalize
+to the same dialect and are rejected. `sqlserver` and `sqlserver2016` don't,
+so the override in the previous example stays legal. Length then only decides
+between a general entry and a more specific one.
+
+**Why not compare runner packages.** An earlier draft rejected two entries
+whose dialects map to the same runner package. `sqlserver` and `sqlserver2016`
+both map to `FluentMigrator.Runner.SqlServer`, so that rule rejected exactly
+the case longest-match exists for.
 
 ### 4. One default schema, two consumers
 
@@ -301,7 +330,9 @@ a hash for Firebird (`PackKeyNames`). Each of its problems is a rule here:
 - It starts every packed name with `fk_`, including indexes and primary keys.
   Here the prefix is part of each kind's pattern.
 - Its limit is a fixed 31 (`FirebirdOptions.MaxNameLength`), although
-  Firebird 4.0 allows 63 characters. Here the limit is a setting (below).
+  Firebird 4.0 allows 63 characters. Here the limit is a setting (below), and
+  the Firebird generator has to read the same setting before the SDK's
+  Firebird default can rise above 31.
 - It applies to `Delete` expressions as well as `Create`. That's right, and
   this design keeps it: the name is computed the same way for both.
 
@@ -316,15 +347,24 @@ The SDK declares one limit per dialect, with its unit:
   <SqlIdentifierLimit Include="oracle"    MaxLength="128" Unit="Bytes" />
   <SqlIdentifierLimit Include="mysql"     MaxLength="64"  Unit="Characters" />
   <SqlIdentifierLimit Include="db2"       MaxLength="128" Unit="Bytes" />
-  <SqlIdentifierLimit Include="firebird"  MaxLength="63"  Unit="Characters" />
+  <SqlIdentifierLimit Include="firebird"  MaxLength="31"  Unit="Bytes" />
 </ItemGroup>
 ```
 
-A project on an older server changes its entry:
-`<SqlIdentifierLimit Update="oracle" MaxLength="30" />`, or
-`<SqlIdentifierLimit Update="firebird" MaxLength="31" Unit="Bytes" />`.
-Entries match the running processor the same way naming entries do
-(decision 3). SQLite has no limit and no entry.
+A project on an older Oracle server lowers its entry:
+`<SqlIdentifierLimit Update="oracle" MaxLength="30" />`. Entries match the
+running processor the same way naming entries do (decision 3). SQLite has no
+limit and no entry.
+
+**Why Firebird's default is 31 bytes, not the server's 63 characters.** The
+default has to be a limit every part of FluentMigrator accepts, not only the
+server. The Firebird generator still checks names against
+`FirebirdOptions.MaxNameLength`, a fixed 31 characters. With
+`TruncateLongNames` off, the default, it throws "Name too long"; with it on,
+it cuts the name at 31 characters, which removes the hash. With a default of
+63, a 40-character fallback name would pass the SDK's limit and then fail, or
+lose its hash, in the generator. 31 bytes is never more than 31 characters,
+so names within it always pass the generator's check.
 
 | Dialect | Limit | When it differs | Source |
 |---|---|---|---|
@@ -349,8 +389,8 @@ Step 3 counts in the dialect's unit, measuring bytes as UTF-8, and only cuts
 between characters.
 
 `FirebirdTruncator` still runs later, inside the Firebird generator. With the
-Firebird limit set to 31 bytes, convention names already fit, and it leaves
-them alone.
+default Firebird limit of 31 bytes, convention names already fit, and it
+leaves them alone.
 
 ### What stays in code, and why
 
@@ -404,8 +444,8 @@ them alone.
   - a pattern with an unknown `{Token}`, or a token the kind doesn't have
     (`{ForeignTable}` on an index);
   - an unknown kind (`Include="Indx"`);
-  - two entries for one kind whose dialects are aliases of the same runner
-    (error, decision 3);
+  - two entries for one kind with the same normalized dialect, such as
+    `postgres` and `postgresql` (error, decision 3);
   - a dialect that isn't in the `MigrationRunnerPackage` registry, allowing a
     version suffix, so `sqlserver2016` passes. A warning, not an error,
     because third-party processors are allowed;
@@ -459,6 +499,12 @@ PostgreSQL currently cuts silently, and break `Delete` for those objects; see
 decision 7.
 
 ## Open questions
+
+- **Raising Firebird's default to 63 characters.** Firebird 4.0 allows it on
+  ODS 13 databases, but the Firebird generator first has to take its limit
+  from the project's `SqlIdentifierLimit` instead of the fixed
+  `FirebirdOptions.MaxNameLength`. Until then, a project can raise the limit
+  only if it doesn't use `OverflowPattern` or the generator's truncation.
 
 - **Which default schema wins when both are given.** A project sets
   `$(DefaultSchema)` and the user also passes `--default-schema-name`. The
