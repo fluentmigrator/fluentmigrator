@@ -16,6 +16,7 @@
 //
 #endregion
 
+using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
@@ -62,6 +63,20 @@ public class MySqlCheckConstraintTests
             Constraint = { Name = "ck", TableName = "items", Condition = "qty > 0", Enabled = false }
         };
         Assert.That(_generator.Generate(create), Is.EqualTo("ALTER TABLE `items` ADD CONSTRAINT `ck` CHECK (qty > 0) NOT ENFORCED;"));
+    }
+
+    [Test]
+    public void StrictModeExplainsWhyEnablingWithoutValidationIsUnsupported()
+    {
+        var generator = new MySql8Generator { CompatibilityMode = CompatibilityMode.STRICT };
+        var alter = new AlterCheckConstraintExpression
+        {
+            Action = CheckConstraintAction.Enable,
+            Constraint = { Name = "ck", TableName = "items", NoCheck = true }
+        };
+
+        var error = Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(alter));
+        Assert.That(error.Message, Does.Contain("without validating existing rows"));
     }
 
     [Test]
