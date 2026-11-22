@@ -279,17 +279,15 @@ namespace FluentMigrator.Runner.Processors
         /// <param name="expression">The CHECK constraint expression</param>
         protected void ProcessCheckConstraintAlterationInSeparateCommands(AlterCheckConstraintExpression expression)
         {
-            if (expression.Action != CheckConstraintAction.ChangeCondition)
+            if (expression.Action != CheckConstraintAction.ChangeCondition || Generator is not GenericGenerator generator)
             {
                 Process(Generator.Generate(expression));
                 return;
             }
 
-            var statements = GenericGenerator.GenerateCheckConstraintReplacementStatements(Generator, expression.Constraint);
-            if (statements.HasValue)
+            foreach (var command in generator.GenerateCheckConstraintReplacement(expression))
             {
-                Process(statements.Value.DeleteSql);
-                Process(statements.Value.CreateSql);
+                Process(command);
             }
         }
 

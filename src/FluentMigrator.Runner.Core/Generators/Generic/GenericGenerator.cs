@@ -376,44 +376,31 @@ namespace FluentMigrator.Runner.Generators.Generic
                 return CompatibilityMode.HandleCompatibility($"The {expression.Action} operation for CHECK constraints is not supported");
             }
 
-            var statements = GenerateCheckConstraintReplacementStatements(this, expression.Constraint);
-            return statements.HasValue
-                ? JoinCheckConstraintReplacementStatements(statements.Value.DeleteSql, statements.Value.CreateSql)
-                : string.Empty;
-        }
-
-        internal static (string DeleteSql, string CreateSql)? GenerateCheckConstraintReplacementStatements(
-            IMigrationGenerator generator,
-            CheckConstraintDefinition constraint)
-        {
-            var createSql = generator.Generate(new CreateCheckConstraintExpression { Constraint = constraint });
-            if (string.IsNullOrEmpty(createSql))
-            {
-                return null;
-            }
-
-            var deleteSql = generator.Generate(new DeleteCheckConstraintExpression
-            {
-                Constraint = new CheckConstraintDefinition
-                {
-                    Name = constraint.Name,
-                    TableName = constraint.TableName,
-                    SchemaName = constraint.SchemaName,
-                },
-            });
-
-            return string.IsNullOrEmpty(deleteSql) ? null : (deleteSql, createSql);
+            return string.Join(Environment.NewLine, GenerateCheckConstraintReplacement(expression));
         }
 
         /// <summary>
-        /// Combines the statements that drop the previous CHECK constraint and add its replacement.
+        /// Generates the commands to replace a CHECK constraint, in execution order.
+        /// Both commands are generated before the previous constraint can be dropped.
         /// </summary>
-        /// <param name="deleteSql">The SQL that drops the previous constraint</param>
-        /// <param name="createSql">The SQL that adds the replacement constraint</param>
-        /// <returns>The generated SQL</returns>
-        protected virtual string JoinCheckConstraintReplacementStatements(string deleteSql, string createSql)
+        protected internal virtual IReadOnlyList<string> GenerateCheckConstraintReplacement(AlterCheckConstraintExpression expression)
         {
-            return deleteSql + Environment.NewLine + createSql;
+            var createSql = Generate(new CreateCheckConstraintExpression { Constraint = expression.Constraint });
+            if (string.IsNullOrEmpty(createSql))
+            {
+                return Array.Empty<string>();
+            }
+
+            var deleteSql = Generate(new DeleteCheckConstraintExpression { Constraint = expression.Constraint.Clone() });
+            return string.IsNullOrEmpty(deleteSql) ? Array.Empty<string>() : FormatCheckConstraintReplacement(deleteSql, createSql);
+        }
+
+        /// <summary>
+        /// Formats the drop and add as separate commands or a provider-specific block.
+        /// </summary>
+        protected virtual IReadOnlyList<string> FormatCheckConstraintReplacement(string deleteSql, string createSql)
+        {
+            return new[] { deleteSql, createSql };
         }
 
         /// <inheritdoc />

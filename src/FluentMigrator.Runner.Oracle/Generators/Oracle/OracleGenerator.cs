@@ -423,9 +423,10 @@ namespace FluentMigrator.Runner.Generators.Oracle
         }
 
         /// <inheritdoc />
-        protected override string JoinCheckConstraintReplacementStatements(string deleteSql, string createSql)
+        protected override IReadOnlyList<string> FormatCheckConstraintReplacement(string deleteSql, string createSql)
         {
-            return WrapInBlock($"{WrapStatementInExecuteImmediateBlock(deleteSql)} {WrapStatementInExecuteImmediateBlock(createSql)}");
+            var block = WrapInBlock($"{WrapStatementInExecuteImmediateBlock(deleteSql)} {WrapStatementInExecuteImmediateBlock(createSql)}");
+            return new[] { block };
         }
 
         /// <inheritdoc />

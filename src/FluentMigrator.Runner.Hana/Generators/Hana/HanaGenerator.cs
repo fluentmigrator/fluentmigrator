@@ -217,12 +217,13 @@ namespace FluentMigrator.Runner.Generators.Hana
         }
 
         /// <inheritdoc />
-        protected override string JoinCheckConstraintReplacementStatements(string deleteSql, string createSql)
+        protected override IReadOnlyList<string> FormatCheckConstraintReplacement(string deleteSql, string createSql)
         {
-            return FormatStatement(
+            var block = FormatStatement(
                 "DO BEGIN EXECUTE IMMEDIATE '{0}'; EXECUTE IMMEDIATE '{1}'; END",
                 FormatHelper.FormatSqlEscape(deleteSql.TrimEnd(';')),
                 FormatHelper.FormatSqlEscape(createSql.TrimEnd(';')));
+            return new[] { block };
         }
 
         /// <inheritdoc />

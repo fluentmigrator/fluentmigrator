@@ -68,8 +68,6 @@ namespace FluentMigrator.Runner.Generators.MySql
             var name = Quoter.QuoteConstraintName(constraint.Name);
             switch (expression.Action)
             {
-                case CheckConstraintAction.ChangeCondition:
-                    return FormatStatement("ALTER TABLE {0} DROP CONSTRAINT {1}, {2}", table, name, AddCheckClause(constraint));
                 case CheckConstraintAction.Enable:
                     return FormatStatement("ALTER TABLE {0} ALTER CHECK {1} ENFORCED", table, name);
                 case CheckConstraintAction.Disable:
@@ -77,6 +75,20 @@ namespace FluentMigrator.Runner.Generators.MySql
                 default:
                     return base.Generate(expression);
             }
+        }
+
+        /// <inheritdoc />
+        protected override IReadOnlyList<string> GenerateCheckConstraintReplacement(AlterCheckConstraintExpression expression)
+        {
+            var constraint = expression.Constraint;
+            if (constraint.NoCheck)
+            {
+                return base.GenerateCheckConstraintReplacement(expression);
+            }
+
+            var table = Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName);
+            var name = Quoter.QuoteConstraintName(constraint.Name);
+            return new[] { FormatStatement("ALTER TABLE {0} DROP CONSTRAINT {1}, {2}", table, name, AddCheckClause(constraint)) };
         }
 
         private string AddCheckClause(CheckConstraintDefinition constraint)
