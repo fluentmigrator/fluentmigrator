@@ -124,7 +124,7 @@ Check the existing data before replacing a predicate. Firebird accepts the new c
 
 A Db2 LUW table already in the set-integrity-pending state still requires its usual `SET INTEGRITY` operation. MySQL versions before 8.0.16 do not enforce CHECK constraints. On Oracle, enabling with `.WithNoCheck()` marks a previously validated constraint as unvalidated. On SQL Server, enabling without validation preserves an already enabled, trusted constraint's trust state.
 
-`AutoReversingMigration` reverses a create by dropping the named constraint. Supply an explicit `Down()` when altering or deleting a check, since the previous predicate and enforcement state are needed to restore it. Strict compatibility mode throws for unsupported operations. Loose mode skips them. If a provider supports dropping a check but skips the create options you selected, automatic rollback still issues the drop by name. Scope that create with `IfDatabase(...)` so rollback uses the same provider selection.
+`AutoReversingMigration` reverses a create by dropping the named constraint. Supply an explicit `Down()` when altering or deleting a check, since the previous predicate and enforcement state are needed to restore it. If a provider supports CHECK constraints but cannot honour a requested create option, creation fails in both compatibility modes. For example, MySQL 8 cannot create an enforced check while skipping validation of existing rows. Use `IfDatabase(...)` for provider-specific options. Other unsupported CHECK operations follow the compatibility mode: strict mode throws and loose mode skips the operation.
 
 ## Default Constraints
 
