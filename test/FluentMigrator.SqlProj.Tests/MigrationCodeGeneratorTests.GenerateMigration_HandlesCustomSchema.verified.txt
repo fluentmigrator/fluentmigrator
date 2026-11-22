@@ -1,0 +1,21 @@
+﻿using FluentMigrator;
+
+namespace Migrations
+{
+    [Migration(123)]
+    public class CustomSchemaMigration : Migration
+    {
+        public override void Up()
+        {
+            Create.Table("SchemaTable").InSchema("custom")
+                .WithColumn("Id").AsInt32().NotNullable()
+                ;
+
+        }
+
+        public override void Down()
+        {
+            Delete.Table("SchemaTable").InSchema("custom");
+        }
+    }
+}

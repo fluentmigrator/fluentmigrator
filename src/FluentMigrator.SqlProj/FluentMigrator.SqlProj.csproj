@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <RootNamespace>FluentMigrator.SqlProj</RootNamespace>
+    <Description>FluentMigrator support for generating migrations from SQL Server Database Projects (.sqlproj). Parses SSDT database schemas and converts them to FluentMigrator C# migration code.</Description>
+    <PackageTags>fluentmigrator;migration;database;sqlproj;ssdt;sql-server;dacpac;code-generator;schema</PackageTags>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <Import Project="$(MSBuildThisFileDirectory)../../PackageLibrary.props" />
+  <ItemGroup>
+    <ProjectReference Include="..\FluentMigrator.Abstractions\FluentMigrator.Abstractions.csproj" />
+    <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SqlServer.DacFx" Version="162.4.92" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="JetBrains.Annotations" Version="2024.3.0" />
+  </ItemGroup>
+</Project>
