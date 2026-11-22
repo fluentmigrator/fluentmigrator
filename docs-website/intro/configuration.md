@@ -210,7 +210,7 @@ FluentMigrator uses these default naming patterns:
 FluentMigrator supports changing naming conventions for:
 
  * Columns
- * Constraints
+ * Constraints, including CHECK constraint names
  * Indexes
  * Sequences
  * Schemas
@@ -245,6 +245,7 @@ public class YourConventionSet : IConventionSet
 
         ColumnsConventions = innerConventionSet.ColumnsConventions;
         ConstraintConventions = innerConventionSet.ConstraintConventions;
+        CheckConstraintConventions = innerConventionSet.CheckConstraintConventions;
         IndexConventions = innerConventionSet.IndexConventions;
         SequenceConventions = innerConventionSet.SequenceConventions;
         AutoNameConventions = innerConventionSet.AutoNameConventions;
@@ -265,6 +266,9 @@ public class YourConventionSet : IConventionSet
     public IList<IConstraintConvention> ConstraintConventions { get; }
 
     /// <inheritdoc />
+    public IList<ICheckConstraintConvention> CheckConstraintConventions { get; }
+
+    /// <inheritdoc />
     public IList<IForeignKeyConvention> ForeignKeyConventions { get; }
 
     /// <inheritdoc />
@@ -276,6 +280,34 @@ public class YourConventionSet : IConventionSet
     /// <inheritdoc />
     public IList<IAutoNameConvention> AutoNameConventions { get; }
 }
+```
+
+#### Use lower-case CHECK constraint names
+
+To generate names such as `ck_items_quantity` for PostgreSQL, implement
+`ICheckConstraintConvention`. Preserve explicit names and use the columns in migration order.
+
+```csharp
+public class LowerCaseCheckNameConvention : ICheckConstraintConvention
+{
+    public ICheckConstraintExpression Apply(ICheckConstraintExpression expression)
+    {
+        var constraint = expression.Constraint;
+        if (constraint != null && string.IsNullOrEmpty(constraint.ConstraintName) && constraint.Columns.Count > 0)
+        {
+            constraint.ConstraintName = ("ck_" + constraint.TableName + "_" +
+                string.Join("_", constraint.Columns)).ToLowerInvariant();
+        }
+
+        return expression;
+    }
+}
+```
+
+In the `YourConventionSet` constructor, replace the assignment from the inner set with:
+
+```csharp
+CheckConstraintConventions = new List<ICheckConstraintConvention> { new LowerCaseCheckNameConvention() };
 ```
 
 ### Override Default Names
