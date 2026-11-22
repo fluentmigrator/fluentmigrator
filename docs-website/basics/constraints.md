@@ -107,7 +107,9 @@ Create.Check("ck_order_items_quantity").OnTable("order_items")
 Alter.Check("ck_order_items_quantity").OnTable("order_items").Enabled();
 ```
 
-To suspend enforcement on a provider that supports it, use `Alter.Check(...).OnTable(...).Disabled()`. To replace the predicate, use `Alter.Check(...).OnTable(...).Condition("quantity >= 0")`. Replacing a condition drops the old constraint and adds its replacement. Oracle DDL and Firebird's default per-command commit can leave the original constraint absent when the replacement fails. On SQL Server and Db2, keep both commands in the migration transaction. MySQL 8 uses a single ALTER TABLE statement. Check existing data before applying the replacement.
+To suspend enforcement on a provider that supports it, use `Alter.Check(...).OnTable(...).Disabled()`. To replace the predicate, use `Alter.Check(...).OnTable(...).Condition("quantity >= 0")`. Replacing a condition drops the old constraint and creates a new one with the options you specify. For example, replacing a disabled SQL Server check with `.Condition(...)` alone enables it and validates existing rows. Provider-specific settings such as `NOT FOR REPLICATION` are lost unless reapplied.
+
+Check the existing data before replacing a predicate. Firebird accepts the new constraint even when existing rows violate it, and those rows stay in the table. On Oracle and on Firebird with its default per-command commit, a failed replacement can leave the old constraint absent. On SAP HANA, the runner generates a single anonymous block, but recovery after a failed replacement has not been verified. Do not rely on the block being atomic. On SQL Server and Db2, keep both commands in the migration transaction. MySQL 8 uses one atomic `ALTER TABLE` statement.
 
 | Provider | Create, replace and drop | Skip existing rows on create | Change enforcement or validate |
 | --- | --- | --- | --- |
