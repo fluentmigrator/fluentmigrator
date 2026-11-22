@@ -97,7 +97,7 @@ namespace FluentMigrator.Tests.Unit.Builders
             var expression = _context.Expressions.Single().ShouldBeOfType<CreateCheckConstraintExpression>();
             Assert.Multiple(() =>
             {
-                expression.Constraint.Name.ShouldBe("CK_Items_Quantity");
+                expression.Constraint.ConstraintName.ShouldBe("CK_Items_Quantity");
                 expression.Constraint.TableName.ShouldBe("Items");
                 expression.Constraint.SchemaName.ShouldBe("inventory");
                 expression.Constraint.Condition.ShouldBe("Quantity > 0");
@@ -145,7 +145,7 @@ namespace FluentMigrator.Tests.Unit.Builders
             Assert.Multiple(() =>
             {
                 expression.Action.ShouldBe(CheckConstraintAction.ChangeCondition);
-                expression.Constraint.Name.ShouldBe("CK_Items_Quantity");
+                expression.Constraint.ConstraintName.ShouldBe("CK_Items_Quantity");
                 expression.Constraint.TableName.ShouldBe("Items");
                 expression.Constraint.SchemaName.ShouldBe("inventory");
                 expression.Constraint.Condition.ShouldBe("Quantity >= 0");
@@ -239,7 +239,7 @@ namespace FluentMigrator.Tests.Unit.Builders
             var expression = _context.Expressions.Single().ShouldBeOfType<DeleteCheckConstraintExpression>();
             Assert.Multiple(() =>
             {
-                expression.Constraint.Name.ShouldBe("CK_Items_Quantity");
+                expression.Constraint.ConstraintName.ShouldBe("CK_Items_Quantity");
                 expression.Constraint.TableName.ShouldBe("Items");
                 expression.Constraint.SchemaName.ShouldBe("inventory");
             });

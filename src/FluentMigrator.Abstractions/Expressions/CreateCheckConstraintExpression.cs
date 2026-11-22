@@ -34,12 +34,12 @@ public sealed class CreateCheckConstraintExpression : CheckConstraintExpressionB
     {
         var identity = new CheckConstraintDefinition
         {
-            Name = Constraint.Name,
+            ConstraintName = Constraint.ConstraintName,
             TableName = Constraint.TableName,
             SchemaName = Constraint.SchemaName
         };
         identity.Columns.AddRange(Constraint.Columns);
-        if (string.IsNullOrEmpty(identity.Name))
+        if (string.IsNullOrEmpty(identity.ConstraintName))
         {
             // Auto-reversing migrations run conventions after reversal. A custom name may use the predicate.
             identity.Condition = Constraint.Condition;

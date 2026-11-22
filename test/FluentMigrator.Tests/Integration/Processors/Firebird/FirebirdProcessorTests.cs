@@ -98,7 +98,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             {
                 Constraint =
                 {
-                    Name = "PositiveId",
+                    ConstraintName = "PositiveId",
                     TableName = table.Name,
                     Condition = "id > 0",
                     NoCheck = true,
@@ -116,7 +116,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             var tableName = Quoter.QuoteTableName(table.Name);
             var constraint = new CheckConstraintDefinition
             {
-                Name = "ValidCode",
+                ConstraintName = "ValidCode",
                 TableName = table.Name,
                 Condition = "code = 'first'",
             };
@@ -127,7 +127,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                 Action = CheckConstraintAction.ChangeCondition,
                 Constraint =
                 {
-                    Name = constraint.Name,
+                    ConstraintName = constraint.ConstraintName,
                     TableName = table.Name,
                     Condition = "code = 'one;two'",
                 },
@@ -148,7 +148,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             {
                 Constraint =
                 {
-                    Name = "PositiveId",
+                    ConstraintName = "PositiveId",
                     TableName = table.Name,
                     Condition = "id > 0",
                 },
@@ -159,7 +159,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                 Action = CheckConstraintAction.ChangeCondition,
                 Constraint =
                 {
-                    Name = "PositiveId",
+                    ConstraintName = "PositiveId",
                     TableName = table.Name,
                     Condition = "id > 1",
                     Enabled = false,

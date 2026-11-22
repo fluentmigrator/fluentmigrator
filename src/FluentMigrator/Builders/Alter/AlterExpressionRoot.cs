@@ -67,7 +67,7 @@ namespace FluentMigrator.Builders.Alter
 
         private AlterCheckConstraintExpressionBuilder BuildCheck(string constraintName)
         {
-            var expression = new AlterCheckConstraintExpression { Constraint = { Name = constraintName } };
+            var expression = new AlterCheckConstraintExpression { Constraint = { ConstraintName = constraintName } };
             _context.Expressions.Add(expression);
             return new AlterCheckConstraintExpressionBuilder(expression);
         }

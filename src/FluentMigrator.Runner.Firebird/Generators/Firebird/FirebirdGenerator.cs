@@ -326,7 +326,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         {
             var definition = constraint.Clone();
             definition.TableName = Truncator.Truncate(definition.TableName);
-            definition.Name = FBOptions.PackKeyNames ? Truncator.Pack(definition.Name) : Truncator.Truncate(definition.Name);
+            definition.ConstraintName = FBOptions.PackKeyNames ? Truncator.Pack(definition.ConstraintName) : Truncator.Truncate(definition.ConstraintName);
             return definition;
         }
 

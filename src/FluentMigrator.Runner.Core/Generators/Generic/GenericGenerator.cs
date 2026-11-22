@@ -425,7 +425,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             return FormatStatement(
                 "ALTER TABLE {0} ADD CONSTRAINT {1} CHECK ({2})",
                 Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName),
-                Quoter.QuoteConstraintName(constraint.Name),
+                Quoter.QuoteConstraintName(constraint.ConstraintName),
                 constraint.Condition);
         }
 
@@ -439,7 +439,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             return FormatStatement(
                 "ALTER TABLE {0} DROP CONSTRAINT {1}",
                 Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName),
-                Quoter.QuoteConstraintName(constraint.Name));
+                Quoter.QuoteConstraintName(constraint.ConstraintName));
         }
 
         /// <inheritdoc />

@@ -36,7 +36,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         {
             var expression = new CreateCheckConstraintExpression
             {
-                Constraint = { SchemaName = "Inventory", TableName = "Items", Name = "CK_Items", Condition = "Quantity > 0", Enabled = enabled, NoCheck = noCheck },
+                Constraint = { SchemaName = "Inventory", TableName = "Items", ConstraintName = "CK_Items", Condition = "Quantity > 0", Enabled = enabled, NoCheck = noCheck },
             };
 
             new OracleGenerator().Generate(expression).ShouldBe(
@@ -51,7 +51,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = new AlterCheckConstraintExpression
             {
                 Action = action,
-                Constraint = { SchemaName = "Inventory", TableName = "Items", Name = "CK_Items", NoCheck = noCheck },
+                Constraint = { SchemaName = "Inventory", TableName = "Items", ConstraintName = "CK_Items", NoCheck = noCheck },
             };
 
             new OracleGenerator().Generate(expression).ShouldBe(
@@ -63,7 +63,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         {
             var expression = new DeleteCheckConstraintExpression
             {
-                Constraint = { SchemaName = "Inventory", TableName = "Items", Name = "CK Items" },
+                Constraint = { SchemaName = "Inventory", TableName = "Items", ConstraintName = "CK Items" },
             };
 
             new OracleGenerator(useQuotedIdentifiers: true).Generate(expression).ShouldBe(
@@ -76,7 +76,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = new AlterCheckConstraintExpression
             {
                 Action = CheckConstraintAction.ChangeCondition,
-                Constraint = { SchemaName = "Inventory", TableName = "Items", Name = "Item's check", Condition = "\"Code\" <> 'Don''t;stop'", NoCheck = true },
+                Constraint = { SchemaName = "Inventory", TableName = "Items", ConstraintName = "Item's check", Condition = "\"Code\" <> 'Don''t;stop'", NoCheck = true },
             };
 
             new OracleGenerator(useQuotedIdentifiers: true).Generate(expression).ShouldBe(

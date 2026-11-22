@@ -45,7 +45,7 @@ public class CheckConstraintDefinitionTests
     {
         var definition = new CheckConstraintDefinition
         {
-            Name = "ck_quantity",
+            ConstraintName = "ck_quantity",
             SchemaName = "stock",
             TableName = "items",
             Condition = "quantity > 0",

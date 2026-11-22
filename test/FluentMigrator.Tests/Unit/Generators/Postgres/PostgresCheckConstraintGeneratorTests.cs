@@ -139,7 +139,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 
         private static CheckConstraintDefinition CreateDefinition(string condition = null) => new()
         {
-            Name = "CK_Quantity",
+            ConstraintName = "CK_Quantity",
             TableName = "Items",
             SchemaName = "inventory",
             Condition = condition,

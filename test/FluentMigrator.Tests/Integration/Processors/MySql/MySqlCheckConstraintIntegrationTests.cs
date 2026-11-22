@@ -43,7 +43,7 @@ public class MySqlCheckConstraintIntegrationTests
             ReplaceWithQuantityGreaterThanOne(processor, constraint);
 
             processor.Execute($"INSERT INTO {constraint.TableName} VALUES (2)");
-            AssertCheckViolation(() => processor.Execute($"INSERT INTO {constraint.TableName} VALUES (1)"), constraint.Name);
+            AssertCheckViolation(() => processor.Execute($"INSERT INTO {constraint.TableName} VALUES (1)"), constraint.ConstraintName);
         });
     }
 
@@ -53,10 +53,10 @@ public class MySqlCheckConstraintIntegrationTests
         WithPositiveQuantityCheck((processor, constraint) =>
         {
             processor.Execute($"INSERT INTO {constraint.TableName} VALUES (1)");
-            AssertCheckViolation(() => ReplaceWithQuantityGreaterThanOne(processor, constraint), constraint.Name);
+            AssertCheckViolation(() => ReplaceWithQuantityGreaterThanOne(processor, constraint), constraint.ConstraintName);
 
             processor.Execute($"INSERT INTO {constraint.TableName} VALUES (1)");
-            AssertCheckViolation(() => processor.Execute($"INSERT INTO {constraint.TableName} VALUES (0)"), constraint.Name);
+            AssertCheckViolation(() => processor.Execute($"INSERT INTO {constraint.TableName} VALUES (0)"), constraint.ConstraintName);
         });
     }
 
@@ -89,7 +89,7 @@ public class MySqlCheckConstraintIntegrationTests
         using var scope = services.CreateScope();
         var processor = scope.ServiceProvider.GetRequiredService<IMigrationProcessor>();
         var table = "items_" + Guid.NewGuid().ToString("N");
-        var definition = new CheckConstraintDefinition { Name = "ck_" + table, TableName = table, Condition = "qty > 0" };
+        var definition = new CheckConstraintDefinition { ConstraintName = "ck_" + table, TableName = table, Condition = "qty > 0" };
 
         processor.Execute($"CREATE TABLE {table} (qty INT)");
         try

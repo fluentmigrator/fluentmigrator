@@ -65,7 +65,7 @@ namespace FluentMigrator.Runner.Generators.MySql
             }
 
             var table = Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName);
-            var name = Quoter.QuoteConstraintName(constraint.Name);
+            var name = Quoter.QuoteConstraintName(constraint.ConstraintName);
             switch (expression.Action)
             {
                 case CheckConstraintAction.Enable:
@@ -87,14 +87,14 @@ namespace FluentMigrator.Runner.Generators.MySql
             }
 
             var table = Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName);
-            var name = Quoter.QuoteConstraintName(constraint.Name);
+            var name = Quoter.QuoteConstraintName(constraint.ConstraintName);
             return new[] { FormatStatement("ALTER TABLE {0} DROP CONSTRAINT {1}, {2}", table, name, AddCheckClause(constraint)) };
         }
 
         private string AddCheckClause(CheckConstraintDefinition constraint)
         {
             var enforcement = constraint.Enabled ? string.Empty : " NOT ENFORCED";
-            return $"ADD CONSTRAINT {Quoter.QuoteConstraintName(constraint.Name)} CHECK ({constraint.Condition}){enforcement}";
+            return $"ADD CONSTRAINT {Quoter.QuoteConstraintName(constraint.ConstraintName)} CHECK ({constraint.Condition}){enforcement}";
         }
 
         /// <inheritdoc />

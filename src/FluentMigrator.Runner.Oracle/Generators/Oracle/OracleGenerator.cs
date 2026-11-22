@@ -397,7 +397,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return FormatStatement(
                 "ALTER TABLE {0} ADD CONSTRAINT {1} CHECK ({2}){3}",
                 Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName),
-                Quoter.QuoteConstraintName(constraint.Name),
+                Quoter.QuoteConstraintName(constraint.ConstraintName),
                 constraint.Condition,
                 state);
         }
@@ -418,7 +418,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
                 : FormatStatement(
                     "ALTER TABLE {0} MODIFY CONSTRAINT {1} {2}",
                     Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName),
-                    Quoter.QuoteConstraintName(constraint.Name),
+                    Quoter.QuoteConstraintName(constraint.ConstraintName),
                     state);
         }
 

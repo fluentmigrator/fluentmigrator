@@ -673,7 +673,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return FormatStatement(
                 "ALTER TABLE {0} ADD CONSTRAINT {1} CHECK ({2}) NOT VALID",
                 Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName),
-                Quoter.QuoteConstraintName(constraint.Name),
+                Quoter.QuoteConstraintName(constraint.ConstraintName),
                 constraint.Condition);
         }
 
@@ -695,7 +695,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return FormatStatement(
                 "ALTER TABLE {0} VALIDATE CONSTRAINT {1}",
                 Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName),
-                Quoter.QuoteConstraintName(constraint.Name));
+                Quoter.QuoteConstraintName(constraint.ConstraintName));
         }
 
         /// <inheritdoc />

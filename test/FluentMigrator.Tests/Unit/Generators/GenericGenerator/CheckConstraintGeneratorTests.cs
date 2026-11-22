@@ -136,7 +136,7 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         {
             return new CheckConstraintDefinition
             {
-                Name = "Positive Quantity",
+                ConstraintName = "Positive Quantity",
                 TableName = "Order Items",
                 SchemaName = "inventory",
                 Condition = "quantity > 0",

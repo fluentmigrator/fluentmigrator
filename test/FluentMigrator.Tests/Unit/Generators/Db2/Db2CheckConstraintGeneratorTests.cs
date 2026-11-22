@@ -165,7 +165,7 @@ public class Db2CheckConstraintGeneratorTests
         {
             TableName = "ITEMS",
             SchemaName = "App-Schema",
-            Name = "Good-Check",
+            ConstraintName = "Good-Check",
             Condition = "QUANTITY > 0",
         };
     }

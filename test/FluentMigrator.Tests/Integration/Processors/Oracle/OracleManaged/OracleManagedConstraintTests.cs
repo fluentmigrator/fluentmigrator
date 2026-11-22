@@ -46,7 +46,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle.OracleManaged
 
             Processor.Process(new CreateCheckConstraintExpression
             {
-                Constraint = { TableName = table.Name, Name = constraintName, Condition = "quantity > 0", NoCheck = true },
+                Constraint = { TableName = table.Name, ConstraintName = constraintName, Condition = "quantity > 0", NoCheck = true },
             });
 
             Processor.Execute($"INSERT INTO {table.Name} (quantity) VALUES (1)");
@@ -61,13 +61,13 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle.OracleManaged
             var constraintName = "CK_" + table.Name;
             Processor.Process(new CreateCheckConstraintExpression
             {
-                Constraint = { TableName = table.Name, Name = constraintName, Condition = "code = 'Don''t;stop'" },
+                Constraint = { TableName = table.Name, ConstraintName = constraintName, Condition = "code = 'Don''t;stop'" },
             });
 
             Processor.Process(new AlterCheckConstraintExpression
             {
                 Action = CheckConstraintAction.ChangeCondition,
-                Constraint = { TableName = table.Name, Name = constraintName, Condition = "code <> 'Don''t;stop'" },
+                Constraint = { TableName = table.Name, ConstraintName = constraintName, Condition = "code <> 'Don''t;stop'" },
             });
 
             Processor.Execute($"INSERT INTO {table.Name} (code) VALUES ('Continue')");

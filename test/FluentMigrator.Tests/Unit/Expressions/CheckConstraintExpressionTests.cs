@@ -34,14 +34,14 @@ public class CheckConstraintExpressionTests
     {
         var create = new CreateCheckConstraintExpression
         {
-            Constraint = { Name = "ck_quantity", TableName = "items", SchemaName = "stock", Condition = "quantity > 0", NoCheck = true }
+            Constraint = { ConstraintName = "ck_quantity", TableName = "items", SchemaName = "stock", Condition = "quantity > 0", NoCheck = true }
         };
 
         var delete = (DeleteCheckConstraintExpression)create.Reverse();
 
         Assert.That(delete.Constraint, Is.EqualTo(new CheckConstraintDefinition
         {
-            Name = "ck_quantity",
+            ConstraintName = "ck_quantity",
             TableName = "items",
             SchemaName = "stock"
         }).UsingPropertiesComparer());
@@ -59,7 +59,7 @@ public class CheckConstraintExpressionTests
         var alter = new AlterCheckConstraintExpression
         {
             Action = action,
-            Constraint = { Name = "ck_quantity", TableName = "items", Condition = condition }
+            Constraint = { ConstraintName = "ck_quantity", TableName = "items", Condition = condition }
         };
 
         Assert.That(ValidationHelper.CollectErrors(alter).Count == 0, Is.EqualTo(valid));

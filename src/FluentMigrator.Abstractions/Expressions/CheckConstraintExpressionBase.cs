@@ -48,7 +48,7 @@ public abstract class CheckConstraintExpressionBase : MigrationExpressionBase, I
     /// <inheritdoc />
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        if (Constraint == null || string.IsNullOrWhiteSpace(Constraint.Name))
+        if (Constraint == null || string.IsNullOrWhiteSpace(Constraint.ConstraintName))
         {
             yield return new ValidationResult("A CHECK constraint requires a name or at least one column.");
         }
@@ -74,5 +74,5 @@ public abstract class CheckConstraintExpressionBase : MigrationExpressionBase, I
     }
 
     /// <inheritdoc />
-    public override string ToString() => base.ToString() + Constraint?.Name;
+    public override string ToString() => base.ToString() + Constraint?.ConstraintName;
 }

@@ -329,7 +329,7 @@ namespace FluentMigrator.Runner.Generators.DB2
             return FormatStatement(
                 "ALTER TABLE {0} ADD CONSTRAINT {1} CHECK ({2}){3}",
                 Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName),
-                Quoter.QuoteConstraintName(constraint.Name, constraint.SchemaName),
+                Quoter.QuoteConstraintName(constraint.ConstraintName, constraint.SchemaName),
                 constraint.Condition,
                 enforcement);
         }
@@ -340,7 +340,7 @@ namespace FluentMigrator.Runner.Generators.DB2
             return FormatStatement(
                 "ALTER TABLE {0} DROP CHECK {1}",
                 Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName),
-                Quoter.QuoteConstraintName(constraint.Name, constraint.SchemaName));
+                Quoter.QuoteConstraintName(constraint.ConstraintName, constraint.SchemaName));
         }
 
         private string GenerateCheckConstraintEnforcement(CheckConstraintDefinition constraint, string enforcement)
@@ -348,7 +348,7 @@ namespace FluentMigrator.Runner.Generators.DB2
             return FormatStatement(
                 "ALTER TABLE {0} ALTER CHECK {1} {2}",
                 Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName),
-                Quoter.QuoteConstraintName(constraint.Name, constraint.SchemaName),
+                Quoter.QuoteConstraintName(constraint.ConstraintName, constraint.SchemaName),
                 enforcement);
         }
 

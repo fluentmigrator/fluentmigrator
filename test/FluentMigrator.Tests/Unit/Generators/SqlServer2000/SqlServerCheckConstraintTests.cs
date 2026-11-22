@@ -36,7 +36,7 @@ public class SqlServerCheckConstraintTests
     {
         var expression = new CreateCheckConstraintExpression
         {
-            Constraint = { Name = "ck", TableName = "items", Condition = "qty > 0", NoCheck = true }
+            Constraint = { ConstraintName = "ck", TableName = "items", Condition = "qty > 0", NoCheck = true }
         };
         Assert.That(_generator.Generate(expression), Is.EqualTo("ALTER TABLE [items] WITH NOCHECK ADD CONSTRAINT [ck] CHECK (qty > 0);"));
     }
@@ -46,7 +46,7 @@ public class SqlServerCheckConstraintTests
     {
         var expression = new CreateCheckConstraintExpression
         {
-            Constraint = { Name = "ck", TableName = "items", Condition = "qty > 0", Enabled = false }
+            Constraint = { ConstraintName = "ck", TableName = "items", Condition = "qty > 0", Enabled = false }
         };
         Assert.That(_generator.Generate(expression), Is.EqualTo("ALTER TABLE [items] WITH NOCHECK ADD CONSTRAINT [ck] CHECK (qty > 0);"
             + Environment.NewLine + "ALTER TABLE [items] NOCHECK CONSTRAINT [ck];"));
@@ -60,7 +60,7 @@ public class SqlServerCheckConstraintTests
         var expression = new AlterCheckConstraintExpression
         {
             Action = action,
-            Constraint = { Name = "ck", TableName = "items", NoCheck = noCheck }
+            Constraint = { ConstraintName = "ck", TableName = "items", NoCheck = noCheck }
         };
         Assert.That(_generator.Generate(expression), Is.EqualTo($"ALTER TABLE [items] {operation} [ck];"));
     }

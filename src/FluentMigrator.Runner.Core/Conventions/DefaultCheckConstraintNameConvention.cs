@@ -27,9 +27,9 @@ public class DefaultCheckConstraintNameConvention : ICheckConstraintConvention
     public ICheckConstraintExpression Apply(ICheckConstraintExpression expression)
     {
         var constraint = expression.Constraint;
-        if (constraint != null && string.IsNullOrEmpty(constraint.Name) && constraint.Columns.Count > 0)
+        if (constraint != null && string.IsNullOrEmpty(constraint.ConstraintName) && constraint.Columns.Count > 0)
         {
-            constraint.Name = "CK_" + constraint.TableName + "_" + string.Join("_", constraint.Columns);
+            constraint.ConstraintName = "CK_" + constraint.TableName + "_" + string.Join("_", constraint.Columns);
         }
 
         return expression;

@@ -163,7 +163,7 @@ namespace FluentMigrator.Builders.Delete
 
         private DeleteCheckConstraintExpressionBuilder BuildCheck(string constraintName)
         {
-            var expression = new DeleteCheckConstraintExpression { Constraint = { Name = constraintName } };
+            var expression = new DeleteCheckConstraintExpression { Constraint = { ConstraintName = constraintName } };
             _context.Expressions.Add(expression);
             return new DeleteCheckConstraintExpressionBuilder(expression);
         }

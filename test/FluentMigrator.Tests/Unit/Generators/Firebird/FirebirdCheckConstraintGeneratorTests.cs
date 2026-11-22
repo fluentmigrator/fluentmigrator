@@ -46,7 +46,7 @@ public class FirebirdCheckConstraintGeneratorTests
             Constraint =
             {
                 TableName = "Items",
-                Name = "CheckItems",
+                ConstraintName = "CheckItems",
                 Condition = "quantity > 0",
                 NoCheck = noCheck,
             },
@@ -67,7 +67,7 @@ public class FirebirdCheckConstraintGeneratorTests
             Constraint =
             {
                 TableName = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789",
-                Name = "abcdefghijklmnopqrstuvwxyz123456789",
+                ConstraintName = "abcdefghijklmnopqrstuvwxyz123456789",
                 Condition = "quantity > 0",
             },
         };

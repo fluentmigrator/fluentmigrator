@@ -27,7 +27,7 @@ namespace FluentMigrator.Model;
 public sealed class CheckConstraintDefinition : ISupportAdditionalFeatures
 {
     /// <summary>The constraint name.</summary>
-    public string Name { get; set; }
+    public string ConstraintName { get; set; }
 
     /// <summary>The columns used to name the constraint, in order.</summary>
     public List<string> Columns { get; } = new List<string>();
@@ -55,7 +55,7 @@ public sealed class CheckConstraintDefinition : ISupportAdditionalFeatures
     {
         var clone = new CheckConstraintDefinition
         {
-            Name = Name,
+            ConstraintName = ConstraintName,
             TableName = TableName,
             SchemaName = SchemaName,
             Condition = Condition,

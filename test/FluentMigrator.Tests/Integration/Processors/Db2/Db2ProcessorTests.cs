@@ -89,7 +89,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
             {
                 Constraint =
                 {
-                    Name = CheckName,
+                    ConstraintName = CheckName,
                     TableName = table.Name,
                     SchemaName = CheckSchema,
                     Condition = "ID > 0",
@@ -109,7 +109,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
             {
                 Constraint =
                 {
-                    Name = CheckName,
+                    ConstraintName = CheckName,
                     TableName = table.Name,
                     SchemaName = CheckSchema,
                     Condition = "ID > 0",
@@ -120,7 +120,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
             new AlterCheckConstraintExpression
             {
                 Action = action,
-                Constraint = { Name = CheckName, TableName = table.Name, SchemaName = CheckSchema },
+                Constraint = { ConstraintName = CheckName, TableName = table.Name, SchemaName = CheckSchema },
             }.ExecuteWith(Processor);
 
             AssertCheckEnforcementAndOptimisation(table, expected);
@@ -134,7 +134,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
             {
                 Constraint =
                 {
-                    Name = CheckName,
+                    ConstraintName = CheckName,
                     TableName = table.Name,
                     SchemaName = CheckSchema,
                     Condition = "ID > 0",
@@ -146,7 +146,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
             var expression = new AlterCheckConstraintExpression
             {
                 Action = CheckConstraintAction.Enable,
-                Constraint = { Name = CheckName, TableName = table.Name, SchemaName = CheckSchema },
+                Constraint = { ConstraintName = CheckName, TableName = table.Name, SchemaName = CheckSchema },
             };
 
             var exception = Should.Throw<DB2Exception>(() => expression.ExecuteWith(Processor));
@@ -161,7 +161,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
             {
                 Constraint =
                 {
-                    Name = CheckName,
+                    ConstraintName = CheckName,
                     TableName = table.Name,
                     SchemaName = CheckSchema,
                     Condition = "ID > 0",
@@ -176,7 +176,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
                     Action = CheckConstraintAction.ChangeCondition,
                     Constraint =
                     {
-                        Name = CheckName,
+                        ConstraintName = CheckName,
                         TableName = table.Name,
                         SchemaName = CheckSchema,
                         Condition = "ID < 0",

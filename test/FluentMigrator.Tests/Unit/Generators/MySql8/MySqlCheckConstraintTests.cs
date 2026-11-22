@@ -38,7 +38,7 @@ public class MySqlCheckConstraintTests
         var alter = new AlterCheckConstraintExpression
         {
             Action = CheckConstraintAction.ChangeCondition,
-            Constraint = { Name = "ck", TableName = "items", Condition = "qty >= 1", Enabled = enabled }
+            Constraint = { ConstraintName = "ck", TableName = "items", Condition = "qty >= 1", Enabled = enabled }
         };
         Assert.That(_generator.Generate(alter), Is.EqualTo("ALTER TABLE `items` DROP CONSTRAINT `ck`, ADD CONSTRAINT `ck` CHECK (qty >= 1)" + enforcement + ";"));
     }
@@ -50,7 +50,7 @@ public class MySqlCheckConstraintTests
         var alter = new AlterCheckConstraintExpression
         {
             Action = action,
-            Constraint = { Name = "ck", TableName = "items" }
+            Constraint = { ConstraintName = "ck", TableName = "items" }
         };
         Assert.That(_generator.Generate(alter), Is.EqualTo("ALTER TABLE `items` ALTER CHECK `ck` " + enforcement + ";"));
     }
@@ -60,7 +60,7 @@ public class MySqlCheckConstraintTests
     {
         var create = new CreateCheckConstraintExpression
         {
-            Constraint = { Name = "ck", TableName = "items", Condition = "qty > 0", Enabled = false }
+            Constraint = { ConstraintName = "ck", TableName = "items", Condition = "qty > 0", Enabled = false }
         };
         Assert.That(_generator.Generate(create), Is.EqualTo("ALTER TABLE `items` ADD CONSTRAINT `ck` CHECK (qty > 0) NOT ENFORCED;"));
     }
@@ -72,7 +72,7 @@ public class MySqlCheckConstraintTests
         var alter = new AlterCheckConstraintExpression
         {
             Action = CheckConstraintAction.Enable,
-            Constraint = { Name = "ck", TableName = "items", NoCheck = true }
+            Constraint = { ConstraintName = "ck", TableName = "items", NoCheck = true }
         };
 
         var error = Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(alter));
@@ -86,7 +86,7 @@ public class MySqlCheckConstraintTests
         var alter = new AlterCheckConstraintExpression
         {
             Action = CheckConstraintAction.ChangeCondition,
-            Constraint = { Name = "ck", TableName = "items", Condition = "qty > 0", NoCheck = true }
+            Constraint = { ConstraintName = "ck", TableName = "items", Condition = "qty > 0", NoCheck = true }
         };
         Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(alter));
     }

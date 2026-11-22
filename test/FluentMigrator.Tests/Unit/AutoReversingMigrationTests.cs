@@ -64,8 +64,8 @@ namespace FluentMigrator.Tests.Unit
             migration.GetDownExpressions(_context.Object);
             var delete = (DeleteCheckConstraintExpression)_context.Object.Expressions.Single().Apply(conventions);
 
-            Assert.That(create.Constraint.Name, Is.EqualTo(expected));
-            Assert.That(delete.Constraint.Name, Is.EqualTo(expected));
+            Assert.That(create.Constraint.ConstraintName, Is.EqualTo(expected));
+            Assert.That(delete.Constraint.ConstraintName, Is.EqualTo(expected));
         }
 
         private sealed class CheckMigration : AutoReversingMigration
@@ -78,7 +78,7 @@ namespace FluentMigrator.Tests.Unit
         {
             public ICheckConstraintExpression Apply(ICheckConstraintExpression expression)
             {
-                expression.Constraint.Name = "custom_" + expression.Constraint.Condition.Replace(" > ", "_gt_");
+                expression.Constraint.ConstraintName = "custom_" + expression.Constraint.Condition.Replace(" > ", "_gt_");
                 return expression;
             }
         }

@@ -153,7 +153,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             }
 
             var table = Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName);
-            var name = Quoter.QuoteConstraintName(constraint.Name);
+            var name = Quoter.QuoteConstraintName(constraint.ConstraintName);
             var add = FormatStatement("ALTER TABLE {0} WITH NOCHECK ADD CONSTRAINT {1} CHECK ({2})", table, name, constraint.Condition);
             return constraint.Enabled ? add : add + Environment.NewLine + FormatStatement("ALTER TABLE {0} NOCHECK CONSTRAINT {1}", table, name);
         }
@@ -176,7 +176,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             }
 
             return FormatStatement("ALTER TABLE {0} {1} CONSTRAINT {2}", Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName),
-                operation, Quoter.QuoteConstraintName(constraint.Name));
+                operation, Quoter.QuoteConstraintName(constraint.ConstraintName));
         }
 
         /// <inheritdoc />

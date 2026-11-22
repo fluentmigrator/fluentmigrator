@@ -37,7 +37,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
         {
             var expression = new CreateCheckConstraintExpression
             {
-                Constraint = { SchemaName = "Inventory", TableName = "Items", Name = "CK Items", Condition = "\"Quantity\" > 0" },
+                Constraint = { SchemaName = "Inventory", TableName = "Items", ConstraintName = "CK Items", Condition = "\"Quantity\" > 0" },
             };
 
             new HanaGenerator().Generate(expression).ShouldBe(
@@ -49,7 +49,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
         {
             var expression = new DeleteCheckConstraintExpression
             {
-                Constraint = { SchemaName = "Inventory", TableName = "Items", Name = "CK Items" },
+                Constraint = { SchemaName = "Inventory", TableName = "Items", ConstraintName = "CK Items" },
             };
 
             new HanaGenerator().Generate(expression).ShouldBe("ALTER TABLE \"Items\" DROP CONSTRAINT \"CK Items\";");
@@ -61,7 +61,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             var expression = new AlterCheckConstraintExpression
             {
                 Action = CheckConstraintAction.ChangeCondition,
-                Constraint = { TableName = "Items", Name = "Item's check", Condition = "\"Code\" <> 'Don''t;stop'" },
+                Constraint = { TableName = "Items", ConstraintName = "Item's check", Condition = "\"Code\" <> 'Don''t;stop'" },
             };
 
             new HanaGenerator().Generate(expression).ShouldBe(
@@ -75,7 +75,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
         {
             var expression = new CreateCheckConstraintExpression
             {
-                Constraint = { TableName = "Items", Name = "CK Items", Condition = "\"Quantity\" > 0", Enabled = enabled, NoCheck = noCheck },
+                Constraint = { TableName = "Items", ConstraintName = "CK Items", Condition = "\"Quantity\" > 0", Enabled = enabled, NoCheck = noCheck },
             };
 
             var generator = new HanaGenerator { CompatibilityMode = CompatibilityMode.STRICT };
@@ -90,7 +90,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             var expression = new AlterCheckConstraintExpression
             {
                 Action = action,
-                Constraint = { TableName = "Items", Name = "CK Items", NoCheck = noCheck },
+                Constraint = { TableName = "Items", ConstraintName = "CK Items", NoCheck = noCheck },
             };
 
             var generator = new HanaGenerator { CompatibilityMode = CompatibilityMode.STRICT };
@@ -104,7 +104,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             var expression = new AlterCheckConstraintExpression
             {
                 Action = CheckConstraintAction.ChangeCondition,
-                Constraint = { TableName = "Items", Name = "CK Items", Condition = "\"Quantity\" > 0", Enabled = enabled, NoCheck = noCheck },
+                Constraint = { TableName = "Items", ConstraintName = "CK Items", Condition = "\"Quantity\" > 0", Enabled = enabled, NoCheck = noCheck },
             };
 
             var generator = new HanaGenerator { CompatibilityMode = CompatibilityMode.LOOSE };

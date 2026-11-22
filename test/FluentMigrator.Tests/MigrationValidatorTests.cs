@@ -70,12 +70,12 @@ namespace FluentMigrator.Tests
         [TestCase("explicit_name", "explicit_name", "Quantity")]
         public void DefaultConventionNamesChecksBeforeValidation(string name, string expected, params string[] columns)
         {
-            var expression = new DeleteCheckConstraintExpression { Constraint = { Name = name, TableName = "Items" } };
+            var expression = new DeleteCheckConstraintExpression { Constraint = { ConstraintName = name, TableName = "Items" } };
             expression.Constraint.Columns.AddRange(columns);
 
             _migrationValidator.ApplyConventionsToAndValidateExpressions(_migration, new[] { expression });
 
-            Assert.That(expression.Constraint.Name, Is.EqualTo(expected));
+            Assert.That(expression.Constraint.ConstraintName, Is.EqualTo(expected));
         }
 
         [Test]

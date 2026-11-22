@@ -155,7 +155,7 @@ namespace FluentMigrator.Builders.Create
 
         private CreateCheckConstraintExpressionBuilder BuildCheck(string constraintName)
         {
-            var expression = new CreateCheckConstraintExpression { Constraint = { Name = constraintName } };
+            var expression = new CreateCheckConstraintExpression { Constraint = { ConstraintName = constraintName } };
             _context.Expressions.Add(expression);
             return new CreateCheckConstraintExpressionBuilder(expression);
         }
