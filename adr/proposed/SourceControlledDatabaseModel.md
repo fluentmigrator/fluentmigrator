@@ -118,21 +118,70 @@ is the `SchemaDotObject` filename policy.
 
 ## Consequences and constraints discovered while implementing
 
-Three MSBuild evaluation-order constraints shape the design, and each one, if
-ignored, fails *silently* — which for a document whose value is being committed
-and diffed is the one unacceptable failure mode.
+Four constraints, three of them about MSBuild's evaluation order, shape the
+design. Each one, if ignored, fails *silently* — which for a document whose value
+is being committed and diffed is the one unacceptable failure mode.
 
-**Pivots must be declared before the project body; convention selection cannot
-be.** Body-level edits like `<MigrationScript Update="…" ContentType="External" />`
-require the item to already exist, so pivots are declared in props. But
-`$(SourceModelConvention)` is naturally set *in* that body, after the props
-have been evaluated — so it cannot be an import condition without silently
-producing an empty model. Resolution: import every built-in pack, stamp each
-item with `Convention` metadata, and filter the unselected packs out at build
-time. This is how the .NET SDK handles `EnableDefaultCompileItems`, for exactly
-the same reason. Custom packs are imported by path from
+**A module's settings are a contract, decided by its own project.** A
+`Microsoft.NET.Sdk` project's item metadata, such as a `Compile` item's, never
+leaves the project. A module's does: its pivots' metadata and properties such
+as `$(DatabaseDialect)` and `$(DefaultSchema)` end up in its manifest and in the
+names its migrations create. A common module used through `ProjectReference` by
+several modules is deployed to all of their databases, so its manifest has to
+depend only on its own project file and its own directory tree, never on who
+references it or how they were built. That gives one order of precedence: the
+SDK's default, then the repository's `Directory.Build.props`, then the module's
+own project file, each overriding the one before.
+
+*Why not `Directory.Build.targets` for repository-wide settings:* it is imported
+after the project body, so the repository would override the module. MSBuild
+finds `Directory.Build.*` by walking up from the project's own folder, so a
+common module vendored into another repository as a git submodule picks up that
+repository's files. With `.targets`, the host repository would replace settings
+the module pinned for objects already in production, and the module's next
+build would describe different objects than the databases it already deployed.
+
+*Why a warning for global properties, and not stripping them:* a global
+property (`-p:`, a solution build, or a parent's `MSBuild` task) overrides even
+the project file, and MSBuild passes it on to every referenced project.
+`dotnet build Sales.csproj -p:DefaultSchema=sales` also rebuilds the `Core`
+module Sales references with that schema. Stripping the contract properties
+from `ProjectReference` (`GlobalPropertiesToRemove`) looks like the fix, but in a
+solution build the solution also passes the property to `Core` directly, so
+`Core` is built twice, with two different manifests, into one output folder,
+and whichever build finishes last wins. So a module with references warns
+(`FMSDK106`) and so does a host (`FMSDK213`) when one of
+`$(SourceModelContractProperties)` arrives as a global property. A `-p:` on a
+module without references stays legal; the provenance records it, and locked
+mode catches a manifest it changed.
+
+**Pivots must be declared before `Directory.Build.props`; convention selection
+and property defaults cannot be.** `<MigrationScript Update="…" ContentType="External" />`
+requires the item to already exist, and `Microsoft.NET.Sdk` imports
+`Directory.Build.props` from its own props. So the built-in packs are imported
+at the top of the SDK's `Sdk.props`, before `Microsoft.NET.Sdk`; an `Update` in
+`Directory.Build.props` and then one in the project body both find the items.
+`Microsoft.NET.Sdk` declares its default `Compile` items after
+`Directory.Build.props`, so a repository-wide `<Compile Update>` silently does
+nothing there; the precedence above is why this SDK doesn't copy that.
+
+Only items can come that early. A property default declared before
+`Directory.Build.props` would run first, so a default the repository sets with a
+`'$(X)' == ''` condition would never apply, and a property derived from another
+would capture an empty value. Item includes and conditions, by contrast, are
+evaluated after every property, so the packs' items still see the final
+`$(EnableDefaultSourceModelItems)` and `$(FlywayLocationRoot)`. Property defaults
+therefore stay in the convention props, after `Directory.Build.props`.
+
+`$(SourceModelConvention)` is naturally set *in* the project body, after every
+import — so it cannot be an import condition without silently producing an
+empty model. Resolution: import every built-in pack, stamp each item with
+`Convention` metadata, and filter the unselected packs out at build time. This
+is how the .NET SDK handles `EnableDefaultCompileItems`, for exactly the same
+reason. Custom packs are imported by path from
 `$(CustomSourceModelConventionPacks)`, which — being read at import time — must
-be set in `Directory.Build.props` or as a global property.
+be set in `Directory.Build.props`, so they are imported after it; a repository
+that wants different metadata on its own pack's items sets it in the pack.
 
 **Properties that derive from other body-settable properties must resolve at
 target time.** `$(VersionTableSchema)` falls back to `$(DefaultSchema)`; resolved

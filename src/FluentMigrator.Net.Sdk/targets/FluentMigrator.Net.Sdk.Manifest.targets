@@ -75,6 +75,83 @@
     </Task>
   </UsingTask>
 
+  <!-- Which of Names this build received as global properties. -->
+  <UsingTask TaskName="FindSourceModelGlobalProperties"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Names ParameterType="System.String[]" Required="true" />
+      <Found ParameterType="System.String[]" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        var found = new System.Collections.Generic.List<string>();
+        var engine = BuildEngine as Microsoft.Build.Framework.IBuildEngine6;
+        if (engine != null)
+        {
+            var globals = engine.GetGlobalProperties();
+            foreach (var name in Names)
+            {
+                foreach (var key in globals.Keys)
+                {
+                    if (string.Equals(key, name.Trim(), System.StringComparison.OrdinalIgnoreCase) && !found.Contains(key))
+                    {
+                        found.Add(key);
+                    }
+                }
+            }
+        }
+        Found = found.ToArray();
+      ]]></Code>
+    </Task>
+  </UsingTask>
+
+  <!--
+    A module's contract: the properties that decide what its manifest says,
+    and so what its migrations create. Add a custom pack's own properties
+    here, as FlywayLocationRoot is for the flyway pack.
+  -->
+  <PropertyGroup>
+    <SourceModelContractProperties>DatabaseDialect;DefaultSchema;IsDatabaseRootModule;VersionTableName;VersionTableSchema;SourceModelConvention;SourceModelRoot;EnableDefaultSourceModelItems;CustomSourceModelConventionPacks;FlywayLocationRoot;$(SourceModelContractProperties)</SourceModelContractProperties>
+  </PropertyGroup>
+
+  <!--
+    FMSDK106: a contract property arrived as a global property, and this
+    module references other projects.
+
+    A global property (-p:, a solution build, or a parent's MSBuild task)
+    overrides even the project file, and MSBuild passes it on to every
+    referenced project. `dotnet build Sales.csproj -p:DefaultSchema=sales`
+    therefore also rebuilds a common module Sales references with that
+    schema, and the common module's names and manifest change with whoever
+    built it. A module's manifest has to depend only on its own project
+    file and its directory tree.
+
+    Why a warning and not stripping the property from ProjectReferences
+    (GlobalPropertiesToRemove): in a solution build, the solution passes
+    the property to the common module directly as well, so stripping it on
+    the reference builds the same project twice with two different
+    manifests into one output folder, and whichever finishes last wins. A
+    -p: on a module with no references stays legal, and its provenance
+    records it.
+  -->
+  <Target Name="WarnOnSourceModelContractGlobalProperties"
+          BeforeTargets="ResolveProjectReferences"
+          Condition="'@(ProjectReference)' != ''">
+    <FindSourceModelGlobalProperties Names="$(SourceModelContractProperties)">
+      <Output TaskParameter="Found" ItemName="_FmContractGlobalProperty" />
+    </FindSourceModelGlobalProperties>
+    <PropertyGroup>
+      <_FmContractGlobalPropertyList>@(_FmContractGlobalProperty, ', ')</_FmContractGlobalPropertyList>
+      <_FmContractReferenceList>@(ProjectReference->'%(Filename)', ', ')</_FmContractReferenceList>
+      <_FmContractGlobalPropertyText>Set as a global property: $(_FmContractGlobalPropertyList). MSBuild passes global properties on to referenced projects, so the value also applies to $(_FmContractReferenceList). A module's manifest should depend only on its own project file: set the property in the project file or Directory.Build.props instead.</_FmContractGlobalPropertyText>
+    </PropertyGroup>
+    <Warning Condition="'$(_FmContractGlobalPropertyList)' != '' and '$(TreatSourceModelWarningsAsErrors)' != 'true'"
+             Code="FMSDK106" Text="$(_FmContractGlobalPropertyText)" />
+    <Error Condition="'$(_FmContractGlobalPropertyList)' != '' and '$(TreatSourceModelWarningsAsErrors)' == 'true'"
+           Code="FMSDK106" Text="$(_FmContractGlobalPropertyText)" />
+  </Target>
+
   <!--
     Convention selection. Every built-in pack was imported before the
     project body so that body-level `Update` edits have items to update;

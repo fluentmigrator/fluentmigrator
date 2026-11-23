@@ -89,6 +89,13 @@ The mapping to `EmbeddedResource`/`Content` runs at target time
 (`BeforeTargets="AssignTargetPaths"`), so body-level `Update` edits are
 respected.
 
+The same `Update` works for a whole repository in `Directory.Build.props`. The
+built-in pivots are declared before `Microsoft.NET.Sdk` imports that file, so
+the order of precedence is the SDK's default, then the repository's
+`Directory.Build.props`, then the module's project file. Don't use
+`Directory.Build.targets` for this: it is imported after the project body, so
+the repository would override the module.
+
 ## Conventions
 
 A *convention* is a layout dialect within a provider — how paths and filenames
@@ -108,13 +115,44 @@ Every convention normalizes onto the same **execution facet** vocabulary —
 `always` (staged) — so two repositories in different layouts still produce
 comparable manifests.
 
-All built-in convention packs are imported before the project body (that is
-what makes body-level `Update` edits possible), and the packs the project did
-not select are filtered out at build time. Custom packs are imported by path
-from `$(CustomSourceModelConventionPacks)`; because that list is read at import
-time it must be set in `Directory.Build.props` or as a global property, while
-`$(SourceModelConvention)` may be set anywhere. A custom pack must stamp
-`Convention` metadata matching the value the project selects.
+All built-in convention packs are imported before `Directory.Build.props` and
+the project body (that is what makes `Update` edits in either possible), and
+the packs the project did not select are filtered out at build time. Custom
+packs are imported by path from `$(CustomSourceModelConventionPacks)`; because
+that list is read at import time it must be set in `Directory.Build.props`,
+while `$(SourceModelConvention)` may be set anywhere. Custom packs are imported
+after `Directory.Build.props`, so set their items' metadata in the pack itself.
+A custom pack must stamp `Convention` metadata matching the value the project
+selects.
+
+## A module's settings are a contract
+
+A module's pivot metadata and properties such as `DatabaseDialect` and
+`DefaultSchema` decide what its manifest says and what its migrations create. A
+common module used through `ProjectReference` is shared by every module that
+references it, so its settings must come only from its own project file and its
+directory tree.
+
+A global property (`-p:`, a solution build, or a parent's `MSBuild` task)
+overrides even the project file, and MSBuild passes it on to every referenced
+project: `dotnet build Sales.csproj -p:DefaultSchema=sales` also builds the
+modules Sales references with that schema. A module with references therefore
+warns (`FMSDK106`) when a property in `$(SourceModelContractProperties)` arrives
+as a global property, and a host does the same (`FMSDK213`). A `-p:` on a
+module without references is fine; its provenance records it.
+
+The SDK warns rather than removing those properties from `ProjectReference`:
+in a solution build the solution passes them to the referenced module directly
+too, so removing them on the reference would build the same module twice, with
+two different manifests, into one output folder.
+
+Add a custom pack's own properties to the list:
+
+```xml
+<PropertyGroup>
+  <SourceModelContractProperties>MyPackRoot</SourceModelContractProperties>
+</PropertyGroup>
+```
 
 ## Central Package Management
 
@@ -361,6 +399,8 @@ frameworks, each one is checked.
 | `IsDatabaseRootModule` | `false` | The one module per database that owns `Tools/` and database-scoped `Maintenance/` |
 | `VersionTableName` / `VersionTableSchema` | `VersionInfo` / `$(DefaultSchema)` | Per-module VersionInfo table; compiler-visible |
 | `EnableDefaultSourceModelItems` | `true` | Disable built-in pivots for full manual control |
+| `FlywayLocationRoot` | `sql/` | Layout root of the `flyway` convention |
+| `SourceModelContractProperties` | the properties above that shape the manifest | Properties that warn (`FMSDK106`) when they arrive as global properties; the SDK appends its own to what you set |
 | `GenerateSourceModelManifest` | `true` | Turn the manifest step off |
 | `TreatSourceModelWarningsAsErrors` | `false` | Promote FMSDK1xx warnings |
 | `SourceModelManifestFileName` | `$(MSBuildProjectName).sourcemodel.json` | Output file name, without a path (`FMSDK003`) |
@@ -390,7 +430,9 @@ produced different source models, so there is no single lock (error);
 outside `SourceModelRoot` without `Link` metadata (warning); `FMSDK104`
 `Execution` other than `once`, `onChange` or `always` (warning; a known value in
 another case is written in its canonical spelling instead); `FMSDK105`
-`SourceModelProvenanceCheckWorkingTree` is on but `git status` failed (warning).
+`SourceModelProvenanceCheckWorkingTree` is on but `git status` failed (warning);
+`FMSDK106` a property in `SourceModelContractProperties` is a global property
+of a module that references other projects (warning).
 
 ## Building and testing
 

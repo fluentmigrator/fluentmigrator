@@ -1,0 +1,35 @@
+<Project>
+
+  <!--
+    The built-in convention packs' items, imported at the top of Sdk.props:
+    before Microsoft.NET.Sdk, and so before Directory.Build.props.
+
+    `Update` changes only items that already exist, and does nothing, without
+    a warning, when there are none yet. Declared here, the pivots exist when
+    a repository's Directory.Build.props and then the project body are
+    evaluated, so an `Update` in either applies, in the order of precedence:
+    the SDK's default, then the repository's, then the module's own.
+    Microsoft.NET.Sdk declares its default Compile items after
+    Directory.Build.props, so a repository-wide `<Compile Update>` there does
+    nothing. That is tolerable for Compile, whose metadata never leaves the
+    project. A module's pivot metadata ends up in its manifest, and a common
+    module's manifest is shared by every module that references it.
+
+    Directory.Build.targets would see the items too, but it is imported after
+    the project body, so the repository would override the module.
+
+    Only items can come this early:
+      - A property default here would run before Directory.Build.props, so a
+        default the repository sets with a "'$(X)' == ''" condition would
+        never apply, and a property derived from another would capture its
+        empty value. Property defaults stay in
+        FluentMigrator.Net.Sdk.Conventions.props.
+      - Item conditions and includes are evaluated after every property, so
+        they see the final values of $(EnableDefaultSourceModelItems) and
+        $(FlywayLocationRoot) wherever those are set.
+      - Custom packs from $(CustomSourceModelConventionPacks) can't move here:
+        the list is set in Directory.Build.props, which hasn't been read yet.
+  -->
+  <Import Project="$(MSBuildThisFileDirectory)conventions/*.props" />
+
+</Project>

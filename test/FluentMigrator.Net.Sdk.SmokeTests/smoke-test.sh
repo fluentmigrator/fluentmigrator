@@ -160,6 +160,27 @@ assert_contains "$OUT/AdventureLite.dll" "order_statuses"       "embedded migrat
 assert_contains "$OUT/AdventureLite.dll" "seed_customers"       "embedded seed data is in the assembly"
 assert_not_contains "$OUT/AdventureLite.dll" "V002_rebuild_stats" "external script is not embedded"
 
+section "a repository-wide Update in Directory.Build.props"
+# Regression: the built-in pivots were declared after Microsoft.NET.Sdk had
+# imported Directory.Build.props, so an Update there matched no item and did
+# nothing, without a warning. This replaces the repository's file with one
+# that imports it and adds two Updates.
+REPO_PROPS=$SCRATCH/Directory.Build.props
+cat > "$REPO_PROPS" <<XML
+<Project>
+  <Import Project="$(native_path "$REPO_ROOT")/Directory.Build.props" />
+  <ItemGroup>
+    <MigrationScript Update="Migrations/Scripts/V001_backfill_status.sql" ContentType="External" />
+    <MigrationScript Update="Migrations/Scripts/V002_rebuild_stats.sql" ContentType="Embedded" />
+  </ItemGroup>
+</Project>
+XML
+build "$ADVENTURE" -p:DirectoryBuildPropsPath="$(native_path "$REPO_PROPS")" > /dev/null
+assert_object "$MANIFEST" "Migrations/Scripts/V001_backfill_status.sql" '"contentType": "external"' "an Update in Directory.Build.props applies"
+assert_object "$MANIFEST" "Migrations/Scripts/V002_rebuild_stats.sql"   '"contentType": "external"' "the module's own Update still wins over the repository's"
+build "$ADVENTURE" > /dev/null
+assert_object "$MANIFEST" "Migrations/Scripts/V001_backfill_status.sql" '"contentType": "embedded"' "and back without it"
+
 # --------------------------------------------------------------- diagnostics
 
 section "FMSDK001 duplicate object identity"
@@ -644,6 +665,28 @@ assert_file "$HOST_INTERMEDIATE" "with its intermediate copy"
 dotnet clean "$COMPOSITE/AdventureHost" -v:minimal > /dev/null
 assert_no_file "$HOST" "dotnet clean removes the host manifest"
 build "$COMPOSITE/AdventureHost" > /dev/null
+
+section "FMSDK106/213 a contract property set as a global property"
+# A global property overrides even the project file and flows on to every
+# referenced project, so -p:DefaultSchema on Sales also rebuilds Core with it.
+CONTRACT_OUT=$(build "$COMPOSITE/Sales" -p:DefaultSchema=elsewhere 2>&1 || true)
+if printf '%s' "$CONTRACT_OUT" | grep "warning FMSDK106" | grep -q "DefaultSchema.*Core"; then
+  pass "FMSDK106 names the property and the referenced module"
+else
+  fail "FMSDK106 expected for -p:DefaultSchema on a module that references Core"
+fi
+STRICT_OUT=$(build "$COMPOSITE/Sales" -p:DefaultSchema=elsewhere -p:TreatSourceModelWarningsAsErrors=true 2>&1 || true)
+if printf '%s' "$STRICT_OUT" | grep -q "error FMSDK106"; then pass "and is an error with TreatSourceModelWarningsAsErrors"; else fail "FMSDK106 error expected with TreatSourceModelWarningsAsErrors"; fi
+NOREF_OUT=$(build "$ADVENTURE" -p:DatabaseDialect=postgres 2>&1 || true)
+if printf '%s' "$NOREF_OUT" | grep -q "FMSDK106"; then fail "FMSDK106 should not fire for a module without references"; else pass "a -p: on a module without references stays quiet"; fi
+HOST_GLOBAL_OUT=$(build "$COMPOSITE/AdventureHost" -p:DatabaseDialect=postgres 2>&1 || true)
+if printf '%s' "$HOST_GLOBAL_OUT" | grep "warning FMSDK213" | grep -q "Core, Sales"; then
+  pass "FMSDK213 names every module the host passes it to"
+else
+  fail "FMSDK213 expected for -p:DatabaseDialect on the host"
+fi
+build "$COMPOSITE/AdventureHost" > /dev/null
+build "$ADVENTURE" > /dev/null
 
 # ------------------------------------------------------------------- flyway
 

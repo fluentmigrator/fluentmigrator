@@ -158,6 +158,7 @@ VersionInfo tables make mechanically possible.
 | `HostManifestFileName` | `$(MSBuildProjectName).host.json` | Output name |
 | `TreatHostWarningsAsErrors` | `false` | Promote FMSDK2xx warnings |
 | `RequireSourceModelProvenance` | `false` | Make `FMSDK211` and `FMSDK212` errors |
+| `SourceModelContractProperties` | the modules' contract properties | Properties that warn (`FMSDK213`) when they arrive as global properties; the same list as FluentMigrator.Net.Sdk's |
 | `GenerateMigrationHost` | `false` | Reserved: `OutputType=Exe` entry-point generation over `FluentMigrator.Runner.Host` |
 
 Diagnostics: `FMSDK201` declared order contradicts the reference graph (warn),
@@ -169,7 +170,10 @@ context (error), `FMSDK208` no runner registered for a target's dialect (warn),
 modules of a target without a `Dialect` declare different dialects (warn),
 `FMSDK211` a module's source model manifest has no provenance beside it (warn),
 `FMSDK212` a module's manifest doesn't have the SHA-256 its provenance records
-(warn). `FMSDK211` and `FMSDK212` are errors with `RequireSourceModelProvenance`.
+(warn), `FMSDK213` a module contract property such as `DatabaseDialect` is a
+global property of the host, so MSBuild passes it on to every module (warn; set
+a target's dialect with its `Dialect` metadata instead). `FMSDK211` and
+`FMSDK212` are errors with `RequireSourceModelProvenance`.
 
 ## Module provenance
 
