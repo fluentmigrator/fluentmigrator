@@ -133,6 +133,22 @@ references it or how they were built. That gives one order of precedence: the
 SDK's default, then the repository's `Directory.Build.props`, then the module's
 own project file, each overriding the one before.
 
+*Why this departs from `Microsoft.NET.Sdk`:* `Microsoft.NET.Sdk` guards against
+none of the ways a project's settings can be changed from outside it, and it
+doesn't need to, since a `Compile` item's metadata stays in the project. A
+module is used in more ways than that. Other modules and hosts reference it
+through `ProjectReference`, solutions build it, and other repositories vendor it
+as a submodule. Each of those is a way in for a setting the module's project
+file doesn't contain. Following `Microsoft.NET.Sdk`'s pattern would leave all of
+them open, so closing each one is an acceptance criterion for this SDK:
+
+| Way in | Does `Microsoft.NET.Sdk` guard against it? | What this SDK does |
+|---|---|---|
+| An `Update` in `Directory.Build.props`, evaluated before the items exist | No; it matches nothing and does nothing, without a warning | Declares the built-in pivots before `Microsoft.NET.Sdk`, so the `Update` finds them (see *Pivots must be declared before `Directory.Build.props`* below) |
+| `Directory.Build.targets` overriding the module | No | Documents the order of precedence above, and why `.targets` is the wrong place for repository-wide settings (below) |
+| A parent folder's `Directory.Build.props`, picked up when the module is vendored into another repository | No | The module's project file still wins, because it is evaluated after `Directory.Build.props`. A setting the module leaves unset can still be inherited; a committed lock file shows that in its diff, and locked mode fails with `FMSDK004` |
+| A global property passed on through `ProjectReference` | No | Warns: `FMSDK106` in a module with references, `FMSDK213` in a host. Import order can't fix this, because a global property overrides even the project file (below) |
+
 *Why not `Directory.Build.targets` for repository-wide settings:* it is imported
 after the project body, so the repository would override the module. MSBuild
 finds `Directory.Build.*` by walking up from the project's own folder, so a
