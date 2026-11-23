@@ -123,7 +123,11 @@ that list is read at import time it must be set in `Directory.Build.props`,
 while `$(SourceModelConvention)` may be set anywhere. Custom packs are imported
 after `Directory.Build.props`, so set their items' metadata in the pack itself.
 A custom pack must stamp `Convention` metadata matching the value the project
-selects.
+selects, and should put `Condition="'$(EnableDefaultSourceModelItems)' == 'true'"`
+on its `ItemGroup`s as the built-in packs do: the SDK checks that property when
+it imports the pack, which is before the project body, so without the condition
+a module that turns the defaults off in its project file still gets the pack's
+items.
 
 ## A module's settings are a contract
 

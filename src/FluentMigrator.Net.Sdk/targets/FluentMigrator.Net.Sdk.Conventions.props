@@ -105,6 +105,13 @@
     after Directory.Build.props, a repository-wide `Update` of a custom pack's
     items does nothing; the repository owns the pack, so it sets that
     metadata in the pack itself.
+
+    The import's EnableDefaultSourceModelItems condition is also evaluated
+    before the project body, so it sees only a value set in
+    Directory.Build.props or on the command line. A custom pack therefore
+    puts the same condition on its own ItemGroups, as the built-in packs
+    do, so that a module turning the defaults off in its project file turns
+    the pack's items off too.
   -->
   <Import Project="$(CustomSourceModelConventionPacks)"
           Condition="'$(EnableDefaultSourceModelItems)' == 'true' and '$(CustomSourceModelConventionPacks)' != ''" />

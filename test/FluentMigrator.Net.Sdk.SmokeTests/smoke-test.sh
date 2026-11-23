@@ -711,6 +711,31 @@ assert_object   "$FLY" "sql/callback/beforeMigrate.sql"  '"stage": "callback"'  
 # The fluentmigrator pack is imported too; selection must filter it back out.
 assert_not_contains "$FLY" '"type": "migration"' "non-selected convention's pivots excluded"
 
+section "EnableDefaultSourceModelItems=false in the project body"
+# The built-in packs are imported before the project body, so the opt-out is
+# an item condition rather than an import condition: item conditions see the
+# body's value. Each project turns the defaults off and declares one item of
+# its own, which has to survive.
+opt_out() { # project item-xml
+  backup "$1"
+  sed -i "s|^  <Import Project=\"[./]*/src/FluentMigrator.Net.Sdk/Sdk/Sdk.targets\" />|  <PropertyGroup><EnableDefaultSourceModelItems>false</EnableDefaultSourceModelItems></PropertyGroup>\n  <ItemGroup>$2</ItemGroup>\n&|" "$1"
+}
+opt_out "$ADVENTURE_PROJ" '<SqlObject Include="Schema/Views/sales.open_orders.sql" ObjectType="view" NamePolicy="SchemaDotObject" Execution="onChange" />'
+build "$ADVENTURE" > /dev/null
+assert_count        "$MANIFEST" '"provider": "sql"' 1 "fluentmigrator: only the explicitly declared object is left"
+assert_object       "$MANIFEST" "Schema/Views/sales.open_orders.sql" '"type": "view"' "fluentmigrator: the explicit item is kept"
+assert_not_contains "$MANIFEST" "V001_backfill_status" "fluentmigrator: the built-in pivots are gone"
+restore "$ADVENTURE_PROJ"
+build "$ADVENTURE" > /dev/null
+FLYWAY_PROJ=$FLYWAY/FlywayStyle.csproj
+opt_out "$FLYWAY_PROJ" '<SqlObject Include="sql/V1__Initial_Schema.sql" ObjectType="migration-script" NamePolicy="FlywayPrefixed" Execution="once" />'
+build "$FLYWAY" > /dev/null
+assert_count        "$FLY" '"provider": "sql"' 1 "flyway: only the explicitly declared object is left"
+assert_object       "$FLY" "sql/V1__Initial_Schema.sql" '"version": "1"' "flyway: the explicit item is kept"
+assert_not_contains "$FLY" "R__01_Create_User_View" "flyway: the built-in pivots are gone"
+restore "$FLYWAY_PROJ"
+build "$FLYWAY" > /dev/null
+
 # --------------------------------------------------------------------- pack
 
 section "pack"
