@@ -669,7 +669,9 @@ build "$COMPOSITE/AdventureHost" > /dev/null
 section "FMSDK106/213 a contract property set as a global property"
 # A global property overrides even the project file and flows on to every
 # referenced project, so -p:DefaultSchema on Sales also rebuilds Core with it.
-CONTRACT_OUT=$(build "$COMPOSITE/Sales" -p:DefaultSchema=elsewhere 2>&1 || true)
+# FMSDK106 and FMSDK213 are warnings, so those builds must still succeed; only
+# the strict build is expected to fail.
+CONTRACT_OUT=$(build "$COMPOSITE/Sales" -p:DefaultSchema=elsewhere 2>&1) || fail "Sales with -p:DefaultSchema should still build"
 if printf '%s' "$CONTRACT_OUT" | grep "warning FMSDK106" | grep -q "DefaultSchema.*Core"; then
   pass "FMSDK106 names the property and the referenced module"
 else
@@ -677,9 +679,14 @@ else
 fi
 STRICT_OUT=$(build "$COMPOSITE/Sales" -p:DefaultSchema=elsewhere -p:TreatSourceModelWarningsAsErrors=true 2>&1 || true)
 if printf '%s' "$STRICT_OUT" | grep -q "error FMSDK106"; then pass "and is an error with TreatSourceModelWarningsAsErrors"; else fail "FMSDK106 error expected with TreatSourceModelWarningsAsErrors"; fi
-NOREF_OUT=$(build "$ADVENTURE" -p:DatabaseDialect=postgres 2>&1 || true)
-if printf '%s' "$NOREF_OUT" | grep -q "FMSDK106"; then fail "FMSDK106 should not fire for a module without references"; else pass "a -p: on a module without references stays quiet"; fi
-HOST_GLOBAL_OUT=$(build "$COMPOSITE/AdventureHost" -p:DatabaseDialect=postgres 2>&1 || true)
+if ! NOREF_OUT=$(build "$ADVENTURE" -p:DatabaseDialect=postgres 2>&1); then
+  fail "a -p: on a module without references should build"
+elif printf '%s' "$NOREF_OUT" | grep -q "FMSDK106"; then
+  fail "FMSDK106 should not fire for a module without references"
+else
+  pass "a -p: on a module without references builds, without FMSDK106"
+fi
+HOST_GLOBAL_OUT=$(build "$COMPOSITE/AdventureHost" -p:DatabaseDialect=postgres 2>&1) || fail "the host with -p:DatabaseDialect should still build"
 if printf '%s' "$HOST_GLOBAL_OUT" | grep "warning FMSDK213" | grep -q "Core, Sales"; then
   pass "FMSDK213 names every module the host passes it to"
 else
