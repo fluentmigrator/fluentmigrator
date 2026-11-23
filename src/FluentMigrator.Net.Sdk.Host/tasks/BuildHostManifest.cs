@@ -86,6 +86,10 @@ namespace FluentMigrator.Net.Sdk.Host.Tasks
 
         public bool TreatValidationWarningsAsErrors { get; set; }
 
+        /// Codes that stay warnings even with TreatValidationWarningsAsErrors
+        /// (NoWarn and WarningsNotAsErrors), upper case, each between ';'.
+        public string WarningsNotAsErrors { get; set; }
+
         /// FMSDK211 and FMSDK212 are errors instead of warnings.
         public bool RequireSourceModelProvenance { get; set; }
 
@@ -524,7 +528,9 @@ namespace FluentMigrator.Net.Sdk.Host.Tasks
 
         private void Report(string code, string message)
         {
-            if (TreatValidationWarningsAsErrors)
+            bool promote = TreatValidationWarningsAsErrors
+                && (WarningsNotAsErrors ?? "").IndexOf(";" + code + ";", StringComparison.Ordinal) < 0;
+            if (promote)
             {
                 Log.LogError(null, code, null, null, 0, 0, 0, 0, message);
             }

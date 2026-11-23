@@ -156,13 +156,16 @@ VersionInfo tables make mechanically possible.
 | `GenerateHostManifest` | `true` | Turn manifest generation off |
 | `HostManifestFile` | *(empty)* | Ship a hand-authored manifest verbatim |
 | `HostManifestFileName` | `$(MSBuildProjectName).host.json` | Output name |
-| `TreatHostWarningsAsErrors` | `false` | Promote FMSDK2xx warnings |
+| `TreatHostWarningsAsErrors` | `$(TreatWarningsAsErrors)`, else `false` | Promote FMSDK2xx warnings, except codes in `NoWarn` or `WarningsNotAsErrors` |
 | `RequireSourceModelProvenance` | `false` | Make `FMSDK211` and `FMSDK212` errors |
 | `SourceModelContractProperties` | the modules' contract properties | Properties that warn (`FMSDK213`) when they arrive as global properties; the same list as FluentMigrator.Net.Sdk's |
 | `GenerateMigrationHost` | `false` | Reserved: `OutputType=Exe` entry-point generation over `FluentMigrator.Runner.Host` |
 
 Diagnostics (the warnings become errors with `TreatHostWarningsAsErrors=true`,
-and `FMSDK211` and `FMSDK212` also with `RequireSourceModelProvenance=true`):
+and `FMSDK211` and `FMSDK212` also with `RequireSourceModelProvenance=true`).
+`TreatHostWarningsAsErrors` follows `TreatWarningsAsErrors` unless you set it,
+and a code in `NoWarn` or `WarningsNotAsErrors` is never promoted, as with C#
+warnings; see FluentMigrator.Net.Sdk's README for why.
 
 | Code | Severity | Meaning |
 |---|---|---|

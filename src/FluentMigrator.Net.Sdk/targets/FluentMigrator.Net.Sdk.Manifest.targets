@@ -116,6 +116,32 @@
   </PropertyGroup>
 
   <!--
+    Whether the FMSDK1xx warnings are errors.
+
+    Unset, TreatSourceModelWarningsAsErrors follows TreatWarningsAsErrors.
+    That property only reaches the C# compiler, so without this a repository
+    that fails its build on every warning would still let FMSDK106 scroll
+    past. NuGet makes the same choice for its NU warnings. Set it to false
+    to keep these warnings while C# warnings are errors.
+
+    The default is decided here, after the project body, rather than in the
+    props with the other defaults: TreatWarningsAsErrors is often set in the
+    body, and the props are evaluated before it.
+
+    A code in NoWarn or WarningsNotAsErrors is never promoted, as with the
+    compiler. MSBuild hides a warning listed in NoWarn but not an error, so
+    promoting it would turn a warning the repository suppressed into a
+    failed build. _FmWarningsNotAsErrors holds both lists in upper case,
+    with ';' around every code, so that a code is found with
+    Contains(';FMSDK106;').
+  -->
+  <PropertyGroup>
+    <TreatSourceModelWarningsAsErrors Condition="'$(TreatSourceModelWarningsAsErrors)' == ''">$(TreatWarningsAsErrors)</TreatSourceModelWarningsAsErrors>
+    <TreatSourceModelWarningsAsErrors Condition="'$(TreatSourceModelWarningsAsErrors)' == ''">false</TreatSourceModelWarningsAsErrors>
+    <_FmWarningsNotAsErrors>;$([System.Text.RegularExpressions.Regex]::Replace('$(NoWarn);$(WarningsNotAsErrors)', '[\s,;]+', ';').ToUpperInvariant());</_FmWarningsNotAsErrors>
+  </PropertyGroup>
+
+  <!--
     FMSDK106: a contract property arrived as a global property, and this
     module references other projects.
 
@@ -146,9 +172,13 @@
       <_FmContractReferenceList>@(ProjectReference->'%(Filename)', ', ')</_FmContractReferenceList>
       <_FmContractGlobalPropertyText>Set as a global property: $(_FmContractGlobalPropertyList). MSBuild passes global properties on to referenced projects, so the value also applies to $(_FmContractReferenceList). A module's manifest should depend only on its own project file: set the property in the project file or Directory.Build.props instead.</_FmContractGlobalPropertyText>
     </PropertyGroup>
-    <Warning Condition="'$(_FmContractGlobalPropertyList)' != '' and '$(TreatSourceModelWarningsAsErrors)' != 'true'"
+    <PropertyGroup>
+      <_FmContractAsError>false</_FmContractAsError>
+      <_FmContractAsError Condition="'$(TreatSourceModelWarningsAsErrors)' == 'true' and !$(_FmWarningsNotAsErrors.Contains(';FMSDK106;'))">true</_FmContractAsError>
+    </PropertyGroup>
+    <Warning Condition="'$(_FmContractGlobalPropertyList)' != '' and '$(_FmContractAsError)' != 'true'"
              Code="FMSDK106" Text="$(_FmContractGlobalPropertyText)" />
-    <Error Condition="'$(_FmContractGlobalPropertyList)' != '' and '$(TreatSourceModelWarningsAsErrors)' == 'true'"
+    <Error Condition="'$(_FmContractGlobalPropertyList)' != '' and '$(_FmContractAsError)' == 'true'"
            Code="FMSDK106" Text="$(_FmContractGlobalPropertyText)" />
   </Target>
 
@@ -281,6 +311,7 @@
       <_SourceModelInputsStampLine Include="property:Convention=$(SourceModelConvention)" />
       <_SourceModelInputsStampLine Include="property:IsRoot=$(IsDatabaseRootModule)" />
       <_SourceModelInputsStampLine Include="property:WarningsAsErrors=$(TreatSourceModelWarningsAsErrors)" />
+      <_SourceModelInputsStampLine Include="property:WarningsNotAsErrors=$(_FmWarningsNotAsErrors)" />
       <_SourceModelInputsStampLine Include="@(SourceModelFile->'item:%(Identity)|Provider=%(Provider)|ObjectType=%(ObjectType)|UniqueIdentity=%(UniqueIdentity)|NamePolicy=%(NamePolicy)|Schema=%(Schema)|ObjectName=%(ObjectName)|Role=%(Role)|ContentType=%(ContentType)|Execution=%(Execution)|Stage=%(Stage)|Link=%(Link)')" />
       <_SourceModelInputsStampLine Include="@(_SourceModelFileHash->'hash:%(Identity)=%(FileHash)')" />
     </ItemGroup>
@@ -308,7 +339,8 @@
                       IsRootModule="$(IsDatabaseRootModule)"
                       Convention="$(SourceModelConvention)"
                       ManifestPath="$(SourceModelIntermediateManifestPath)"
-                      TreatValidationWarningsAsErrors="$(TreatSourceModelWarningsAsErrors)" />
+                      TreatValidationWarningsAsErrors="$(TreatSourceModelWarningsAsErrors)"
+                      WarningsNotAsErrors="$(_FmWarningsNotAsErrors)" />
 
     <!--
       The task leaves an unchanged manifest alone, so that an input change
@@ -533,7 +565,8 @@
                       IsRootModule="$(IsDatabaseRootModule)"
                       Convention="$(SourceModelConvention)"
                       ManifestPath="$(_SourceModelVerifyDirectory)$(SourceModelManifestFileName)"
-                      TreatValidationWarningsAsErrors="$(TreatSourceModelWarningsAsErrors)" />
+                      TreatValidationWarningsAsErrors="$(TreatSourceModelWarningsAsErrors)"
+                      WarningsNotAsErrors="$(_FmWarningsNotAsErrors)" />
     <WriteSourceModelProvenance ManifestPath="$(_SourceModelVerifyDirectory)$(SourceModelManifestFileName)"
                                 ManifestName="$(SourceModelManifestFileName)"
                                 ProvenancePath="$(_SourceModelVerifyDirectory)$(SourceModelProvenanceFileName)"

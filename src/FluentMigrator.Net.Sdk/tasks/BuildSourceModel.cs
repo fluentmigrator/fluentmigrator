@@ -67,6 +67,10 @@ namespace FluentMigrator.Net.Sdk.Tasks
 
         public bool TreatValidationWarningsAsErrors { get; set; }
 
+        /// Codes that stay warnings even with TreatValidationWarningsAsErrors
+        /// (NoWarn and WarningsNotAsErrors), upper case, each between ';'.
+        public string WarningsNotAsErrors { get; set; }
+
         public bool IsRootModule { get; set; }
 
         public string Convention { get; set; }
@@ -404,7 +408,9 @@ namespace FluentMigrator.Net.Sdk.Tasks
 
         private void Report(string code, string message, bool isWarning)
         {
-            if (isWarning && !TreatValidationWarningsAsErrors)
+            bool promote = TreatValidationWarningsAsErrors
+                && (WarningsNotAsErrors ?? "").IndexOf(";" + code + ";", StringComparison.Ordinal) < 0;
+            if (isWarning && !promote)
             {
                 Log.LogWarning(null, code, null, null, 0, 0, 0, 0, message);
             }

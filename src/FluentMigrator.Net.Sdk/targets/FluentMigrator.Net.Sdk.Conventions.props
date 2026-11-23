@@ -60,7 +60,8 @@
 
     <EnableDefaultSourceModelItems Condition="'$(EnableDefaultSourceModelItems)' == ''">true</EnableDefaultSourceModelItems>
     <GenerateSourceModelManifest Condition="'$(GenerateSourceModelManifest)' == ''">true</GenerateSourceModelManifest>
-    <TreatSourceModelWarningsAsErrors Condition="'$(TreatSourceModelWarningsAsErrors)' == ''">false</TreatSourceModelWarningsAsErrors>
+    <!-- TreatSourceModelWarningsAsErrors defaults in Manifest.targets, after
+         the project body, because it follows TreatWarningsAsErrors. -->
     <SourceModelManifestFileName Condition="'$(SourceModelManifestFileName)' == ''">$(MSBuildProjectName).sourcemodel.json</SourceModelManifestFileName>
 
     <!--

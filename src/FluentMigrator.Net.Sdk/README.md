@@ -406,7 +406,7 @@ frameworks, each one is checked.
 | `FlywayLocationRoot` | `sql/` | Layout root of the `flyway` convention |
 | `SourceModelContractProperties` | the properties above that shape the manifest | Properties that warn (`FMSDK106`) when they arrive as global properties; the SDK appends its own to what you set |
 | `GenerateSourceModelManifest` | `true` | Turn the manifest step off |
-| `TreatSourceModelWarningsAsErrors` | `false` | Promote FMSDK1xx warnings, except `FMSDK105` |
+| `TreatSourceModelWarningsAsErrors` | `$(TreatWarningsAsErrors)`, else `false` | Promote FMSDK1xx warnings, except `FMSDK105` and codes in `NoWarn` or `WarningsNotAsErrors` |
 | `SourceModelManifestFileName` | `$(MSBuildProjectName).sourcemodel.json` | Output file name, without a path (`FMSDK003`) |
 | `GenerateSourceModelLockFile` | `false` | Compare the lock file every build; create or update it |
 | `SourceModelLockedMode` | `false` | Fail (`FMSDK004`) instead of writing the lock; for CI |
@@ -420,7 +420,13 @@ frameworks, each one is checked.
 | `SourceModelVerifyManifest` / `SourceModelVerifyProvenance` | the `bin/` manifest / its provenance | What `-t:VerifySourceModel` checks |
 
 Diagnostics (the warnings other than `FMSDK105` become errors with
-`TreatSourceModelWarningsAsErrors=true`):
+`TreatSourceModelWarningsAsErrors=true`).
+`TreatSourceModelWarningsAsErrors` follows `TreatWarningsAsErrors` unless you
+set it. `TreatWarningsAsErrors` on its own only reaches the C# compiler, so
+without this a repository that fails its build on any warning would still let
+these scroll past. As with C# warnings, a code in `NoWarn` stays hidden and a
+code in `WarningsNotAsErrors` stays a warning. To keep all of them warnings
+while C# warnings are errors, set `TreatSourceModelWarningsAsErrors` to `false`.
 
 | Code | Severity | Meaning |
 |---|---|---|

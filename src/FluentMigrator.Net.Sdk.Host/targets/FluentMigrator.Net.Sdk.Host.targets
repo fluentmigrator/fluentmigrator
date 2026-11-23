@@ -14,6 +14,19 @@
     <HostManifestPath>$(OutputPath)$(HostManifestFileName)</HostManifestPath>
   </PropertyGroup>
 
+  <!--
+    Whether the FMSDK2xx warnings are errors: unset, TreatHostWarningsAsErrors
+    follows TreatWarningsAsErrors, and a code in NoWarn or
+    WarningsNotAsErrors stays a warning. Decided here, after the project
+    body, for the reasons given beside TreatSourceModelWarningsAsErrors in
+    FluentMigrator.Net.Sdk's Manifest.targets.
+  -->
+  <PropertyGroup>
+    <TreatHostWarningsAsErrors Condition="'$(TreatHostWarningsAsErrors)' == ''">$(TreatWarningsAsErrors)</TreatHostWarningsAsErrors>
+    <TreatHostWarningsAsErrors Condition="'$(TreatHostWarningsAsErrors)' == ''">false</TreatHostWarningsAsErrors>
+    <_FmWarningsNotAsErrors>;$([System.Text.RegularExpressions.Regex]::Replace('$(NoWarn);$(WarningsNotAsErrors)', '[\s,;]+', ';').ToUpperInvariant());</_FmWarningsNotAsErrors>
+  </PropertyGroup>
+
   <UsingTask TaskName="FluentMigrator.Net.Sdk.Host.Tasks.BuildHostManifest"
              TaskFactory="RoslynCodeTaskFactory"
              AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
@@ -85,9 +98,13 @@
       <_FmContractReferenceList>@(ProjectReference->'%(Filename)', ', ')</_FmContractReferenceList>
       <_FmContractGlobalPropertyText>Set as a global property: $(_FmContractGlobalPropertyList). MSBuild passes global properties on to referenced projects, so the value also applies to $(_FmContractReferenceList). Set the property in each module's project file or Directory.Build.props, and a target's dialect with its Dialect metadata.</_FmContractGlobalPropertyText>
     </PropertyGroup>
-    <Warning Condition="'$(_FmContractGlobalPropertyList)' != '' and '$(TreatHostWarningsAsErrors)' != 'true'"
+    <PropertyGroup>
+      <_FmContractAsError>false</_FmContractAsError>
+      <_FmContractAsError Condition="'$(TreatHostWarningsAsErrors)' == 'true' and !$(_FmWarningsNotAsErrors.Contains(';FMSDK213;'))">true</_FmContractAsError>
+    </PropertyGroup>
+    <Warning Condition="'$(_FmContractGlobalPropertyList)' != '' and '$(_FmContractAsError)' != 'true'"
              Code="FMSDK213" Text="$(_FmContractGlobalPropertyText)" />
-    <Error Condition="'$(_FmContractGlobalPropertyList)' != '' and '$(TreatHostWarningsAsErrors)' == 'true'"
+    <Error Condition="'$(_FmContractGlobalPropertyList)' != '' and '$(_FmContractAsError)' == 'true'"
            Code="FMSDK213" Text="$(_FmContractGlobalPropertyText)" />
   </Target>
 
@@ -121,6 +138,7 @@
                        ProjectName="$(MSBuildProjectName)"
                        ManifestPath="$(HostIntermediateManifestPath)"
                        TreatValidationWarningsAsErrors="$(TreatHostWarningsAsErrors)"
+                       WarningsNotAsErrors="$(_FmWarningsNotAsErrors)"
                        RequireSourceModelProvenance="$(RequireSourceModelProvenance)" />
 
     <Copy SourceFiles="$(HostIntermediateManifestPath)"

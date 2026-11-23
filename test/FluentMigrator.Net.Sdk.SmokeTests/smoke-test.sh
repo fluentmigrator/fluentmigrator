@@ -35,9 +35,17 @@ BACKUPS=()
 backup() { cp "$1" "$1.smokebak"; BACKUPS+=("$1"); }
 restore() { if [ -f "$1.smokebak" ]; then mv "$1.smokebak" "$1"; fi; }
 
+# Adds XML to a sample project's body, just before it imports Sdk.targets,
+# where a project file sets its own properties and items. Unlike -p:, this is
+# not a global property: it is what a module or host sets for itself.
+in_body() { # project xml
+  backup "$1"
+  sed -i "s|^  <Import Project=\"[./]*/src/FluentMigrator\.Net\.Sdk[.A-Za-z]*/Sdk/Sdk\.targets\" />|  $2\n&|" "$1"
+}
+
 cleanup() {
   rm -rf "$FEED" "$SCRATCH" "$SHARED"
-  rm -rf "$ADVENTURE/Schema/Views/legacy" "$ADVENTURE/Schema/Functions/sales.open_orders.sql"
+  rm -rf "$ADVENTURE/Schema/Views/legacy" "$ADVENTURE/Schema/Functions/sales.open_orders.sql" "$ADVENTURE/Schema/Views/sales.empty_view.sql"
   rm -f "$ADVENTURE/AdventureLite.sourcemodel.lock.json" "$ADVENTURE/Schema/Views/sales.tmp_lock.sql"
   if [ -f "$COMPOSITE/AdventureHost/AdventureHost.csproj.bak" ]; then
     mv "$COMPOSITE/AdventureHost/AdventureHost.csproj.bak" "$COMPOSITE/AdventureHost/AdventureHost.csproj"
@@ -695,6 +703,42 @@ fi
 build "$COMPOSITE/AdventureHost" > /dev/null
 build "$ADVENTURE" > /dev/null
 
+section "TreatWarningsAsErrors in the project body promotes FMSDK warnings"
+# Unset, TreatSourceModelWarningsAsErrors and TreatHostWarningsAsErrors
+# follow TreatWarningsAsErrors. Set in the body, as most projects set it, it
+# is only visible because the SDKs decide those defaults in their targets.
+# A code in NoWarn or WarningsNotAsErrors stays a warning, as with C#.
+outcome() { # code build-args...  -> prints "<exit status>:<error, warning or none>"
+  local code=$1 out status=0 kind=none; shift
+  out=$(build "$@" 2>&1) || status=1
+  if printf '%s' "$out" | grep -q "error $code"; then kind=error
+  elif printf '%s' "$out" | grep -q "warning $code"; then kind=warning; fi
+  printf '%s:%s' "$status" "$kind"
+}
+expect() { # actual expected message
+  if [ "$1" = "$2" ]; then pass "$3"; else fail "$3 (expected $2, got $1)"; fi
+}
+SALES_PROJ=$COMPOSITE/Sales/Sales.csproj
+in_body "$SALES_PROJ" '<PropertyGroup><TreatWarningsAsErrors>true</TreatWarningsAsErrors></PropertyGroup>'
+expect "$(outcome FMSDK106 "$COMPOSITE/Sales" -p:DefaultSchema=elsewhere)" "1:error" "FMSDK106 is an error, and the build fails"
+expect "$(outcome FMSDK106 "$COMPOSITE/Sales" -p:DefaultSchema=elsewhere -p:NoWarn=FMSDK106)" "0:none" "NoWarn still hides it"
+expect "$(outcome FMSDK106 "$COMPOSITE/Sales" -p:DefaultSchema=elsewhere -p:WarningsNotAsErrors=FMSDK106)" "0:warning" "WarningsNotAsErrors keeps it a warning"
+expect "$(outcome FMSDK106 "$COMPOSITE/Sales" -p:DefaultSchema=elsewhere -p:TreatSourceModelWarningsAsErrors=false)" "0:warning" "TreatSourceModelWarningsAsErrors=false keeps it a warning"
+restore "$SALES_PROJ"
+# A warning the BuildSourceModel task reports, rather than the targets.
+in_body "$ADVENTURE_PROJ" '<PropertyGroup><TreatWarningsAsErrors>true</TreatWarningsAsErrors></PropertyGroup>'
+: > "$ADVENTURE/Schema/Views/sales.empty_view.sql"
+expect "$(outcome FMSDK101 "$ADVENTURE")" "1:error" "FMSDK101 from the task is an error too"
+expect "$(outcome FMSDK101 "$ADVENTURE" -p:NoWarn=FMSDK101)" "0:none" "and NoWarn hides it"
+rm -f "$ADVENTURE/Schema/Views/sales.empty_view.sql"
+restore "$ADVENTURE_PROJ"
+HOST_PROJ=$COMPOSITE/AdventureHost/AdventureHost.csproj
+in_body "$HOST_PROJ" '<PropertyGroup><TreatWarningsAsErrors>true</TreatWarningsAsErrors></PropertyGroup>'
+expect "$(outcome FMSDK213 "$COMPOSITE/AdventureHost" -p:DatabaseDialect=postgres)" "1:error" "FMSDK213 is an error in a host"
+restore "$HOST_PROJ"
+build "$COMPOSITE/AdventureHost" > /dev/null
+build "$ADVENTURE" > /dev/null
+
 # ------------------------------------------------------------------- flyway
 
 section "flyway convention pack"
@@ -717,8 +761,7 @@ section "EnableDefaultSourceModelItems=false in the project body"
 # body's value. Each project turns the defaults off and declares one item of
 # its own, which has to survive.
 opt_out() { # project item-xml
-  backup "$1"
-  sed -i "s|^  <Import Project=\"[./]*/src/FluentMigrator.Net.Sdk/Sdk/Sdk.targets\" />|  <PropertyGroup><EnableDefaultSourceModelItems>false</EnableDefaultSourceModelItems></PropertyGroup>\n  <ItemGroup>$2</ItemGroup>\n&|" "$1"
+  in_body "$1" "<PropertyGroup><EnableDefaultSourceModelItems>false</EnableDefaultSourceModelItems></PropertyGroup><ItemGroup>$2</ItemGroup>"
 }
 opt_out "$ADVENTURE_PROJ" '<SqlObject Include="Schema/Views/sales.open_orders.sql" ObjectType="view" NamePolicy="SchemaDotObject" Execution="onChange" />'
 build "$ADVENTURE" > /dev/null
