@@ -125,7 +125,13 @@ module's own `Update`, each overriding the one before.
 
 `Directory.Build.targets` would also see the defaults, but it's imported after
 the project body, so a repository-wide `Update` there would override a module's
-own `Update`. That's backwards: the more specific setting has to win.
+own `Update`. That's backwards: the more specific setting has to win. It
+matters most for a common module. MSBuild finds `Directory.Build.*` by walking
+up from the project's own folder, so a module vendored into another repository
+as a git submodule picks up that repository's files. If they could override
+the module, a host repository's `ForeignKey` pattern would replace the one the
+module pinned for names already in production, and the module's next migration
+would create names that its earlier databases don't use.
 
 **Why patterns and not code.** Most teams that change naming change a prefix or
 drop a column list. A pattern covers that without a C# file. Logic beyond a
@@ -245,12 +251,29 @@ deployment.
 Each module project produces its own convention set, and the Host runs each
 module with its own.
 
-**Why.** The composite sample's modules have different default schemas, `core`
-and `sales`. A runner registers one `IConventionSet`, so one set can't serve
-both. The Host manifest already gives each module its own version table on
-each target, which one runner can't do either, so the Host's runtime has to
-build a runner per module anyway. The convention set follows the version
-table.
+**Why: a shared module's names belong to it.** A common module can be used
+through `ProjectReference` by several modules, and each of them deploys its
+migrations to its own databases. The names those migrations create are a
+contract across all of those databases, and a later
+`Delete.ForeignKey().FromTable(...)` recomputes them. If the referencing
+module's set applied, the same `Common` migration would create
+`FK_Orders_Customers` through one module and
+`FK_Orders_CustomerId_Customers_Id` through another, and a later delete would
+fail on whichever databases didn't match. So a module's names come only from
+its own project file and its own directory tree, never from a module that
+references it, and never from the Host.
+
+**Why the runtime can afford it.** The composite sample's modules have
+different default schemas, `core` and `sales`. A runner registers one
+`IConventionSet`, so one set can't serve both. The Host manifest already gives
+each module its own version table on each target, which one runner can't do
+either, so the Host's runtime has to build a runner per module anyway. The
+convention set follows the version table.
+
+Build-time inputs can leak in too: a global property such as
+`-p:DatabaseDialect=sqlserver` overrides even a module's own project file and
+flows to every referenced project. That's a rule for the whole SDK, not only
+for conventions, so it belongs in `SourceControlledDatabaseModel.md`.
 
 ### 7. Names that are too long: an opt-in fallback pattern with a hash
 
