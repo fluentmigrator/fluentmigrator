@@ -147,8 +147,11 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
         /// <inheritdoc />
         /// <remarks>
-        /// The table's own indexes, and its own foreign keys, which <see cref="SQLiteColumn"/> declares in the
-        /// <c>CREATE TABLE</c>. SQLite can't add a foreign key to another table (<c>ReferencedBy(...)</c>).
+        /// The table's own indexes, and the foreign keys that <see cref="SQLiteColumn"/> declares in the
+        /// <c>CREATE TABLE</c>: those of a column declared with <c>ForeignKey(...)</c>, which share the column's
+        /// <see cref="ColumnDefinition.ForeignKey"/>. Any other key stays with the processor, where SQLite reports that it
+        /// can't add it. That includes a key on this same table declared with <c>ReferencedBy(...)</c>, which gives the
+        /// referencing column no foreign key, so it is not in the <c>CREATE TABLE</c>.
         /// </remarks>
         public virtual bool GeneratesWithTable(CreateTableExpression expression, IMigrationExpression expressionForNewTable)
         {
@@ -157,7 +160,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
                 case CreateIndexExpression index:
                     return index.Index.TableName == expression.TableName;
                 case CreateForeignKeyExpression foreignKey:
-                    return foreignKey.ForeignKey.ForeignTable == expression.TableName;
+                    return expression.Columns.Any(column => column.IsForeignKey && ReferenceEquals(column.ForeignKey, foreignKey.ForeignKey));
                 default:
                     return false;
             }

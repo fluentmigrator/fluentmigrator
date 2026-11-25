@@ -18,6 +18,7 @@
 
 using System.Linq;
 
+using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
@@ -25,6 +26,7 @@ using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.MySql;
 using FluentMigrator.Runner.Generators.Redshift;
+using FluentMigrator.Runner.Generators.SQLite;
 using FluentMigrator.Runner.Generators.SqlServer;
 
 using NUnit.Framework;
@@ -91,6 +93,47 @@ namespace FluentMigrator.Tests.Unit
             expression.ExpressionsForNewTable.Add(referencedBy);
 
             expression.GetExpressionsProcessedSeparately(new MySql5Generator()).ShouldBe([referencedBy]);
+        }
+
+        [Test]
+        public void SQLiteLeavesASelfReferencingReferencedByKeyToTheProcessor()
+        {
+            // Create.Table("Node").IfNotExists().WithColumn("Id")...ReferencedBy("FK_Node_Parent", "Node", "ParentId"):
+            // the key is on this table, but ReferencedBy gives the ParentId column no foreign key, so SQLiteColumn
+            // doesn't write it in the CREATE TABLE. If it counted as created with the table, the migration would pass
+            // without the key, even in STRICT mode. Left to the processor, SQLite reports that it can't add it.
+            var expression = new CreateTableExpression { TableName = "Node", IfNotExists = true };
+            expression.Columns.Add(new ColumnDefinition { Name = "Id", Type = System.Data.DbType.Int32, IsPrimaryKey = true, TableName = "Node" });
+            expression.Columns.Add(new ColumnDefinition { Name = "ParentId", Type = System.Data.DbType.Int32, IsNullable = true, TableName = "Node" });
+            var referencedBy = new CreateForeignKeyExpression
+            {
+                ForeignKey = new ForeignKeyDefinition
+                {
+                    Name = "FK_Node_Parent",
+                    ForeignTable = "Node",
+                    ForeignColumns = { "ParentId" },
+                    PrimaryTable = "Node",
+                    PrimaryColumns = { "Id" },
+                },
+            };
+            expression.ExpressionsForNewTable.Add(referencedBy);
+            var generator = new SQLiteGenerator { CompatibilityMode = CompatibilityMode.STRICT };
+
+            generator.Generate(expression).ShouldNotContain("FK_Node_Parent");
+            expression.GetExpressionsProcessedSeparately(generator).ShouldBe([referencedBy]);
+            Should.Throw<DatabaseOperationNotSupportedException>(() => generator.Generate(referencedBy));
+        }
+
+        [Test]
+        public void SQLiteKeepsTheKeysItWritesInTheCreateTable()
+        {
+            // WithColumn("KindId").ForeignKey("Kind", "Id") gives the column the key, which SQLiteColumn writes.
+            var expression = CreateWidget();
+            var foreignKey = (CreateForeignKeyExpression) expression.ExpressionsForNewTable[1];
+            expression.Columns[0].IsForeignKey = true;
+            expression.Columns[0].ForeignKey = foreignKey.ForeignKey;
+
+            expression.GetExpressionsProcessedSeparately(new SQLiteGenerator()).ShouldBeEmpty();
         }
 
         [Test]

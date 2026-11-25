@@ -42,8 +42,9 @@ namespace FluentMigrator.Builders.Create.Table
         /// The table's descriptions, and the indexes and foreign keys declared on its columns (<c>Indexed()</c>,
         /// <c>Unique()</c>, <c>ForeignKey(...)</c>, <c>ReferencedBy(...)</c>), are created only along with the table, so an
         /// existing table is left as it is. On SQLite the indexes are <c>CREATE INDEX IF NOT EXISTS</c>. On Redshift,
-        /// Snowflake, SAP HANA and Db2, and for a <c>ReferencedBy(...)</c> foreign key on MySQL and SQLite, they are
-        /// separate statements after the table, which fail when they already exist.
+        /// Snowflake, SAP HANA and Db2, and for a <c>ReferencedBy(...)</c> foreign key from another table on MySQL, they are
+        /// separate statements after the table, which fail when they already exist. SQLite can't add a foreign key
+        /// after the table, so a <c>ReferencedBy(...)</c> key there, even to the same table, fails in STRICT mode.
         /// </para>
         /// </remarks>
         /// <returns>Define the table schema, description or a new column</returns>
