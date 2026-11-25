@@ -16,8 +16,12 @@
 //
 #endregion
 
+using System.Linq;
+
 using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Exceptions;
 
 using Microsoft.Extensions.Logging;
@@ -79,6 +83,39 @@ namespace FluentMigrator.Tests
                 () => _migrationValidator.ApplyConventionsToAndValidateExpressions(
                     _migration,
                     new[] { BuildInvalidExpression(), BuildInvalidExpression() }));
+        }
+
+        [Test]
+        public void ItReturnsExpressionsReplacedByConventions()
+        {
+            var original = new CreateIndexExpression
+            {
+                Index = new IndexDefinition
+                {
+                    Name = "ix_original",
+                    TableName = "items",
+                    Columns = { new IndexColumnDefinition { Name = "qty" } },
+                },
+            };
+            var replacement = new CreateIndexExpression
+            {
+                Index = new IndexDefinition
+                {
+                    Name = "ix_from_convention",
+                    TableName = "items",
+                    Columns = { new IndexColumnDefinition { Name = "qty" } },
+                },
+            };
+
+            var convention = new Mock<IIndexConvention>();
+            convention.Setup(c => c.Apply(original)).Returns(replacement);
+
+            var conventions = new ConventionSet { IndexConventions = { convention.Object } };
+            var validator = new MigrationValidator(Mock.Of<ILogger<MigrationValidator>>(), conventions);
+
+            var result = validator.ApplyConventionsAndValidateExpressions(_migration, new IMigrationExpression[] { original });
+
+            Assert.That(result.Single(), Is.SameAs(replacement));
         }
     }
 }

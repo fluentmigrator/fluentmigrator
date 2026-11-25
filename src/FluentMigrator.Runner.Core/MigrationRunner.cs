@@ -819,7 +819,7 @@ namespace FluentMigrator.Runner
 
             getExpressions(migration, context);
 
-            _migrationValidator.ApplyConventionsToAndValidateExpressions(migration, context.Expressions);
+            context.Expressions = _migrationValidator.ApplyConventionsAndValidateExpressions(migration, context.Expressions);
             ExecuteExpressions(context.Expressions);
         }
 

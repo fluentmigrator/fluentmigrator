@@ -106,10 +106,25 @@ namespace FluentMigrator.Runner
         /// <param name="expressions">All the expressions contained in the up or down action</param>
         public void ApplyConventionsToAndValidateExpressions(IMigration migration, IEnumerable<IMigrationExpression> expressions)
         {
+            ApplyConventionsAndValidateExpressions(migration, expressions);
+        }
+
+        /// <summary>
+        /// Applies conventions to each migration expression, validates the resulting expressions,
+        /// and returns them for execution. Throws an <see cref="InvalidMigrationException"/> if validation fails.
+        /// </summary>
+        /// <param name="migration">The current migration being run</param>
+        /// <param name="expressions">All the expressions contained in the up or down action</param>
+        /// <returns>The expressions returned by applying conventions.</returns>
+        internal ICollection<IMigrationExpression> ApplyConventionsAndValidateExpressions(IMigration migration, IEnumerable<IMigrationExpression> expressions)
+        {
             var errorMessageBuilder = new StringBuilder();
+            var appliedExpressions = new List<IMigrationExpression>();
 
             foreach (var expression in expressions.Apply(_conventions))
             {
+                appliedExpressions.Add(expression);
+
                 var errors = new Collection<string>();
                 foreach (var result in _validator.Validate(expression))
                 {
@@ -128,6 +143,8 @@ namespace FluentMigrator.Runner
                 _logger?.LogError("The migration {0} contained the following Validation Error(s): {1}", migration.GetType().Name, errorMessage);
                 throw new InvalidMigrationException(migration, errorMessage);
             }
+
+            return appliedExpressions;
         }
 
         private void AppendError(StringBuilder builder, string expressionType, string errors)
