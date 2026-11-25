@@ -266,7 +266,7 @@ Everything declared in the `Create.Table(...)` is conditional, not only the tabl
 |---|---|
 | SQL Server 2005 and later | `IF OBJECT_ID(N'[dbo].[Projects]', N'U') IS NULL BEGIN CREATE TABLE ...; CREATE INDEX ...; ALTER TABLE ... ADD CONSTRAINT ...; END;` |
 | SQL Server 2000 | The same, checking `dbo.sysobjects` |
-| Oracle | The statements through `EXECUTE IMMEDIATE`, in a PL/SQL block that checks `USER_TABLES` (or `ALL_TABLES` with a schema) |
+| Oracle | The statements through `EXECUTE IMMEDIATE`, in a PL/SQL block that checks `ALL_TABLES` in the table's schema, or without one in the session's current schema |
 | Firebird | The statements through `EXECUTE STATEMENT`, in an `EXECUTE BLOCK` that checks `RDB$RELATIONS`, between `SET TERM ^ ;` and `SET TERM ; ^` |
 | PostgreSQL | `CREATE TABLE IF NOT EXISTS ...`; with indexes or foreign keys, a `DO` block that checks `information_schema.tables` |
 | MySQL | `CREATE TABLE IF NOT EXISTS ...`, with the indexes and foreign keys declared in it |

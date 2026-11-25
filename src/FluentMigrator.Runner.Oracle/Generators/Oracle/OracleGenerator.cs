@@ -292,6 +292,12 @@ namespace FluentMigrator.Runner.Generators.Oracle
         /// other exists, and the migration would be recorded without the table.
         /// </para>
         /// <para>
+        /// A table without a schema is created in the session's current schema, which <c>ALTER SESSION SET
+        /// CURRENT_SCHEMA</c> can make another than the login's. So the guard looks in that schema, not in
+        /// <c>USER_TABLES</c>, which lists the login's tables: otherwise an existing table there would be created again
+        /// (ORA-00955), and a table of the same name owned by the login would skip the <c>CREATE TABLE</c>.
+        /// </para>
+        /// <para>
         /// The block has no <c>DECLARE</c>: the loop over a query that returns one row or none needs no variable, and
         /// a <c>DECLARE ... BEGIN</c> would be split into two blocks by <c>OracleSqlParser</c>, which runs scripts.
         /// </para>
@@ -299,9 +305,10 @@ namespace FluentMigrator.Runner.Generators.Oracle
         private string GenerateCreateTableIfNotExists(CreateTableExpression expression, IEnumerable<string> descriptionStatements)
         {
             var tableName = FormatHelper.FormatSqlEscape(ToStoredName(expression.TableName));
-            var catalogQuery = string.IsNullOrEmpty(expression.SchemaName)
-                ? $"SELECT 1 FROM USER_TABLES WHERE TABLE_NAME = '{tableName}'"
-                : $"SELECT 1 FROM ALL_TABLES WHERE OWNER = '{FormatHelper.FormatSqlEscape(ToStoredName(expression.SchemaName))}' AND TABLE_NAME = '{tableName}'";
+            var owner = string.IsNullOrEmpty(expression.SchemaName)
+                ? "SYS_CONTEXT('USERENV', 'CURRENT_SCHEMA')"
+                : $"'{FormatHelper.FormatSqlEscape(ToStoredName(expression.SchemaName))}'";
+            var catalogQuery = $"SELECT 1 FROM ALL_TABLES WHERE OWNER = {owner} AND TABLE_NAME = '{tableName}'";
 
             var builder = new StringBuilder();
             builder.AppendLine("BEGIN");
