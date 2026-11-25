@@ -53,7 +53,7 @@
 
   <ItemGroup Label="Database drivers">
     <PackageVersion Include="FirebirdSql.Data.FirebirdClient" Version="10.3.3" />
-    <PackageVersion Include="Microsoft.Data.SqlClient" Version="6.0.1" />
+    <PackageVersion Include="Microsoft.Data.SqlClient" Version="6.1.8" />
     <PackageVersion Include="MySql.Data" Version="9.3.0" />
     <PackageVersion Include="MySqlConnector" Version="2.4.0" />
     <!-- Net.IBM.Data.Db2 is Windows-only; the -lnx variant is its Linux counterpart. -->
