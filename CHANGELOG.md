@@ -45,6 +45,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - New ADR: Connection Management (`adr/proposed/ConnectionManagement.md`)
 - New ADR: FluentMigrator.Runner.Host — a general command-hosting framework (`adr/proposed/FluentMigrator-Host-Design.md`)
 - New ADR: A source-controlled database model (`adr/proposed/SourceControlledDatabaseModel.md`)
+- New ADR: `Create.Check` / `Alter.Check` / `Delete.Check` top-level syntax for CHECK constraints, with what each provider supports and a `CK_<Table>_<Column>` naming convention (`adr/proposed/CheckConstraints.md`, Issue #2458, related to Issue #1021 and PR #2457)
 - ADRs AsyncAllTheWay (D4) and ParallelAsyncAllTheWay (§4.5) note where `PreviewFromNothing`'s version-table step must go in 10.0, so the async runner and the `VersionInfoStep` table keep the script complete (PR #2370)
 
 ### Changed
