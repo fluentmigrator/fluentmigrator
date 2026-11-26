@@ -18,6 +18,7 @@
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Tests.Helpers;
 
@@ -54,6 +55,62 @@ namespace FluentMigrator.Tests.Unit.Expressions
         public void ErrorIsNotReturnedWhenTableNameIsSet()
         {
             var expression = new CreateTableExpression { TableName = "table1" };
+
+            var errors = ValidationHelper.CollectErrors(expression);
+            Assert.That(errors, Is.Empty);
+        }
+
+        // With IfNotExists(), the table's indexes and foreign keys are in ExpressionsForNewTable, not in the
+        // migration's own list of expressions, so the table must validate them.
+
+        [Test]
+        public void ErrorIsReturnedWhenAnIndexForTheNewTableIsInvalid()
+        {
+            var index = new CreateIndexExpression { Index = { Name = null, TableName = "table1" } };
+            index.Index.Columns.Add(new IndexColumnDefinition { Name = "Column1" });
+            var expression = new CreateTableExpression { TableName = "table1", ExpressionsForNewTable = { index } };
+
+            var errors = ValidationHelper.CollectErrors(expression);
+            errors.ShouldContain(ErrorMessages.IndexNameCannotBeNullOrEmpty);
+        }
+
+        [Test]
+        public void ErrorIsReturnedWhenAForeignKeyForTheNewTableIsInvalid()
+        {
+            var foreignKey = new CreateForeignKeyExpression
+            {
+                ForeignKey =
+                {
+                    Name = "FK_table1_table2",
+                    ForeignTable = "table1",
+                    PrimaryTable = null,
+                    ForeignColumns = { "Column1" },
+                    PrimaryColumns = { "Id" },
+                },
+            };
+            var expression = new CreateTableExpression { TableName = "table1", ExpressionsForNewTable = { foreignKey } };
+
+            var errors = ValidationHelper.CollectErrors(expression);
+            errors.ShouldContain(ErrorMessages.PrimaryTableNameCannotBeNullOrEmpty);
+        }
+
+        [Test]
+        public void ErrorIsNotReturnedWhenTheIndexesAndForeignKeysForTheNewTableAreValid()
+        {
+            var index = new CreateIndexExpression { Index = { Name = "IX_table1_Column1", TableName = "table1" } };
+            index.Index.Columns.Add(new IndexColumnDefinition { Name = "Column1" });
+            var foreignKey = new CreateForeignKeyExpression
+            {
+                ForeignKey =
+                {
+                    Name = "FK_table1_table2",
+                    ForeignTable = "table1",
+                    PrimaryTable = "table2",
+                    ForeignColumns = { "Column1" },
+                    PrimaryColumns = { "Id" },
+                },
+            };
+            var expression = new CreateTableExpression { TableName = "table1", ExpressionsForNewTable = { index, foreignKey } };
 
             var errors = ValidationHelper.CollectErrors(expression);
             Assert.That(errors, Is.Empty);

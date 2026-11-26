@@ -128,7 +128,10 @@ namespace FluentMigrator.Tests.Integration.CreationScript
             return string.IsNullOrWhiteSpace(withoutComments);
         }
 
-        private static readonly Regex DollarQuoteTag = new Regex(@"\G\$[A-Za-z_]*\$");
+        /// <summary>
+        /// <c>$$</c>, or a tag such as <c>$body1$</c>: a letter or underscore, then letters, digits or underscores.
+        /// </summary>
+        private static readonly Regex DollarQuoteTag = new Regex(@"\G\$(?:[A-Za-z_][A-Za-z_0-9]*)?\$");
 
         /// <summary>
         /// Splits a script at each <c>;</c> outside string literals, quoted identifiers and comments, as psql, the
@@ -138,7 +141,7 @@ namespace FluentMigrator.Tests.Integration.CreationScript
         /// The generators put several statements on one line for a multi-row insert or a multi-column drop, so
         /// splitting at line ends is not enough.
         /// </remarks>
-        protected static IEnumerable<string> SplitStatements(string script)
+        protected internal static IEnumerable<string> SplitStatements(string script)
         {
             var statement = new System.Text.StringBuilder();
             char? quote = null;
