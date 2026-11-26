@@ -127,7 +127,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 builder.AppendLine(statement);
             }
 
-            foreach (var statement in GenerateExpressionsForNewTable(expression, IsIndexOrForeignKey))
+            foreach (var statement in GenerateExpressionsForNewTable(expression, e => GeneratesWithTable(expression, e)))
             {
                 builder.AppendLine(statement);
             }

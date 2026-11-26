@@ -319,7 +319,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
                 builder.AppendLine(WrapStatementInExecuteImmediateBlock(descriptionStatement));
             }
 
-            foreach (var statement in GenerateExpressionsForNewTable(expression, IsIndexOrForeignKey))
+            foreach (var statement in GenerateExpressionsForNewTable(expression, e => GeneratesWithTable(expression, e)))
             {
                 builder.AppendLine(WrapStatementInExecuteImmediateBlock(statement));
             }

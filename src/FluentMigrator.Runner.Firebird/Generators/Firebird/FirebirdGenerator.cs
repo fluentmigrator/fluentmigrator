@@ -268,7 +268,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
                 return createTable;
             }
 
-            var statements = new[] { createTable }.Concat(GenerateExpressionsForNewTable(expression, IsIndexOrForeignKey));
+            var statements = new[] { createTable }.Concat(GenerateExpressionsForNewTable(expression, e => GeneratesWithTable(expression, e)));
 
             // The name as the CREATE TABLE stores it: as written when quoted (by the migration, or by the quoter for a
             // keyword or with ForceQuote), otherwise in upper case. Compared exactly, since USERS and "Users" are

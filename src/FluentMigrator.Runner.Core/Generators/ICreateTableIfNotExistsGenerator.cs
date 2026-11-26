@@ -39,6 +39,11 @@ namespace FluentMigrator.Runner.Generators
         /// </summary>
         /// <param name="expression">A <see cref="CreateTableExpression"/> with <see cref="CreateTableExpression.IfNotExists"/></param>
         /// <param name="expressionForNewTable">One of its <see cref="CreateTableExpression.ExpressionsForNewTable"/></param>
+        /// <remarks>
+        /// This is the one decision: the generator writes exactly the expressions this selects, and the processor runs the
+        /// rest. A generator that chose its statements another way would disagree with an override of this method, and
+        /// an expression would then be created twice, or not at all.
+        /// </remarks>
         bool GeneratesWithTable(CreateTableExpression expression, IMigrationExpression expressionForNewTable);
     }
 

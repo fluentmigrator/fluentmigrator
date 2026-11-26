@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System.Collections.Generic;
 using System.Linq;
 
 using FluentMigrator.Exceptions;
@@ -24,10 +25,16 @@ using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Generators.MySql;
+using FluentMigrator.Runner.Generators.Oracle;
+using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Generators.Redshift;
 using FluentMigrator.Runner.Generators.SQLite;
 using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.Runner.Processors.Firebird;
+using FluentMigrator.Runner.Processors.Postgres;
+using FluentMigrator.Tests.Unit.Generators;
 
 using NUnit.Framework;
 
@@ -136,6 +143,40 @@ namespace FluentMigrator.Tests.Unit
             expression.GetExpressionsProcessedSeparately(new SQLiteGenerator()).ShouldBeEmpty();
         }
 
+        /// <summary>
+        /// Generators whose <see cref="ICreateTableIfNotExistsGenerator.GeneratesWithTable"/> is overridden to leave the
+        /// foreign key out of the table.
+        /// </summary>
+        private static IEnumerable<TestCaseData> GeneratorsThatLeaveTheForeignKeyOut()
+        {
+            yield return new TestCaseData(new SqlServer2000WithoutForeignKeys()).SetArgDisplayNames("SqlServer2000");
+            yield return new TestCaseData(new SqlServer2005WithoutForeignKeys()).SetArgDisplayNames("SqlServer2005");
+            yield return new TestCaseData(new OracleWithoutForeignKeys()).SetArgDisplayNames("Oracle");
+            yield return new TestCaseData(new FirebirdWithoutForeignKeys()).SetArgDisplayNames("Firebird");
+            yield return new TestCaseData(new PostgresWithoutForeignKeys()).SetArgDisplayNames("Postgres");
+            yield return new TestCaseData(new MySql5WithoutForeignKeys()).SetArgDisplayNames("MySql5");
+        }
+
+        [TestCaseSource(nameof(GeneratorsThatLeaveTheForeignKeyOut))]
+        public void AnOverriddenGeneratesWithTableDecidesWhatTheTablesSqlHas(IMigrationGenerator generator)
+        {
+            // The processor runs what GeneratesWithTable leaves out. If the generator chose the table's statements by
+            // another test, an override would make the two disagree: a statement in both would run twice, and one in
+            // neither not at all.
+            var expression = GeneratorTestHelper.GetCreateTableIfNotExistsWithIndexAndForeignKey();
+            var foreignKey = expression.ExpressionsForNewTable.OfType<CreateForeignKeyExpression>().Single();
+
+            var sql = generator.Generate(expression);
+
+            Assert.Multiple(
+                () =>
+                {
+                    Assert.That(sql, Does.Contain("UX_TestTable1_TestColumn1"), "the index, which stays with the table");
+                    Assert.That(sql, Does.Not.Contain("FK_TestTable1_TestTable2"), "the foreign key, which the override leaves out");
+                    Assert.That(expression.GetExpressionsProcessedSeparately(generator), Is.EqualTo(new[] { foreignKey }), "processed separately");
+                });
+        }
+
         [Test]
         public void WithoutIfNotExistsTheProcessorRunsThemAll()
         {
@@ -172,6 +213,55 @@ namespace FluentMigrator.Tests.Unit
             expression.ExpressionsForNewTable.Add(index);
             expression.ExpressionsForNewTable.Add(foreignKey);
             return expression;
+        }
+
+        private static bool IsNotAForeignKey(IMigrationExpression expressionForNewTable) =>
+            !(expressionForNewTable is CreateForeignKeyExpression);
+
+        private sealed class SqlServer2000WithoutForeignKeys : SqlServer2000Generator
+        {
+            public override bool GeneratesWithTable(CreateTableExpression expression, IMigrationExpression expressionForNewTable) =>
+                IsNotAForeignKey(expressionForNewTable) && base.GeneratesWithTable(expression, expressionForNewTable);
+        }
+
+        private sealed class SqlServer2005WithoutForeignKeys : SqlServer2005Generator
+        {
+            public override bool GeneratesWithTable(CreateTableExpression expression, IMigrationExpression expressionForNewTable) =>
+                IsNotAForeignKey(expressionForNewTable) && base.GeneratesWithTable(expression, expressionForNewTable);
+        }
+
+        private sealed class OracleWithoutForeignKeys : OracleGenerator
+        {
+            public override bool GeneratesWithTable(CreateTableExpression expression, IMigrationExpression expressionForNewTable) =>
+                IsNotAForeignKey(expressionForNewTable) && base.GeneratesWithTable(expression, expressionForNewTable);
+        }
+
+        private sealed class FirebirdWithoutForeignKeys : FirebirdGenerator
+        {
+            public FirebirdWithoutForeignKeys()
+                : base(FirebirdOptions.StandardBehaviour())
+            {
+            }
+
+            public override bool GeneratesWithTable(CreateTableExpression expression, IMigrationExpression expressionForNewTable) =>
+                IsNotAForeignKey(expressionForNewTable) && base.GeneratesWithTable(expression, expressionForNewTable);
+        }
+
+        private sealed class PostgresWithoutForeignKeys : PostgresGenerator
+        {
+            public PostgresWithoutForeignKeys()
+                : base(new PostgresQuoter(new PostgresOptions()))
+            {
+            }
+
+            public override bool GeneratesWithTable(CreateTableExpression expression, IMigrationExpression expressionForNewTable) =>
+                IsNotAForeignKey(expressionForNewTable) && base.GeneratesWithTable(expression, expressionForNewTable);
+        }
+
+        private sealed class MySql5WithoutForeignKeys : MySql5Generator
+        {
+            public override bool GeneratesWithTable(CreateTableExpression expression, IMigrationExpression expressionForNewTable) =>
+                IsNotAForeignKey(expressionForNewTable) && base.GeneratesWithTable(expression, expressionForNewTable);
         }
     }
 }

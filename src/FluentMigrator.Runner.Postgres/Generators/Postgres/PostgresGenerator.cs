@@ -130,7 +130,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
         /// </remarks>
         public override string Generate(CreateTableExpression expression)
         {
-            if (!expression.IfNotExists || !(expression.ExpressionsForNewTable ?? Enumerable.Empty<IMigrationExpression>()).Any(IsIndexOrForeignKey))
+            if (!expression.IfNotExists || !(expression.ExpressionsForNewTable ?? Enumerable.Empty<IMigrationExpression>()).Any(e => GeneratesWithTable(expression, e)))
             {
                 return base.Generate(expression);
             }
@@ -162,7 +162,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 "IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE "
               + $"{schemaCondition} AND c.relname = '{FormatHelper.FormatSqlEscape(NameInCatalog(expression.TableName))}') THEN");
             body.AppendLine(createTable);
-            foreach (var statement in GenerateExpressionsForNewTable(expression, IsIndexOrForeignKey))
+            foreach (var statement in GenerateExpressionsForNewTable(expression, e => GeneratesWithTable(expression, e)))
             {
                 body.AppendLine(statement);
             }
