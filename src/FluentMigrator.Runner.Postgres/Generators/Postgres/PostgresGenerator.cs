@@ -150,11 +150,17 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
             var schemaName = string.IsNullOrEmpty(expression.SchemaName) ? "public" : NameInCatalog(expression.SchemaName);
 
+            // pg_temp is an alias for the session's temporary schema, which pg_namespace lists as pg_temp_N, so a table
+            // created in pg_temp is never in a schema named pg_temp.
+            var schemaCondition = schemaName == "pg_temp"
+                ? "c.relnamespace = pg_catalog.pg_my_temp_schema()"
+                : $"n.nspname = '{FormatHelper.FormatSqlEscape(schemaName)}'";
+
             var body = new StringBuilder();
             body.AppendLine("BEGIN");
             body.AppendLine(
                 "IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE "
-              + $"n.nspname = '{FormatHelper.FormatSqlEscape(schemaName)}' AND c.relname = '{FormatHelper.FormatSqlEscape(NameInCatalog(expression.TableName))}') THEN");
+              + $"{schemaCondition} AND c.relname = '{FormatHelper.FormatSqlEscape(NameInCatalog(expression.TableName))}') THEN");
             body.AppendLine(createTable);
             foreach (var statement in GenerateExpressionsForNewTable(expression, IsIndexOrForeignKey))
             {

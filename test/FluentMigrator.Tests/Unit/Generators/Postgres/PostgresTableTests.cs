@@ -301,6 +301,18 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
+        public void CreateTableIfNotExistsInPgTempLooksInTheSessionsTemporarySchema()
+        {
+            // pg_temp is an alias for the session's temporary schema, which pg_namespace lists as pg_temp_N.
+            var expression = GeneratorTestHelper.GetCreateTableIfNotExistsWithIndexAndForeignKey();
+            expression.SchemaName = "pg_temp";
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldContain("WHERE c.relnamespace = pg_catalog.pg_my_temp_schema() AND c.relname = 'TestTable1') THEN");
+        }
+
+        [Test]
         public void CreateTableIfNotExistsWithIndexUsesADollarQuoteTagNotInTheBody()
         {
             var expression = GeneratorTestHelper.GetCreateTableIfNotExistsWithIndexAndForeignKey();

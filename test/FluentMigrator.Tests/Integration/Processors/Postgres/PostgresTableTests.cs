@@ -135,6 +135,63 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             Processor.Execute("DROP ROLE IF EXISTS fm_no_grants");
         }
 
+        [Test]
+        public void CreateTableIfNotExistsInPgTempCreatesAMissingTemporaryTable()
+        {
+            var createTable = CreateTemporaryTableIfNotExists();
+
+            try
+            {
+                Processor.Process(createTable);
+
+                Processor.Exists("SELECT 1 FROM pg_catalog.pg_class WHERE relnamespace = pg_catalog.pg_my_temp_schema() AND relname = 'IX_FmTemp_Id'")
+                    .ShouldBeTrue();
+            }
+            finally
+            {
+                Processor.Execute("DROP TABLE IF EXISTS pg_temp.\"FmTemp\"");
+            }
+        }
+
+        [Test]
+        public void CreateTableIfNotExistsInPgTempSkipsAnExistingTemporaryTable()
+        {
+            // pg_temp is an alias for the session's temporary schema, which pg_namespace lists as pg_temp_N. A check for
+            // a schema named pg_temp would not find the table, and the CREATE TABLE in the DO block would fail.
+            var createTable = CreateTemporaryTableIfNotExists();
+
+            try
+            {
+                Processor.Execute("CREATE TEMPORARY TABLE \"FmTemp\" (\"Original\" integer)");
+
+                Processor.Process(createTable);
+
+                Processor.Exists("SELECT 1 FROM pg_catalog.pg_class WHERE relnamespace = pg_catalog.pg_my_temp_schema() AND relname = 'IX_FmTemp_Id'")
+                    .ShouldBeFalse();
+            }
+            finally
+            {
+                Processor.Execute("DROP TABLE IF EXISTS pg_temp.\"FmTemp\"");
+            }
+        }
+
+        /// <summary>
+        /// <c>Create.Table("FmTemp").InSchema("pg_temp").IfNotExists().WithColumn("Id").AsInt32().Indexed("IX_FmTemp_Id")</c>.
+        /// The index puts the table in a <c>DO</c> block.
+        /// </summary>
+        private static CreateTableExpression CreateTemporaryTableIfNotExists()
+        {
+            var createTable = new CreateTableExpression { SchemaName = "pg_temp", TableName = "FmTemp", IfNotExists = true };
+            createTable.Columns.Add(new ColumnDefinition { Name = "Id", Type = DbType.Int32, TableName = "FmTemp" });
+            var index = new CreateIndexExpression
+            {
+                Index = new IndexDefinition { Name = "IX_FmTemp_Id", SchemaName = "pg_temp", TableName = "FmTemp" },
+            };
+            index.Index.Columns.Add(new IndexColumnDefinition { Name = "Id" });
+            createTable.ExpressionsForNewTable.Add(index);
+            return createTable;
+        }
+
         [OneTimeSetUp]
         public void ClassSetUp()
         {
