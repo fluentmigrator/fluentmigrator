@@ -129,6 +129,13 @@ namespace FluentMigrator.Tests.Integration.CreationScript
         }
 
         /// <summary>
+        /// <c>$$</c>, or a tag such as <c>$body1$</c>: a letter or underscore, then letters, digits or underscores.
+        /// </summary>
+        private static readonly Regex DollarQuoteTag = new Regex(@"\G\$(?:[A-Za-z_][A-Za-z_0-9]*)?\$");
+
+        private static bool IsIdentifierPart(char c) => char.IsLetterOrDigit(c) || c == '_' || c == '$';
+
+        /// <summary>
         /// Splits a script at each <c>;</c> outside string literals, quoted identifiers and comments, as psql, the
         /// mysql client and the Db2 command line processor do. Each statement then runs on its own, in autocommit.
         /// </summary>
@@ -136,7 +143,7 @@ namespace FluentMigrator.Tests.Integration.CreationScript
         /// The generators put several statements on one line for a multi-row insert or a multi-column drop, so
         /// splitting at line ends is not enough.
         /// </remarks>
-        protected static IEnumerable<string> SplitStatements(string script)
+        protected internal static IEnumerable<string> SplitStatements(string script)
         {
             var statement = new System.Text.StringBuilder();
             char? quote = null;
@@ -182,6 +189,21 @@ namespace FluentMigrator.Tests.Integration.CreationScript
                     statement.Append(script, i, end - i);
                     i = end - 1;
                     continue;
+                }
+
+                // A PostgreSQL dollar-quoted body, such as a DO block's, is one token for psql. A '$' that continues an
+                // unquoted identifier, as in a$b$c, which PostgreSQL and MySQL allow, doesn't start one.
+                if (c == '$' && (i == 0 || !IsIdentifierPart(script[i - 1])))
+                {
+                    var tag = DollarQuoteTag.Match(script, i);
+                    if (tag.Success)
+                    {
+                        var end = script.IndexOf(tag.Value, i + tag.Length, StringComparison.Ordinal);
+                        end = end < 0 ? script.Length : end + tag.Length;
+                        statement.Append(script, i, end - i);
+                        i = end - 1;
+                        continue;
+                    }
                 }
 
                 if (c == ';')

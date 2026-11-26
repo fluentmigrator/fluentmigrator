@@ -25,6 +25,7 @@ using System.Text;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.Runner.Helpers;
 using FluentMigrator.Runner.Processors.Firebird;
 
 using JetBrains.Annotations;
@@ -36,8 +37,10 @@ namespace FluentMigrator.Runner.Generators.Firebird
     /// <summary>
     /// The Firebird SQL generator for FluentMigrator.
     /// </summary>
-    public class FirebirdGenerator : GenericGenerator
+    public class FirebirdGenerator : GenericGenerator, ICreateTableIfNotExistsGenerator
     {
+        private readonly FirebirdQuoter _quoter;
+
         /// <inheritdoc />
         [Obsolete("Use the Truncator property")]
         protected readonly FirebirdTruncator truncator;
@@ -64,6 +67,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
             : base(new FirebirdColumn(fbOptions, quoter), quoter, new EmptyDescriptionGenerator(), generatorOptions)
         {
+            _quoter = quoter;
             FBOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
 #pragma warning disable 618
             truncator = new FirebirdTruncator(FBOptions.TruncateLongNames, FBOptions.PackKeyNames);
@@ -226,16 +230,95 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public override string Generate(CreateTableExpression expression)
         {
             Truncator.Truncate(expression);
-            if (expression.IfNotExists)
-            {
-                return CompatibilityMode.HandleCompatibility("Create.Table(...).IfNotExists() is not supported");
-            }
-
             if (expression.Columns.Any(x => x.ExpressionStored))
             {
                 CompatibilityMode.HandleCompatibility("Stored computed columns are not supported");
             }
+
+            if (expression.IfNotExists)
+            {
+                return GenerateCreateTableIfNotExists(expression);
+            }
+
             return base.Generate(expression);
+        }
+
+        /// <inheritdoc />
+        public virtual bool GeneratesWithTable(CreateTableExpression expression, IMigrationExpression expressionForNewTable) =>
+            IsIndexOrForeignKey(expressionForNewTable);
+
+        /// <summary>
+        /// Firebird has no <c>CREATE TABLE IF NOT EXISTS</c> before 6.0. The statement and the table's
+        /// <see cref="CreateTableExpression.ExpressionsForNewTable"/> run through <c>EXECUTE STATEMENT</c> in an
+        /// <c>EXECUTE BLOCK</c>, when <c>RDB$RELATIONS</c> has no table of the name the statement stores, compared exactly, as
+        /// <c>FirebirdProcessor</c> checks before it creates the table.
+        /// </summary>
+        /// <remarks>
+        /// Each statement runs in its own autonomous transaction, which commits it, as isql's AUTODDL does: the indexes
+        /// and foreign keys are created on a committed table. The block is wrapped in <c>SET TERM</c>, as isql and other
+        /// script tools need for a block whose body has <c>;</c> in it. This is the form for a script:
+        /// <c>FirebirdProcessor</c> checks for the table itself and runs a plain <c>CREATE TABLE</c>, because it also
+        /// creates the identity columns' sequences and triggers.
+        /// </remarks>
+        private string GenerateCreateTableIfNotExists(CreateTableExpression expression)
+        {
+            var createTable = base.Generate(CopyWithoutIfNotExists(expression));
+            if (string.IsNullOrEmpty(createTable))
+            {
+                return createTable;
+            }
+
+            var statements = new[] { createTable }.Concat(GenerateExpressionsForNewTable(expression, e => GeneratesWithTable(expression, e)));
+
+            // The name as the CREATE TABLE stores it: as written when quoted (by the migration, or by the quoter for a
+            // keyword or with ForceQuote), otherwise in upper case. Compared exactly, since USERS and "Users" are
+            // different tables.
+            var tableName = _quoter.ToFbObjectName(expression.TableName);
+
+            var builder = new StringBuilder();
+            builder.AppendLine("SET TERM ^ ;");
+            builder.AppendLine("EXECUTE BLOCK AS");
+            builder.AppendLine("BEGIN");
+            builder.AppendLine(
+                "IF (NOT EXISTS (SELECT 1 FROM RDB$RELATIONS WHERE (RDB$FLAGS IS NOT NULL) AND "
+              + $"(RDB$RELATION_NAME = '{FormatHelper.FormatSqlEscape(tableName)}'))) THEN");
+            builder.AppendLine("BEGIN");
+            foreach (var statement in statements)
+            {
+                builder.AppendLine($"IN AUTONOMOUS TRANSACTION DO EXECUTE STATEMENT '{FormatHelper.FormatSqlEscape(WithoutEndToken(statement))}';");
+            }
+
+            builder.AppendLine("END");
+            builder.AppendLine("END^");
+            builder.Append("SET TERM ; ^");
+            return builder.ToString();
+        }
+
+        private static string WithoutEndToken(string statement)
+        {
+            statement = statement.TrimEnd();
+            return statement.EndsWith(";") ? statement.Substring(0, statement.Length - 1) : statement;
+        }
+
+        /// <summary>
+        /// The expression as a plain <c>CREATE TABLE</c>, for when the caller has checked that the table is missing.
+        /// </summary>
+        internal static CreateTableExpression CopyWithoutIfNotExists(CreateTableExpression expression)
+        {
+            var copy = new CreateTableExpression
+            {
+                SchemaName = expression.SchemaName,
+                TableName = expression.TableName,
+                Columns = expression.Columns,
+                TableDescription = expression.TableDescription,
+            };
+
+            foreach (var feature in expression.AdditionalFeatures)
+            {
+                copy.AdditionalFeatures[feature.Key] = feature.Value;
+            }
+
+            return copy;
         }
 
         /// <inheritdoc />

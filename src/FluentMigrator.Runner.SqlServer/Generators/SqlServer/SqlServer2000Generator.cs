@@ -23,7 +23,9 @@ using System.Text;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Generation;
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.Runner.Helpers;
 using FluentMigrator.SqlServer;
 
 using JetBrains.Annotations;
@@ -35,7 +37,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
     /// <summary>
     /// The SQL Server 2000 SQL generator for FluentMigrator.
     /// </summary>
-    public class SqlServer2000Generator : GenericGenerator
+    public class SqlServer2000Generator : GenericGenerator, ICreateTableIfNotExistsGenerator
     {
         /// <inheritdoc />
         public SqlServer2000Generator()
@@ -90,6 +92,99 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         /// <inheritdoc />
         public override string CreateConstraint => "ALTER TABLE {0} ADD CONSTRAINT {1} {2}{3} ({4})";
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// SQL Server has no <c>CREATE TABLE IF NOT EXISTS</c>. With <see cref="CreateTableExpression.IfNotExists"/>, the
+        /// statement, and the statements that belong to the new table (see
+        /// <see cref="GenerateStatementsForNewTable"/>), run in one batch guarded by <see cref="GetTableIsMissingCondition"/>.
+        /// </remarks>
+        public override string Generate(CreateTableExpression expression)
+        {
+            if (!expression.IfNotExists)
+            {
+                return base.Generate(expression);
+            }
+
+            var createTable = base.Generate(CopyWithoutIfNotExists(expression));
+            if (string.IsNullOrEmpty(createTable))
+            {
+                return createTable;
+            }
+
+            // A temporary table (#Name or ##Name) is in tempdb, whatever the schema, so OBJECT_ID in the current database
+            // never finds it.
+            var condition = Quoter.UnQuote(expression.TableName).StartsWith("#", StringComparison.Ordinal)
+                ? GetTemporaryTableIsMissingCondition(Quoter.Quote(expression.TableName))
+                : GetTableIsMissingCondition(Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
+
+            var builder = new StringBuilder();
+            builder.Append("IF ").AppendLine(condition);
+            builder.AppendLine("BEGIN");
+            builder.AppendLine(createTable);
+            foreach (var statement in GenerateStatementsForNewTable(expression).Where(s => !string.IsNullOrEmpty(s)))
+            {
+                builder.AppendLine(statement);
+            }
+
+            foreach (var statement in GenerateExpressionsForNewTable(expression, e => GeneratesWithTable(expression, e)))
+            {
+                builder.AppendLine(statement);
+            }
+
+            builder.Append("END");
+            AppendSqlStatementEndToken(builder);
+            return builder.ToString();
+        }
+
+        /// <inheritdoc />
+        public virtual bool GeneratesWithTable(CreateTableExpression expression, IMigrationExpression expressionForNewTable) =>
+            IsIndexOrForeignKey(expressionForNewTable);
+
+        /// <summary>
+        /// The condition, for an <c>IF</c>, that no user table has the given name.
+        /// </summary>
+        /// <param name="quotedTableName">The table name as the quoter writes it, with its schema.</param>
+        protected virtual string GetTableIsMissingCondition(string quotedTableName)
+        {
+            return $"NOT EXISTS (SELECT 1 FROM dbo.sysobjects WHERE id = OBJECT_ID(N'{FormatHelper.FormatSqlEscape(quotedTableName)}') AND OBJECTPROPERTY(id, N'IsUserTable') = 1)";
+        }
+
+        /// <summary>
+        /// The condition, for an <c>IF</c>, that the session has no temporary table of the given name. Temporary tables
+        /// are in <c>tempdb</c>, and <c>OBJECT_ID(N'tempdb..#Name')</c> finds the one this session sees.
+        /// </summary>
+        /// <param name="quotedTableName">The table name as the quoter writes it, without a schema.</param>
+        protected virtual string GetTemporaryTableIsMissingCondition(string quotedTableName)
+        {
+            return $"OBJECT_ID(N'tempdb..{FormatHelper.FormatSqlEscape(quotedTableName)}') IS NULL";
+        }
+
+        /// <summary>
+        /// Statements that run after <c>CREATE TABLE</c>, and only when it does, such as the descriptions.
+        /// </summary>
+        protected virtual IEnumerable<string> GenerateStatementsForNewTable(CreateTableExpression expression)
+        {
+            return Enumerable.Empty<string>();
+        }
+
+        private static CreateTableExpression CopyWithoutIfNotExists(CreateTableExpression expression)
+        {
+            var copy = new CreateTableExpression
+            {
+                SchemaName = expression.SchemaName,
+                TableName = expression.TableName,
+                Columns = expression.Columns,
+                TableDescription = expression.TableDescription,
+            };
+
+            foreach (var feature in expression.AdditionalFeatures)
+            {
+                copy.AdditionalFeatures[feature.Key] = feature.Value;
+            }
+
+            return copy;
+        }
 
         /// <inheritdoc />
         public override string GetClusterTypeString(CreateIndexExpression column)

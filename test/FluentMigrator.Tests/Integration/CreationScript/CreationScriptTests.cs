@@ -18,17 +18,14 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Tests.Integration.CreationScript.Example;
 
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 using NUnit.Framework;
 
@@ -58,7 +55,7 @@ namespace FluentMigrator.Tests.Integration.CreationScript
             var serverOptions = target.ServerOptions;
             serverOptions.IgnoreIfNotEnabled();
 
-            var script = GenerateScript(target);
+            var script = ConnectionlessScript.Generate(target, CreateServices(target, connectionString: null));
 
             try
             {
@@ -73,47 +70,6 @@ namespace FluentMigrator.Tests.Integration.CreationScript
                 TestContext.Out.WriteLine($"The {target.Name} creation script:");
                 TestContext.Out.WriteLine(script);
                 throw;
-            }
-        }
-
-        /// <summary>
-        /// What <c>dotnet fm migrate --no-connection --preview --preview-from-nothing --output=FILE</c> writes.
-        /// </summary>
-        private static string GenerateScript(CreationScriptTarget target)
-        {
-            var outputFile = Path.Combine(Path.GetTempPath(), $"fm-creation-{target.Name}-{Guid.NewGuid():N}.sql");
-
-            try
-            {
-                var services = CreateServices(target, connectionString: null)
-                    .AddSingleton<ILoggerProvider, LogFileFluentMigratorLoggerProvider>()
-                    .Configure<LogFileFluentMigratorLoggerOptions>(
-                        options =>
-                        {
-                            options.OutputFileName = outputFile;
-                            options.OutputGoBetweenStatements = target.GoBetweenStatements;
-                            options.ShowSql = true;
-                        })
-                    .Configure<RunnerOptions>(
-                        options =>
-                        {
-                            options.NoConnection = true;
-                            options.PreviewFromNothing = true;
-                        })
-                    .Configure<ProcessorOptions>(options => options.PreviewOnly = true);
-
-                // Disposing the provider closes the output file.
-                using (var serviceProvider = services.BuildServiceProvider())
-                using (var scope = serviceProvider.CreateScope())
-                {
-                    scope.ServiceProvider.GetRequiredService<IMigrationRunner>().MigrateUp();
-                }
-
-                return File.ReadAllText(outputFile);
-            }
-            finally
-            {
-                File.Delete(outputFile);
             }
         }
 

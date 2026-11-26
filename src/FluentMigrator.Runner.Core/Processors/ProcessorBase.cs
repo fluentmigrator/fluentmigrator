@@ -25,6 +25,7 @@ using System.IO;
 using FluentMigrator.Expressions;
 using FluentMigrator.Generation;
 using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Logging;
 
 using JetBrains.Annotations;
@@ -134,6 +135,11 @@ namespace FluentMigrator.Runner.Processors
         public virtual void Process(CreateTableExpression expression)
         {
             Process(Generator.Generate(expression));
+
+            foreach (var expressionForNewTable in expression.GetExpressionsProcessedSeparately(Generator))
+            {
+                expressionForNewTable.ExecuteWith(this);
+            }
         }
 
         /// <inheritdoc />

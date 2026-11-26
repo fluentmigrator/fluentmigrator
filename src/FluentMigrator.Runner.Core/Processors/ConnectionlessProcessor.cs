@@ -211,6 +211,11 @@ namespace FluentMigrator.Runner.Processors
         public void Process(CreateTableExpression expression)
         {
             Process(Generator.Generate(expression));
+
+            foreach (var expressionForNewTable in expression.GetExpressionsProcessedSeparately(Generator))
+            {
+                expressionForNewTable.ExecuteWith(this);
+            }
         }
 
         /// <inheritdoc />

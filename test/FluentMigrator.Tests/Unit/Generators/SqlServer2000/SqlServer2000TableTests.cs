@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System;
+
 using FluentMigrator.Builders.Create.Table;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -42,6 +44,35 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         public void Setup()
         {
             Generator = new SqlServer2000Generator();
+        }
+
+        [Test]
+        public void CanCreateTableIfNotExistsWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.IfNotExists = true;
+
+            var result = Generator.Generate(expression);
+
+            // SQL Server 2000 has no CREATE TABLE IF NOT EXISTS, and no two-argument OBJECT_ID.
+            result.ShouldBe(
+                "IF NOT EXISTS (SELECT 1 FROM dbo.sysobjects WHERE id = OBJECT_ID(N'[TestTable1]') AND OBJECTPROPERTY(id, N'IsUserTable') = 1)" + Environment.NewLine +
+                "BEGIN" + Environment.NewLine +
+                "CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL);" + Environment.NewLine +
+                "END;");
+        }
+
+        [Test]
+        public void CreateTableIfNotExistsLooksForATemporaryTableInTempdb()
+        {
+            // A temporary table is in tempdb, so OBJECT_ID in the current database would never find it.
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.TableName = "#TestTable1";
+            expression.IfNotExists = true;
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldStartWith("IF OBJECT_ID(N'tempdb..[#TestTable1]') IS NULL" + Environment.NewLine);
         }
 
         [Test]

@@ -28,6 +28,7 @@ using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
 using FluentMigrator.Postgres;
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.Runner.Helpers;
 
 using JetBrains.Annotations;
 
@@ -38,7 +39,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
     /// <summary>
     /// The PostgreSQL SQL generator for FluentMigrator.
     /// </summary>
-    public class PostgresGenerator : GenericGenerator
+    public class PostgresGenerator : GenericGenerator, ICreateTableIfNotExistsGenerator
     {
         private static readonly HashSet<string> _supportedAdditionalFeatures = new HashSet<string>
         {
@@ -107,6 +108,99 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
         /// <inheritdoc />
         public override List<string> GeneratorIdAliases => [GeneratorIdConstants.PostgreSQL, GeneratorIdConstants.Postgres];
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// The table's indexes and foreign keys, except an index built with <c>CONCURRENTLY</c>, which can't run inside the
+        /// <c>DO</c> block. The fluent syntax only offers <c>AsConcurrently()</c> on <c>Create.Index(...)</c>, but an
+        /// <c>IIndexConvention</c> can set it on an index the table declares with <c>.Indexed()</c> or <c>.Unique()</c>. Such
+        /// an index runs after the table as a separate statement, which fails if the existing table already has it.
+        /// </remarks>
+        public virtual bool GeneratesWithTable(CreateTableExpression expression, IMigrationExpression expressionForNewTable) =>
+            IsIndexOrForeignKey(expressionForNewTable)
+            && !(expressionForNewTable is CreateIndexExpression index && !string.IsNullOrEmpty(GetAsConcurrently(index)));
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// <c>CREATE TABLE IF NOT EXISTS</c> skips only the table. When the table has
+        /// <see cref="CreateTableExpression.ExpressionsForNewTable"/>, the table and those run in a <c>DO</c> block when
+        /// the schema has no relation of the table's name, so an existing table's indexes and foreign keys are not
+        /// created again.
+        /// <para>
+        /// The check reads <c>pg_catalog.pg_class</c>, as <c>CREATE TABLE IF NOT EXISTS</c> does, and not
+        /// <c>information_schema.tables</c>, as <c>PostgresProcessor.TableExists</c> does. <c>information_schema.tables</c>
+        /// lists only the tables the current role owns or has a privilege on, so a role that may create tables in the
+        /// schema would not find another role's table there, and the <c>CREATE TABLE</c> would fail with "relation
+        /// already exists". Like <c>IF NOT EXISTS</c>, it matches a relation of any kind, such as a view, since
+        /// <c>CREATE TABLE</c> fails on any of them.
+        /// </para>
+        /// </remarks>
+        public override string Generate(CreateTableExpression expression)
+        {
+            if (!expression.IfNotExists || !(expression.ExpressionsForNewTable ?? Enumerable.Empty<IMigrationExpression>()).Any(e => GeneratesWithTable(expression, e)))
+            {
+                return base.Generate(expression);
+            }
+
+            var createTable = base.Generate(new CreateTableExpression
+            {
+                SchemaName = expression.SchemaName,
+                TableName = expression.TableName,
+                Columns = expression.Columns,
+                TableDescription = expression.TableDescription,
+            });
+
+            if (string.IsNullOrEmpty(createTable))
+            {
+                return createTable;
+            }
+
+            var schemaName = string.IsNullOrEmpty(expression.SchemaName) ? "public" : NameInCatalog(expression.SchemaName);
+
+            // pg_temp is an alias for the session's temporary schema, which pg_namespace lists as pg_temp_N, so a table
+            // created in pg_temp is never in a schema named pg_temp.
+            var schemaCondition = schemaName == "pg_temp"
+                ? "c.relnamespace = pg_catalog.pg_my_temp_schema()"
+                : $"n.nspname = '{FormatHelper.FormatSqlEscape(schemaName)}'";
+
+            var body = new StringBuilder();
+            body.AppendLine("BEGIN");
+            body.AppendLine(
+                "IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE "
+              + $"{schemaCondition} AND c.relname = '{FormatHelper.FormatSqlEscape(NameInCatalog(expression.TableName))}') THEN");
+            body.AppendLine(createTable);
+            foreach (var statement in GenerateExpressionsForNewTable(expression, e => GeneratesWithTable(expression, e)))
+            {
+                body.AppendLine(statement);
+            }
+
+            body.AppendLine("END IF;");
+            body.AppendLine("END");
+
+            // A dollar-quote tag that the body, such as a column default, does not contain, so it does not end early.
+            var bodyText = body.ToString();
+            var tag = "$fluentmigrator$";
+            while (bodyText.Contains(tag))
+            {
+                tag = tag.Insert(tag.Length - 1, "_");
+            }
+
+            var builder = new StringBuilder();
+            builder.AppendLine("DO " + tag);
+            builder.Append(bodyText);
+            builder.Append(tag);
+            AppendSqlStatementEndToken(builder);
+            return builder.ToString();
+        }
+
+        /// <summary>
+        /// A name as PostgreSQL stores it: as written when the quoter quotes it, otherwise folded to lower case.
+        /// </summary>
+        private string NameInCatalog(string name)
+        {
+            var quoted = Quoter.Quote(name);
+            return Quoter.IsQuoted(quoted) ? Quoter.UnQuote(quoted) : name.ToLowerInvariant();
+        }
 
         /// <inheritdoc />
         public override string Generate(CreateSchemaExpression expression)

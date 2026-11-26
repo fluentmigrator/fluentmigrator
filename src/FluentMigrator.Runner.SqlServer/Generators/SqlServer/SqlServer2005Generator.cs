@@ -26,6 +26,7 @@ using FluentMigrator.Generation;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
+using FluentMigrator.Runner.Helpers;
 using FluentMigrator.SqlServer;
 
 using JetBrains.Annotations;
@@ -220,7 +221,8 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
             if (expression.IfNotExists)
             {
-                return CompatibilityMode.HandleCompatibility("Create.Table(...).IfNotExists() is not supported");
+                // One guarded batch, descriptions included: after a GO they would run, and fail, when the table exists.
+                return base.Generate(expression);
             }
 
             var descriptionStatements = DescriptionGenerator.GenerateDescriptionStatements(expression);
@@ -231,6 +233,24 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 return createTableStatement;
 
             return ComposeStatements(createTableStatement, descriptionStatementsArray);
+        }
+
+        /// <inheritdoc />
+        protected override string GetTableIsMissingCondition(string quotedTableName)
+        {
+            return $"OBJECT_ID(N'{FormatHelper.FormatSqlEscape(quotedTableName)}', N'U') IS NULL";
+        }
+
+        /// <inheritdoc />
+        protected override string GetTemporaryTableIsMissingCondition(string quotedTableName)
+        {
+            return $"OBJECT_ID(N'tempdb..{FormatHelper.FormatSqlEscape(quotedTableName)}', N'U') IS NULL";
+        }
+
+        /// <inheritdoc />
+        protected override IEnumerable<string> GenerateStatementsForNewTable(CreateTableExpression expression)
+        {
+            return DescriptionGenerator.GenerateDescriptionStatements(expression);
         }
 
         /// <inheritdoc />

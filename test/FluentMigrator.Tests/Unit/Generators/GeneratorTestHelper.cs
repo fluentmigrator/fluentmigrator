@@ -70,6 +70,42 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
+        /// <summary>
+        /// <c>Create.Table("TestTable1").IfNotExists()</c> with <c>.Unique("UX_TestTable1_TestColumn1")</c> on TestColumn1
+        /// and <c>.ForeignKey("FK_TestTable1_TestTable2", "TestTable2", "TestColumn2")</c> on TestColumn2, as the builder
+        /// makes it: the index and foreign key are in <see cref="CreateTableExpression.ExpressionsForNewTable"/>.
+        /// </summary>
+        public static CreateTableExpression GetCreateTableIfNotExistsWithIndexAndForeignKey()
+        {
+            var expression = GetCreateTableExpression();
+            expression.IfNotExists = true;
+
+            var index = new CreateIndexExpression
+            {
+                Index = new IndexDefinition { Name = "UX_TestTable1_TestColumn1", TableName = TestTableName1, IsUnique = true },
+            };
+            index.Index.Columns.Add(new IndexColumnDefinition { Name = TestColumnName1 });
+
+            var foreignKey = new CreateForeignKeyExpression
+            {
+                ForeignKey = new ForeignKeyDefinition
+                {
+                    Name = "FK_TestTable1_TestTable2",
+                    ForeignTable = TestTableName1,
+                    ForeignColumns = { TestColumnName2 },
+                    PrimaryTable = TestTableName2,
+                    PrimaryColumns = { TestColumnName2 },
+                },
+            };
+
+            expression.Columns[1].IsForeignKey = true;
+            expression.Columns[1].ForeignKey = foreignKey.ForeignKey;
+
+            expression.ExpressionsForNewTable.Add(index);
+            expression.ExpressionsForNewTable.Add(foreignKey);
+            return expression;
+        }
+
         public static CreateColumnExpression GetCreateBooleanColumnExpression()
         {
             ColumnDefinition column = new ColumnDefinition { Name = TestColumnName1, Type = DbType.Boolean, };

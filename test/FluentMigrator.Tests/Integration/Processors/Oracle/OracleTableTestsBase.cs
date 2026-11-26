@@ -17,9 +17,11 @@
 #endregion
 
 using System;
+using System.Data;
 using System.IO;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Tests.Helpers;
@@ -110,6 +112,37 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
                 if (Processor.TableExists(null, expression.TableName))
                 {
                     Processor.Process(new DeleteTableExpression { TableName = expression.TableName });
+                }
+            }
+        }
+
+        [Test]
+        public void CreateTableIfNotExistsCreatesAQuotedTableWhenOnlyTheUnquotedOneExists()
+        {
+            // FMCASE and "FmCase" are different tables: a case-insensitive check would take one for the other and skip
+            // the CREATE TABLE.
+            var createTable = new CreateTableExpression { TableName = "\"FmCase\"", IfNotExists = true };
+            createTable.Columns.Add(new ColumnDefinition { Name = "Id", Type = DbType.Int32, TableName = createTable.TableName });
+
+            try
+            {
+                Processor.Execute("CREATE TABLE FmCase (Id NUMBER(10))");
+
+                Processor.Process(createTable);
+
+                Processor.Exists("SELECT 1 FROM USER_TABLES WHERE TABLE_NAME = 'FMCASE'").ShouldBeTrue();
+                Processor.Exists("SELECT 1 FROM USER_TABLES WHERE TABLE_NAME = 'FmCase'").ShouldBeTrue();
+            }
+            finally
+            {
+                if (Processor.Exists("SELECT 1 FROM USER_TABLES WHERE TABLE_NAME = 'FMCASE'"))
+                {
+                    Processor.Execute("DROP TABLE FMCASE");
+                }
+
+                if (Processor.Exists("SELECT 1 FROM USER_TABLES WHERE TABLE_NAME = 'FmCase'"))
+                {
+                    Processor.Execute("DROP TABLE \"FmCase\"");
                 }
             }
         }

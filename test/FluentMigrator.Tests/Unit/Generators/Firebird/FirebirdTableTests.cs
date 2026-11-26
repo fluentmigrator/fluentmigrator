@@ -1,3 +1,8 @@
+using System;
+using System.Linq;
+
+using FirebirdSql.Data.Isql;
+
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Processors.Firebird;
@@ -62,14 +67,84 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255) NOT NULL, TestColumn2 INTEGER NOT NULL);");
         }
 
+        [TestCase(CompatibilityMode.LOOSE)]
+        [TestCase(CompatibilityMode.STRICT)]
+        public void CanCreateTableIfNotExistsWithDefaultSchema(CompatibilityMode compatibilityMode)
+        {
+            Generator.CompatibilityMode = compatibilityMode;
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.IfNotExists = true;
+            expression.Columns[1].DefaultValue = "it's";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(
+                "SET TERM ^ ;" + Environment.NewLine +
+                "EXECUTE BLOCK AS" + Environment.NewLine +
+                "BEGIN" + Environment.NewLine +
+                "IF (NOT EXISTS (SELECT 1 FROM RDB$RELATIONS WHERE (RDB$FLAGS IS NOT NULL) AND (RDB$RELATION_NAME = 'TESTTABLE1'))) THEN" + Environment.NewLine +
+                "BEGIN" + Environment.NewLine +
+                "IN AUTONOMOUS TRANSACTION DO EXECUTE STATEMENT 'CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255) NOT NULL, TestColumn2 INTEGER DEFAULT ''it''''s'' NOT NULL)';" + Environment.NewLine +
+                "END" + Environment.NewLine +
+                "END^" + Environment.NewLine +
+                "SET TERM ; ^");
+        }
+
         [Test]
-        public void CanCreateTableIfNotExistsWithDefaultSchema()
+        public void CanCreateTableIfNotExistsWithIndexAndForeignKey()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableIfNotExistsWithIndexAndForeignKey();
+
+            var result = Generator.Generate(expression);
+
+            // In the block with the table, each committed before the next, as isql's AUTODDL does.
+            result.ShouldBe(
+                "SET TERM ^ ;" + Environment.NewLine +
+                "EXECUTE BLOCK AS" + Environment.NewLine +
+                "BEGIN" + Environment.NewLine +
+                "IF (NOT EXISTS (SELECT 1 FROM RDB$RELATIONS WHERE (RDB$FLAGS IS NOT NULL) AND (RDB$RELATION_NAME = 'TESTTABLE1'))) THEN" + Environment.NewLine +
+                "BEGIN" + Environment.NewLine +
+                "IN AUTONOMOUS TRANSACTION DO EXECUTE STATEMENT 'CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255) NOT NULL, TestColumn2 INTEGER NOT NULL)';" + Environment.NewLine +
+                "IN AUTONOMOUS TRANSACTION DO EXECUTE STATEMENT 'CREATE UNIQUE ASC INDEX UX_TestTable1_TestColumn1 ON TestTable1 (TestColumn1)';" + Environment.NewLine +
+                "IN AUTONOMOUS TRANSACTION DO EXECUTE STATEMENT 'ALTER TABLE TestTable1 ADD CONSTRAINT FK_TestTable1_TestTable2 FOREIGN KEY (TestColumn2) REFERENCES TestTable2 (TestColumn2)';" + Environment.NewLine +
+                "END" + Environment.NewLine +
+                "END^" + Environment.NewLine +
+                "SET TERM ; ^");
+        }
+
+        [TestCase("Users", false, "USERS")]
+        [TestCase("\"Users\"", false, "Users")]
+        [TestCase("Users", true, "Users")]
+        [TestCase("Order", false, "Order")]
+        public void CreateTableIfNotExistsLooksForTheNameAsFirebirdStoresIt(string tableName, bool forceQuote, string storedName)
+        {
+            // Unquoted names are stored in upper case, quoted ones as written, and USERS and "Users" are different
+            // tables, so the guard compares the stored name exactly. Order is a keyword, which the quoter quotes.
+            var options = FirebirdOptions.StandardBehaviour();
+            options.ForceQuote = forceQuote;
+            var generator = new FirebirdGenerator(options);
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.TableName = tableName;
+            expression.IfNotExists = true;
+
+            var result = generator.Generate(expression);
+
+            result.ShouldContain($"(RDB$RELATION_NAME = '{storedName}')");
+        }
+
+        [Test]
+        public void CreateTableIfNotExistsIsOneStatementForIsql()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             expression.IfNotExists = true;
 
-            var result = Generator.Generate(expression);
-            result.ShouldBeEmpty();
+            var script = new FbScript(Generator.Generate(expression) + Environment.NewLine + "SELECT 1 FROM RDB$DATABASE;");
+            script.Parse();
+
+            // The parser applies SET TERM itself; it is not one of the results.
+            var statements = script.Results.ToList();
+            statements.Count.ShouldBe(2);
+            statements[0].StatementType.ShouldBe(SqlStatementType.ExecuteBlock);
+            statements[1].StatementType.ShouldBe(SqlStatementType.Select);
         }
 
         [Test]

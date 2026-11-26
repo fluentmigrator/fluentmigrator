@@ -16,9 +16,15 @@
 //
 #endregion
 
+using System;
+using System.Linq;
+
+using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Processors.Postgres;
+using FluentMigrator.Tests.Integration.CreationScript.ConcurrentIndex;
 
 using NUnit.Framework;
 
@@ -276,6 +282,69 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 
             var result = Generator.Generate(expression);
             result.ShouldBe("DROP TABLE IF EXISTS \"TestSchema\".\"TestTable1\";");
+        }
+
+        [Test]
+        public void CanCreateTableIfNotExistsWithIndexAndForeignKey()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableIfNotExistsWithIndexAndForeignKey();
+
+            var result = Generator.Generate(expression);
+
+            // CREATE TABLE IF NOT EXISTS would skip only the table, so a DO block skips all three.
+            result.ShouldBe(
+                "DO $fluentmigrator$" + Environment.NewLine +
+                "BEGIN" + Environment.NewLine +
+                "IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relname = 'TestTable1') THEN" + Environment.NewLine +
+                "CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" text NOT NULL, \"TestColumn2\" integer NOT NULL);" + Environment.NewLine +
+                "CREATE UNIQUE INDEX \"UX_TestTable1_TestColumn1\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC);" + Environment.NewLine +
+                "ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_TestTable1_TestTable2\" FOREIGN KEY (\"TestColumn2\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\");" + Environment.NewLine +
+                "END IF;" + Environment.NewLine +
+                "END" + Environment.NewLine +
+                "$fluentmigrator$;");
+        }
+
+        [Test]
+        public void CreateTableIfNotExistsLeavesAConventionsConcurrentIndexOutOfTheDoBlock()
+        {
+            // CREATE INDEX CONCURRENTLY can't run in a DO block, and a convention can make an index the table declares
+            // concurrent. The index then runs after the table, and the foreign key stays in the block.
+            var conventions = new DefaultConventionSet();
+            conventions.IndexConventions.Add(new ConcurrentIndexesConvention(GeneratorTestHelper.TestTableName1));
+            var expression = (CreateTableExpression) GeneratorTestHelper.GetCreateTableIfNotExistsWithIndexAndForeignKey().Apply(conventions);
+            var index = expression.ExpressionsForNewTable.OfType<CreateIndexExpression>().Single();
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldNotContain("UX_TestTable1_TestColumn1");
+            result.ShouldContain("FK_TestTable1_TestTable2");
+            expression.GetExpressionsProcessedSeparately(Generator).ShouldBe([index]);
+            Generator.Generate(index).ShouldStartWith("CREATE UNIQUE INDEX CONCURRENTLY \"UX_TestTable1_TestColumn1\"");
+        }
+
+        [Test]
+        public void CreateTableIfNotExistsInPgTempLooksInTheSessionsTemporarySchema()
+        {
+            // pg_temp is an alias for the session's temporary schema, which pg_namespace lists as pg_temp_N.
+            var expression = GeneratorTestHelper.GetCreateTableIfNotExistsWithIndexAndForeignKey();
+            expression.SchemaName = "pg_temp";
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldContain("WHERE c.relnamespace = pg_catalog.pg_my_temp_schema() AND c.relname = 'TestTable1') THEN");
+        }
+
+        [Test]
+        public void CreateTableIfNotExistsWithIndexUsesADollarQuoteTagNotInTheBody()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableIfNotExistsWithIndexAndForeignKey();
+            expression.Columns[0].DefaultValue = "$fluentmigrator$";
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldStartWith("DO $fluentmigrator_$" + Environment.NewLine);
+            result.ShouldEndWith(Environment.NewLine + "$fluentmigrator_$;");
+            result.ShouldContain("DEFAULT '$fluentmigrator$'");
         }
 
         [Test]
