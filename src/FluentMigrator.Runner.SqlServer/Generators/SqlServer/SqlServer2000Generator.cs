@@ -112,10 +112,14 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 return createTable;
             }
 
-            var quotedTableName = Quoter.QuoteTableName(expression.TableName, expression.SchemaName);
+            // A temporary table (#Name or ##Name) is in tempdb, whatever the schema, so OBJECT_ID in the current database
+            // never finds it.
+            var condition = Quoter.UnQuote(expression.TableName).StartsWith("#", StringComparison.Ordinal)
+                ? GetTemporaryTableIsMissingCondition(Quoter.Quote(expression.TableName))
+                : GetTableIsMissingCondition(Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
 
             var builder = new StringBuilder();
-            builder.Append("IF ").AppendLine(GetTableIsMissingCondition(quotedTableName));
+            builder.Append("IF ").AppendLine(condition);
             builder.AppendLine("BEGIN");
             builder.AppendLine(createTable);
             foreach (var statement in GenerateStatementsForNewTable(expression).Where(s => !string.IsNullOrEmpty(s)))
@@ -144,6 +148,16 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         protected virtual string GetTableIsMissingCondition(string quotedTableName)
         {
             return $"NOT EXISTS (SELECT 1 FROM dbo.sysobjects WHERE id = OBJECT_ID(N'{FormatHelper.FormatSqlEscape(quotedTableName)}') AND OBJECTPROPERTY(id, N'IsUserTable') = 1)";
+        }
+
+        /// <summary>
+        /// The condition, for an <c>IF</c>, that the session has no temporary table of the given name. Temporary tables
+        /// are in <c>tempdb</c>, and <c>OBJECT_ID(N'tempdb..#Name')</c> finds the one this session sees.
+        /// </summary>
+        /// <param name="quotedTableName">The table name as the quoter writes it, without a schema.</param>
+        protected virtual string GetTemporaryTableIsMissingCondition(string quotedTableName)
+        {
+            return $"OBJECT_ID(N'tempdb..{FormatHelper.FormatSqlEscape(quotedTableName)}') IS NULL";
         }
 
         /// <summary>

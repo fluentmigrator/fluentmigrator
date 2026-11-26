@@ -242,6 +242,12 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         }
 
         /// <inheritdoc />
+        protected override string GetTemporaryTableIsMissingCondition(string quotedTableName)
+        {
+            return $"OBJECT_ID(N'tempdb..{FormatHelper.FormatSqlEscape(quotedTableName)}', N'U') IS NULL";
+        }
+
+        /// <inheritdoc />
         protected override IEnumerable<string> GenerateStatementsForNewTable(CreateTableExpression expression)
         {
             return DescriptionGenerator.GenerateDescriptionStatements(expression);

@@ -16,6 +16,10 @@
 //
 #endregion
 
+using System.Data;
+
+using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.SqlServer;
@@ -69,6 +73,53 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer.SqlServer2016
         {
             using (var table = new SqlServerTestTable(Processor, "test_schema", "id int"))
                 Processor.TableExists("test_schema", table.Name).ShouldBeTrue();
+        }
+
+        [Test]
+        public void CreateTableIfNotExistsCreatesAMissingTemporaryTable()
+        {
+            var createTable = CreateTemporaryTableIfNotExists();
+
+            try
+            {
+                Processor.Process(createTable);
+
+                Processor.Exists("SELECT 1 FROM tempdb.sys.columns WHERE object_id = OBJECT_ID(N'tempdb..#FmWork') AND name = 'Id'")
+                    .ShouldBeTrue();
+            }
+            finally
+            {
+                Processor.Execute("IF OBJECT_ID(N'tempdb..#FmWork') IS NOT NULL DROP TABLE #FmWork");
+            }
+        }
+
+        [Test]
+        public void CreateTableIfNotExistsSkipsAnExistingTemporaryTable()
+        {
+            // A temporary table is in tempdb, so a check of the current database would not find it, and the CREATE TABLE
+            // would fail because #FmWork already exists.
+            var createTable = CreateTemporaryTableIfNotExists();
+
+            try
+            {
+                Processor.Execute("CREATE TABLE #FmWork (Original INT)");
+
+                Processor.Process(createTable);
+
+                Processor.Exists("SELECT 1 FROM tempdb.sys.columns WHERE object_id = OBJECT_ID(N'tempdb..#FmWork') AND name = 'Original'")
+                    .ShouldBeTrue();
+            }
+            finally
+            {
+                Processor.Execute("IF OBJECT_ID(N'tempdb..#FmWork') IS NOT NULL DROP TABLE #FmWork");
+            }
+        }
+
+        private static CreateTableExpression CreateTemporaryTableIfNotExists()
+        {
+            var createTable = new CreateTableExpression { TableName = "#FmWork", IfNotExists = true };
+            createTable.Columns.Add(new ColumnDefinition { Name = "Id", Type = DbType.Int32, TableName = "#FmWork" });
+            return createTable;
         }
 
         [OneTimeSetUp]

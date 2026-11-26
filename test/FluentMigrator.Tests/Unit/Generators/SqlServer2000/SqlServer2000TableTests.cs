@@ -63,6 +63,19 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         }
 
         [Test]
+        public void CreateTableIfNotExistsLooksForATemporaryTableInTempdb()
+        {
+            // A temporary table is in tempdb, so OBJECT_ID in the current database would never find it.
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.TableName = "#TestTable1";
+            expression.IfNotExists = true;
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldStartWith("IF OBJECT_ID(N'tempdb..[#TestTable1]') IS NULL" + Environment.NewLine);
+        }
+
+        [Test]
         public void CanCreateTableWithIgnoredRowGuidCol()
         {
             var expression = new CreateTableExpression()
