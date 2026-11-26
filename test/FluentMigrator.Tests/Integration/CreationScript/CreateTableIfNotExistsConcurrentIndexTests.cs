@@ -21,6 +21,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Tests.Integration.CreationScript.ConcurrentIndex;
@@ -37,9 +38,11 @@ namespace FluentMigrator.Tests.Integration.CreationScript
     /// </summary>
     /// <remarks>
     /// PostgreSQL creates such a table and its own indexes in a <c>DO</c> block, and <c>CREATE INDEX CONCURRENTLY</c>
-    /// can't run in one. The fluent API can't make a concurrent index part of the table: <c>AsConcurrently()</c> is
-    /// only on <c>Create.Index(...).WithOptions()</c>, a separate expression that runs after the block. These tests run
-    /// the migration, as a script and live, on an empty database and on one that already has the table.
+    /// can't run in one. The fluent syntax only offers <c>AsConcurrently()</c> on <c>Create.Index(...).WithOptions()</c>,
+    /// a separate expression that runs after the block. An <c>IIndexConvention</c> can also make an index the table
+    /// declares concurrent (<see cref="ConcurrentIndexesConvention"/>), and the generator then leaves it out of the
+    /// block too. These tests run the migration, as a script and live, on an empty database and on one that already has
+    /// the table.
     /// </remarks>
     [TestFixture]
     [Category("Integration")]
@@ -79,13 +82,38 @@ namespace FluentMigrator.Tests.Integration.CreationScript
                 });
         }
 
-        [TestCase(false, TestName = "{m}(empty database)")]
-        [TestCase(true, TestName = "{m}(existing table)")]
-        public void ScriptCreatesTheConcurrentIndex(bool tableExisted)
+        [Test]
+        public void AConventionsConcurrentIndexRunsAfterTheTable()
+        {
+            // Needs no database. A convention can make the index the table declares with .Indexed() concurrent too, and
+            // that one must also stay out of any DO block.
+            var script = GenerateScript(withConvention: true);
+
+            Assert.Multiple(
+                () =>
+                {
+                    foreach (Match doBlock in Regex.Matches(script, @"DO (\$\w*\$)\s.*?\1;", RegexOptions.Singleline))
+                    {
+                        Assert.That(doBlock.Value, Does.Not.Contain("CONCURRENTLY"), "CONCURRENTLY in a DO block");
+                    }
+
+                    Assert.That(script, Does.Contain($"CREATE INDEX CONCURRENTLY \"{ConcurrentIndexMigrations.TableIndex}\""), "the table's index, made concurrent by the convention");
+                    Assert.That(script, Does.Contain($"CREATE INDEX CONCURRENTLY \"{ConcurrentIndexMigrations.ConcurrentIndex}\""), "the concurrent index");
+                });
+        }
+
+        /// <summary>
+        /// The convention case runs on an empty database only. On a table that already has the index, the index the
+        /// convention made concurrent runs as a separate statement and fails, as the documentation says.
+        /// </summary>
+        [TestCase(false, false, TestName = "{m}(empty database)")]
+        [TestCase(true, false, TestName = "{m}(existing table)")]
+        [TestCase(false, true, TestName = "{m}(empty database, convention)")]
+        public void ScriptCreatesTheConcurrentIndex(bool tableExisted, bool withConvention)
         {
             Postgres.ServerOptions.IgnoreIfNotEnabled();
 
-            var script = GenerateScript();
+            var script = GenerateScript(withConvention);
 
             try
             {
@@ -107,9 +135,10 @@ namespace FluentMigrator.Tests.Integration.CreationScript
             }
         }
 
-        [TestCase(false, TestName = "{m}(empty database)")]
-        [TestCase(true, TestName = "{m}(existing table)")]
-        public void LiveRunCreatesTheConcurrentIndex(bool tableExisted)
+        [TestCase(false, false, TestName = "{m}(empty database)")]
+        [TestCase(true, false, TestName = "{m}(existing table)")]
+        [TestCase(false, true, TestName = "{m}(empty database, convention)")]
+        public void LiveRunCreatesTheConcurrentIndex(bool tableExisted, bool withConvention)
         {
             Postgres.ServerOptions.IgnoreIfNotEnabled();
 
@@ -119,7 +148,7 @@ namespace FluentMigrator.Tests.Integration.CreationScript
                 Postgres.RunScript(database.ConnectionString, ExistingTable);
             }
 
-            using (var serviceProvider = CreateServices(database.ConnectionString).BuildServiceProvider())
+            using (var serviceProvider = CreateServices(database.ConnectionString, withConvention).BuildServiceProvider())
             using (var scope = serviceProvider.CreateScope())
             {
                 scope.ServiceProvider.GetRequiredService<IMigrationRunner>().MigrateUp();
@@ -128,8 +157,8 @@ namespace FluentMigrator.Tests.Integration.CreationScript
             Verify(database.ConnectionString, tableExisted);
         }
 
-        private static string GenerateScript() =>
-            ConnectionlessScript.Generate(Postgres, CreateServices(connectionString: null));
+        private static string GenerateScript(bool withConvention = false) =>
+            ConnectionlessScript.Generate(Postgres, CreateServices(connectionString: null, withConvention));
 
         private static void Verify(string connectionString, bool tableExisted)
         {
@@ -155,9 +184,17 @@ namespace FluentMigrator.Tests.Integration.CreationScript
                 });
         }
 
-        private static IServiceCollection CreateServices(string connectionString)
+        private static IServiceCollection CreateServices(string connectionString, bool withConvention = false)
         {
-            return new ServiceCollection()
+            var services = new ServiceCollection();
+            if (withConvention)
+            {
+                var conventions = new DefaultConventionSet();
+                conventions.IndexConventions.Add(new ConcurrentIndexesConvention(ConcurrentIndexMigrations.Table));
+                services.AddSingleton<IConventionSet>(conventions);
+            }
+
+            return services
                 .AddFluentMigratorCore()
                 .AddSingleton<IAssemblySourceItem>(new AssemblySourceItem(typeof(ConcurrentIndexMigrations).Assembly))
                 .Configure<TypeFilterOptions>(

@@ -16,7 +16,10 @@
 //
 #endregion
 
+using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Postgres;
+using FluentMigrator.Runner.Conventions;
 
 namespace FluentMigrator.Tests.Integration.CreationScript.ConcurrentIndex
 {
@@ -64,6 +67,35 @@ namespace FluentMigrator.Tests.Integration.CreationScript.ConcurrentIndex
             Create.Index(ConcurrentIndexMigrations.ConcurrentIndex).OnTable(ConcurrentIndexMigrations.Table)
                 .OnColumn("Code").Ascending()
                 .WithOptions().AsConcurrently();
+        }
+    }
+
+    /// <summary>
+    /// A convention that builds a table's indexes concurrently, as a team that deploys without downtime might. It
+    /// reaches the indexes the table declares with <c>.Indexed()</c> and <c>.Unique()</c> too, which the fluent syntax
+    /// can't make concurrent.
+    /// </summary>
+    /// <remarks>
+    /// It is limited to one table: the runner creates its own version table's index in a transaction, where
+    /// <c>CREATE INDEX CONCURRENTLY</c> fails.
+    /// </remarks>
+    public sealed class ConcurrentIndexesConvention : IIndexConvention
+    {
+        private readonly string _tableName;
+
+        public ConcurrentIndexesConvention(string tableName)
+        {
+            _tableName = tableName;
+        }
+
+        public IIndexExpression Apply(IIndexExpression expression)
+        {
+            if (expression.Index.TableName == _tableName)
+            {
+                expression.Index.AdditionalFeatures[PostgresExtensions.Concurrently] = new PostgresIndexConcurrentlyDefinition { IsConcurrently = true };
+            }
+
+            return expression;
         }
     }
 }

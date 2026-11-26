@@ -17,10 +17,14 @@
 #endregion
 
 using System;
+using System.Linq;
 
+using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Processors.Postgres;
+using FluentMigrator.Tests.Integration.CreationScript.ConcurrentIndex;
 
 using NUnit.Framework;
 
@@ -298,6 +302,24 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
                 "END IF;" + Environment.NewLine +
                 "END" + Environment.NewLine +
                 "$fluentmigrator$;");
+        }
+
+        [Test]
+        public void CreateTableIfNotExistsLeavesAConventionsConcurrentIndexOutOfTheDoBlock()
+        {
+            // CREATE INDEX CONCURRENTLY can't run in a DO block, and a convention can make an index the table declares
+            // concurrent. The index then runs after the table, and the foreign key stays in the block.
+            var conventions = new DefaultConventionSet();
+            conventions.IndexConventions.Add(new ConcurrentIndexesConvention(GeneratorTestHelper.TestTableName1));
+            var expression = (CreateTableExpression) GeneratorTestHelper.GetCreateTableIfNotExistsWithIndexAndForeignKey().Apply(conventions);
+            var index = expression.ExpressionsForNewTable.OfType<CreateIndexExpression>().Single();
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldNotContain("UX_TestTable1_TestColumn1");
+            result.ShouldContain("FK_TestTable1_TestTable2");
+            expression.GetExpressionsProcessedSeparately(Generator).ShouldBe([index]);
+            Generator.Generate(index).ShouldStartWith("CREATE UNIQUE INDEX CONCURRENTLY \"UX_TestTable1_TestColumn1\"");
         }
 
         [Test]

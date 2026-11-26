@@ -110,8 +110,15 @@ namespace FluentMigrator.Runner.Generators.Postgres
         public override List<string> GeneratorIdAliases => [GeneratorIdConstants.PostgreSQL, GeneratorIdConstants.Postgres];
 
         /// <inheritdoc />
+        /// <remarks>
+        /// The table's indexes and foreign keys, except an index built with <c>CONCURRENTLY</c>, which can't run inside the
+        /// <c>DO</c> block. The fluent syntax only offers <c>AsConcurrently()</c> on <c>Create.Index(...)</c>, but an
+        /// <c>IIndexConvention</c> can set it on an index the table declares with <c>.Indexed()</c> or <c>.Unique()</c>. Such
+        /// an index runs after the table as a separate statement, which fails if the existing table already has it.
+        /// </remarks>
         public virtual bool GeneratesWithTable(CreateTableExpression expression, IMigrationExpression expressionForNewTable) =>
-            IsIndexOrForeignKey(expressionForNewTable);
+            IsIndexOrForeignKey(expressionForNewTable)
+            && !(expressionForNewTable is CreateIndexExpression index && !string.IsNullOrEmpty(GetAsConcurrently(index)));
 
         /// <inheritdoc />
         /// <remarks>

@@ -274,10 +274,10 @@ Everything declared in the `Create.Table(...)` is conditional, not only the tabl
 | SQLite | `CREATE TABLE IF NOT EXISTS ...`, with the `.ForeignKey(...)` foreign keys declared in it, then `CREATE INDEX IF NOT EXISTS ...` |
 | Redshift, Snowflake, SAP HANA, Db2 | `CREATE TABLE IF NOT EXISTS ...`, then the indexes and foreign keys as separate statements |
 
-Two exceptions:
+The exceptions:
 
 - **SQLite** has no conditional block, so its indexes use `CREATE INDEX IF NOT EXISTS`: an index that the existing table lacks is created. SQLite also can't add a foreign key to a table after it is created, so a `.ReferencedBy(...)` key, even to the same table, is an error in STRICT mode and is not created in LOOSE mode, as without `IfNotExists()`. Declare the key on the referencing column with `.ForeignKey(...)` instead.
-- **Redshift, Snowflake, SAP HANA and Db2** run the indexes and foreign keys as separate statements after the table, which fail if the existing table already has them. On MySQL, so does a foreign key from another table (`.ReferencedBy(...)`), which can't be declared in this table's `CREATE TABLE`. Declare those separately, with your own `Schema.Table(...).Index(...).Exists()` check, when the table may already exist.
+- **Redshift, Snowflake, SAP HANA and Db2** run the indexes and foreign keys as separate statements after the table, which fail if the existing table already has them. On MySQL, so does a foreign key from another table (`.ReferencedBy(...)`), which can't be declared in this table's `CREATE TABLE`. On PostgreSQL, so does an index built with `CONCURRENTLY`, which can't run inside the `DO` block; the fluent syntax only offers `AsConcurrently()` on `Create.Index(...)`, but an index convention can set it on an index the table declares. Declare those separately, with your own `Schema.Table(...).Index(...).Exists()` check, when the table may already exist.
 
 Conditional table creation cannot be automatically reversed safely. If the table already existed, dropping it during rollback would delete an object the migration did not create. Use a `ForwardOnlyMigration`, or avoid `IfNotExists()` when the migration must support automatic reversal.
 
