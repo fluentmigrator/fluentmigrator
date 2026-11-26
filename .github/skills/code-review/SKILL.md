@@ -94,7 +94,7 @@ outside the PR's scope.
   escaping their backslashes (PR #2344).
 - `$(name)` and `$[name]` token substitution lives in
   `src/FluentMigrator.Abstractions/SqlScriptTokenReplacer.cs`. As
-  `adr/proposed/RequireQuoterForTokenSubstitution.md` records, `$[name]` requires an
+  `adr/implemented/RequireQuoterForTokenSubstitution.md` records, `$[name]` requires an
   `IQuoter` and must not get a second, private literal-quoting implementation. Changes
   here usually move the token substitution matrix snapshots
   (`test/FluentMigrator.Tests/Unit/TokenSubstitution/*.verified.md`). Review a snapshot

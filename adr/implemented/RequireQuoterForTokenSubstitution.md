@@ -1,7 +1,7 @@
 # ADR: Require an IQuoter for SQL Script Token Substitution
 
 ## Status
-Proposed — **amended**. The original decision (Option G) was superseded during implementation; see
+Implemented in [#2365](https://github.com/fluentmigrator/fluentmigrator/pull/2365) — **amended**. The original decision (Option G) was superseded during implementation; see
 [Amendment](#amendment-option-g-superseded-by-option-i) and the revised [Decision](#decision).
 
 Follows the coverage work in [#2336](https://github.com/fluentmigrator/fluentmigrator/issues/2336), which recorded the correct behaviour of the no-quoter fallback as "an API decision" rather than resolving it.

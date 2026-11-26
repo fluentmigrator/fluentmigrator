@@ -3,7 +3,7 @@
 Reference document for `TokenSubstitutionMatrixTests`. Describes *what* the matrix covers and *why*
 each axis exists. The measured output lives in the `*.verified.md` snapshots beside this file.
 
-Origin: [#2336](https://github.com/fluentmigrator/fluentmigrator/issues/2336), the coverage request this fixture answers. Design decisions since then live in `adr/proposed/RequireQuoterForTokenSubstitution.md`.
+Origin: [#2336](https://github.com/fluentmigrator/fluentmigrator/issues/2336), the coverage request this fixture answers. Design decisions since then live in `adr/implemented/RequireQuoterForTokenSubstitution.md`.
 
 ## Why a matrix
 
@@ -22,7 +22,7 @@ markdown table rather than one of 35,000 opaque case names.
 | # | Axis | Values | Why it matters |
 |---|---|---|---|
 | 1 | Token style | `$(name)` raw, `$[name]` safe-quoted | Different code paths: raw bypasses the quoter entirely |
-| 2 | Quoter presence | supplied only | A `null` quoter no longer renders anything - it throws when `$[name]` is expanded, identically for every value and dialect. Covered once in `SqlScriptTokenReplacerTests` rather than as a matrix column; see `adr/proposed/RequireQuoterForTokenSubstitution.md` |
+| 2 | Quoter presence | supplied only | A `null` quoter no longer renders anything - it throws when `$[name]` is expanded, identically for every value and dialect. Covered once in `SqlScriptTokenReplacerTests` rather than as a matrix column; see `adr/implemented/RequireQuoterForTokenSubstitution.md` |
 | 3 | Value type | every branch of `GenericQuoter.QuoteValue`, plus uncased fall-through, plus `RawSql` | The reported defects are all value-type specific |
 | 4 | Dialect | ~30 `Add*()` registrations on `IMigrationRunnerBuilder` | Each wires a different quoter/typemap/generator triple |
 | 5 | `IQuoter` switch | `binaryGuid`, `ForceQuote`, quoted-identifier variants | Orthogonal to dialect; changes value rendering |

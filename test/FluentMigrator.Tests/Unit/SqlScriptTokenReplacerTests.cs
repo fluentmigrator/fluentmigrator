@@ -217,7 +217,7 @@ namespace FluentMigrator.Tests.Unit
         /// The obsolete overload does not expand <c>$[name]</c>, and never did: that token style
         /// arrived long after this overload, and 8.0.1 returned such text unchanged. There is also
         /// no quoter here to render it with. Restoring that is deliberate - see
-        /// <c>adr/proposed/RequireQuoterForTokenSubstitution.md</c>.
+        /// <c>adr/implemented/RequireQuoterForTokenSubstitution.md</c>.
         /// </summary>
         [Test]
         public void LegacyStringDictionaryOverloadLeavesSafeTokenVerbatim()
@@ -299,7 +299,7 @@ namespace FluentMigrator.Tests.Unit
         // The guard lives inside the $[name] branch rather than at method entry. These two tests
         // are the pair that makes that visible; the second is the one that regresses if someone
         // "tidies" the check up to the top of the method.
-        // See adr/proposed/RequireQuoterForTokenSubstitution.md.
+        // See adr/implemented/RequireQuoterForTokenSubstitution.md.
 
         [Test]
         public void ThrowsWhenSafeTokenIsExpandedWithoutAQuoter()

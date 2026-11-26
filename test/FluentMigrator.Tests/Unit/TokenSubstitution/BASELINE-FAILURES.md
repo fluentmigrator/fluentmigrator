@@ -8,7 +8,7 @@ Run against `e25bf5ef` ("Fix RawSql script token replacement (#2333)") on `net48
 > **Historical note.** The `$[x] no quoter` column referenced throughout this document no longer
 > exists. The private fallback it recorded was deleted when the quoter became required — a null
 > quoter now throws, identically for every value and dialect, so the column carried one fact
-> repeated 161 times. See `adr/proposed/RequireQuoterForTokenSubstitution.md` and the three
+> repeated 161 times. See `adr/implemented/RequireQuoterForTokenSubstitution.md` and the three
 > dedicated tests in `SqlScriptTokenReplacerTests`. This file is kept as the record of what the
 > matrix found, not as a description of the current fixture.
 
@@ -62,7 +62,7 @@ non-string values as string literals:
 | `RawSql.Insert("CURRENT_TIMESTAMP")` | `'FluentMigrator.RawSql'` | `CURRENT_TIMESTAMP` |
 
 These are visible in the golden tables rather than asserted individually, because the correct
-behaviour of the fallback is an API decision (resolved by adr/proposed/RequireQuoterForTokenSubstitution.md, implemented in #2365) rather than an unambiguous bug.
+behaviour of the fallback is an API decision (resolved by adr/implemented/RequireQuoterForTokenSubstitution.md, implemented in #2365) rather than an unambiguous bug.
 
 ## After the fixes
 
