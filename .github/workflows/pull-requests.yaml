@@ -66,13 +66,13 @@ jobs:
         fetch-depth: 0
 
     - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v4.7.0
+      uses: gittools/actions/gitversion/setup@v5.0.0
       with:
         versionSpec: 6.3.x
 
     - name: Execute GitVersion
       id: gitversion
-      uses: gittools/actions/gitversion/execute@v4.7.0
+      uses: gittools/actions/gitversion/execute@v5.0.0
       env:
         BUILD_BUILDNUMBER: ${{ env.GitVersion.NuGetVersionV2 }}
       with:
@@ -252,7 +252,7 @@ jobs:
         find . -type f -iname "*cobertura.xml" || true
 
     - name: Combine Coverage Reports
-      uses: danielpalme/ReportGenerator-GitHub-Action@5.6.0
+      uses: danielpalme/ReportGenerator-GitHub-Action@5.6.1
       if: '!cancelled()'
       with:
         reports: "**/*.cobertura.xml"
