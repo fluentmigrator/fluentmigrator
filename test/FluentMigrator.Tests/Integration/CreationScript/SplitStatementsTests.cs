@@ -48,5 +48,22 @@ namespace FluentMigrator.Tests.Integration.CreationScript
 
             Assert.That(statements, Is.EqualTo(new[] { $"DO {tag} BEGIN PERFORM 1; PERFORM 2; END {tag}", "SELECT 1" }));
         }
+
+        /// <summary>
+        /// PostgreSQL and MySQL allow <c>$</c> in an unquoted identifier after its first character, so <c>$b$</c> in
+        /// <c>a$b$c</c> is part of the name, not a tag.
+        /// </summary>
+        [Test]
+        public void ADollarInAnIdentifierIsNotATag()
+        {
+            const string script = "SELECT 1 AS a$b$c; SELECT 2;";
+
+            var statements = CreationScriptTarget.SplitStatements(script)
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .Select(s => s.Trim())
+                .ToList();
+
+            Assert.That(statements, Is.EqualTo(new[] { "SELECT 1 AS a$b$c", "SELECT 2" }));
+        }
     }
 }

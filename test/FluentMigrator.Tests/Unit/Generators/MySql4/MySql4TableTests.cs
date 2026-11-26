@@ -69,6 +69,19 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
         }
 
         [Test]
+        public void CanCreateTableIfNotExistsWithAForeignKeysRules()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableIfNotExistsWithIndexAndForeignKey();
+            expression.Columns[1].ForeignKey.OnDelete = System.Data.Rule.Cascade;
+            expression.Columns[1].ForeignKey.OnUpdate = System.Data.Rule.SetNull;
+
+            var result = Generator.Generate(expression);
+
+            // The inline foreign key keeps its rules, as Create.ForeignKey(...) would write them.
+            result.ShouldContain("CONSTRAINT `FK_TestTable1_TestTable2` FOREIGN KEY (`TestColumn2`) REFERENCES `TestTable2` (`TestColumn2`) ON DELETE CASCADE ON UPDATE SET NULL)");
+        }
+
+        [Test]
         public void CanCreateTableIfNotExistsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
