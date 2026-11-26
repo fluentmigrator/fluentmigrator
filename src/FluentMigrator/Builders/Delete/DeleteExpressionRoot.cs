@@ -16,6 +16,7 @@
 //
 #endregion
 
+using FluentMigrator.Builders.Delete.CheckConstraint;
 using FluentMigrator.Builders.Delete.Column;
 using FluentMigrator.Builders.Delete.Constraint;
 using FluentMigrator.Builders.Delete.DefaultConstraint;
@@ -152,6 +153,19 @@ namespace FluentMigrator.Builders.Delete
             var expression = new DeleteDefaultConstraintExpression();
             _context.Expressions.Add(expression);
             return new DeleteDefaultConstraintExpressionBuilder(expression);
+        }
+
+        /// <inheritdoc />
+        public IDeleteCheckUnnamedFromTableSyntax Check() => BuildCheck(null);
+
+        /// <inheritdoc />
+        public IDeleteCheckFromTableSyntax Check(string constraintName) => BuildCheck(constraintName);
+
+        private DeleteCheckConstraintExpressionBuilder BuildCheck(string constraintName)
+        {
+            var expression = new DeleteCheckConstraintExpression { Constraint = { ConstraintName = constraintName } };
+            _context.Expressions.Add(expression);
+            return new DeleteCheckConstraintExpressionBuilder(expression);
         }
     }
 }

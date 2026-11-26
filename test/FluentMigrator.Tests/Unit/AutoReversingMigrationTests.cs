@@ -21,10 +21,13 @@ using System.Linq;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Runner;
+using FluentMigrator.Runner.Conventions;
+
+using Moq;
 
 using NUnit.Framework;
 
-using Moq;
 using Shouldly;
 
 namespace FluentMigrator.Tests.Unit
@@ -40,6 +43,51 @@ namespace FluentMigrator.Tests.Unit
         {
             _context = new Mock<IMigrationContext>();
             _context.SetupAllProperties();
+        }
+
+        [TestCase(false, "CK_Bookings_Start_End")]
+        [TestCase(true, "custom_window_End_gt_Start")]
+        public void DownDropsTheCheckNamedByTheCreateConvention(bool custom, string expected)
+        {
+            var conventions = new DefaultConventionSet();
+            if (custom)
+            {
+                conventions.CheckConstraintConventions.Clear();
+                conventions.CheckConstraintConventions.Add(new ConditionNameConvention());
+            }
+
+            var migration = new CheckMigration();
+            _context.Object.Expressions = new Collection<IMigrationExpression>();
+            migration.GetUpExpressions(_context.Object);
+            var create = (CreateCheckConstraintExpression)_context.Object.Expressions.Single().Apply(conventions);
+
+            _context.Object.Expressions = new Collection<IMigrationExpression>();
+            migration.GetDownExpressions(_context.Object);
+            var delete = (DeleteCheckConstraintExpression)_context.Object.Expressions.Single().Apply(conventions);
+
+            Assert.That(create.Constraint.ConstraintName, Is.EqualTo(expected));
+            Assert.That(delete.Constraint.ConstraintName, Is.EqualTo(expected));
+            Assert.That(delete.Constraint.Condition, Is.Null);
+            Assert.That(delete.Constraint.AdditionalFeatures, Is.Empty);
+        }
+
+        private sealed class CheckMigration : AutoReversingMigration
+        {
+            public override void Up()
+            {
+                var options = Create.Check().OnTable("Bookings").Columns("Start", "End").Condition("End > Start");
+                ((ISupportAdditionalFeatures)options).AdditionalFeatures["NamingGroup"] = "window";
+            }
+        }
+
+        private sealed class ConditionNameConvention : ICheckConstraintConvention
+        {
+            public ICheckConstraintExpression Apply(ICheckConstraintExpression expression)
+            {
+                expression.Constraint.ConstraintName = "custom_" + expression.Constraint.AdditionalFeatures["NamingGroup"]
+                    + "_" + expression.Constraint.Condition.Replace(" > ", "_gt_");
+                return expression;
+            }
         }
 
         [Test]

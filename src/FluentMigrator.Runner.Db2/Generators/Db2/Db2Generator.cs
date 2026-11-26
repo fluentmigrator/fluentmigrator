@@ -286,6 +286,72 @@ namespace FluentMigrator.Runner.Generators.DB2
                 constraintName);
         }
 
+        /// <summary>
+        /// Gets a value indicating whether the database can change CHECK constraint enforcement.
+        /// </summary>
+        protected virtual bool SupportsCheckConstraintEnforcement => true;
+
+        /// <inheritdoc />
+        public override string Generate(Expressions.CreateCheckConstraintExpression expression)
+        {
+            if (SupportsTableCheckConstraints && SupportsCheckConstraintEnforcement
+                && !expression.Constraint.Enabled && !expression.Constraint.NoCheck)
+            {
+                return GenerateCreateCheckConstraint(expression.Constraint);
+            }
+
+            return base.Generate(expression);
+        }
+
+        /// <inheritdoc />
+        public override string Generate(Expressions.AlterCheckConstraintExpression expression)
+        {
+            if (!SupportsTableCheckConstraints || !SupportsCheckConstraintEnforcement)
+            {
+                return base.Generate(expression);
+            }
+
+            return expression.Action switch
+            {
+                CheckConstraintAction.Enable when expression.Constraint.NoCheck
+                    => CompatibilityMode.HandleCompatibility("Enabling a CHECK constraint without validating existing rows is not supported"),
+                CheckConstraintAction.Enable => GenerateCheckConstraintEnforcement(expression.Constraint, "ENFORCED ENABLE QUERY OPTIMIZATION"),
+                CheckConstraintAction.Disable => GenerateCheckConstraintEnforcement(expression.Constraint, "NOT ENFORCED DISABLE QUERY OPTIMIZATION"),
+                _ => base.Generate(expression),
+            };
+        }
+
+        /// <inheritdoc />
+        protected override string GenerateCreateCheckConstraint(CheckConstraintDefinition constraint)
+        {
+            // Db2 must not use a disabled constraint to optimise queries.
+            var enforcement = constraint.Enabled ? string.Empty : " NOT ENFORCED DISABLE QUERY OPTIMIZATION";
+            return FormatStatement(
+                "ALTER TABLE {0} ADD CONSTRAINT {1} CHECK ({2}){3}",
+                Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName),
+                Quoter.QuoteConstraintName(constraint.ConstraintName, constraint.SchemaName),
+                constraint.Condition,
+                enforcement);
+        }
+
+        /// <inheritdoc />
+        protected override string GenerateDeleteCheckConstraint(CheckConstraintDefinition constraint)
+        {
+            return FormatStatement(
+                "ALTER TABLE {0} DROP CHECK {1}",
+                Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName),
+                Quoter.QuoteConstraintName(constraint.ConstraintName, constraint.SchemaName));
+        }
+
+        private string GenerateCheckConstraintEnforcement(CheckConstraintDefinition constraint, string enforcement)
+        {
+            return FormatStatement(
+                "ALTER TABLE {0} ALTER CHECK {1} {2}",
+                Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName),
+                Quoter.QuoteConstraintName(constraint.ConstraintName, constraint.SchemaName),
+                enforcement);
+        }
+
         /// <inheritdoc />
         public override string Generate(Expressions.DeleteForeignKeyExpression expression)
         {

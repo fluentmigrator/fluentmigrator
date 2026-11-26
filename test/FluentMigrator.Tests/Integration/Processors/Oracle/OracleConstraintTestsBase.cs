@@ -16,7 +16,6 @@
 //
 #endregion
 
-using System;
 using System.IO;
 
 using FluentMigrator.Runner.Initialization;
@@ -41,7 +40,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
 
         private ServiceProvider ServiceProvider { get; set; }
         private IServiceScope ServiceScope { get; set; }
-        private OracleProcessorBase Processor { get; set; }
+        protected OracleProcessorBase Processor { get; private set; }
 
         [Test]
         public override void CallingConstraintExistsCanAcceptConstraintNameWithSingleQuote()

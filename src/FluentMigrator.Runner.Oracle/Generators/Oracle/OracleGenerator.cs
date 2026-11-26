@@ -384,6 +384,52 @@ namespace FluentMigrator.Runner.Generators.Oracle
         }
 
         /// <inheritdoc />
+        public override string Generate(CreateCheckConstraintExpression expression)
+        {
+            var constraint = expression.Constraint;
+            var state = (constraint.Enabled, constraint.NoCheck) switch
+            {
+                (false, _) => " DISABLE",
+                (true, true) => " ENABLE NOVALIDATE",
+                _ => string.Empty,
+            };
+
+            return FormatStatement(
+                "ALTER TABLE {0} ADD CONSTRAINT {1} CHECK ({2}){3}",
+                Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName),
+                Quoter.QuoteConstraintName(constraint.ConstraintName),
+                constraint.Condition,
+                state);
+        }
+
+        /// <inheritdoc />
+        public override string Generate(AlterCheckConstraintExpression expression)
+        {
+            var constraint = expression.Constraint;
+            var state = expression.Action switch
+            {
+                CheckConstraintAction.Enable => constraint.NoCheck ? "ENABLE NOVALIDATE" : "ENABLE VALIDATE",
+                CheckConstraintAction.Disable => "DISABLE",
+                _ => null,
+            };
+
+            return state == null
+                ? base.Generate(expression)
+                : FormatStatement(
+                    "ALTER TABLE {0} MODIFY CONSTRAINT {1} {2}",
+                    Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName),
+                    Quoter.QuoteConstraintName(constraint.ConstraintName),
+                    state);
+        }
+
+        /// <inheritdoc />
+        protected override IReadOnlyList<string> FormatCheckConstraintReplacement(string deleteSql, string createSql)
+        {
+            var block = WrapInBlock($"{WrapStatementInExecuteImmediateBlock(deleteSql)} {WrapStatementInExecuteImmediateBlock(createSql)}");
+            return new[] { block };
+        }
+
+        /// <inheritdoc />
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
             return FormatStatement(AlterColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(new ColumnDefinition

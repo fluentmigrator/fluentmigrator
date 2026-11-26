@@ -36,6 +36,9 @@ namespace FluentMigrator.Runner.Generators.Redshift
     public class RedshiftGenerator : GenericGenerator
     {
         /// <inheritdoc />
+        protected override bool SupportsTableCheckConstraints => false;
+
+        /// <inheritdoc />
         public override string RenameTable => "ALTER TABLE {0} RENAME TO {1}";
         /// <inheritdoc />
         public override string AlterColumn => "ALTER TABLE {0} {1}";

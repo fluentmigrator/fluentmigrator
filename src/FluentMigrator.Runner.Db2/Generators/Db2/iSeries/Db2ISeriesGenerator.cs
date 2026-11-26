@@ -82,6 +82,9 @@ namespace FluentMigrator.Runner.Generators.DB2.iSeries
         public override string GeneratorId => GeneratorIdConstants.Db2ISeries;
 
         /// <inheritdoc />
+        protected override bool SupportsCheckConstraintEnforcement => false;
+
+        /// <inheritdoc />
         public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.Db2ISeries, GeneratorIdConstants.DB2 };
     }
 }

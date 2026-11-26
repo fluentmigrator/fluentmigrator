@@ -46,6 +46,9 @@ namespace FluentMigrator.Runner.Conventions
         public IList<IConstraintConvention> ConstraintConventions { get; } = new List<IConstraintConvention>();
 
         /// <inheritdoc />
+        public IList<ICheckConstraintConvention> CheckConstraintConventions { get; } = new List<ICheckConstraintConvention>();
+
+        /// <inheritdoc />
         public IList<IForeignKeyConvention> ForeignKeyConventions { get; } = new List<IForeignKeyConvention>();
 
         /// <inheritdoc />

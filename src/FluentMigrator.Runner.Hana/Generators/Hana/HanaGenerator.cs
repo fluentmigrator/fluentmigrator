@@ -24,6 +24,7 @@ using System.Text;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.Runner.Helpers;
 
 using JetBrains.Annotations;
 
@@ -213,6 +214,16 @@ namespace FluentMigrator.Runner.Generators.Hana
             }
 
             return base.Generate(expression);
+        }
+
+        /// <inheritdoc />
+        protected override IReadOnlyList<string> FormatCheckConstraintReplacement(string deleteSql, string createSql)
+        {
+            var block = FormatStatement(
+                "DO BEGIN EXECUTE IMMEDIATE '{0}'; EXECUTE IMMEDIATE '{1}'; END",
+                FormatHelper.FormatSqlEscape(deleteSql.TrimEnd(';')),
+                FormatHelper.FormatSqlEscape(createSql.TrimEnd(';')));
+            return new[] { block };
         }
 
         /// <inheritdoc />

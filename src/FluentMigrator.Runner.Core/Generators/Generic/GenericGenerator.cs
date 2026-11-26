@@ -22,6 +22,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
+using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
 using FluentMigrator.Generation;
 using FluentMigrator.Infrastructure;
@@ -110,6 +111,11 @@ namespace FluentMigrator.Runner.Generators.Generic
         /// <c>ALTER TABLE ... ADD/ALTER COLUMN</c> statements with an <c>IF EXISTS</c> table existence check.
         /// </summary>
         protected virtual bool SupportsAlterTableIfExistsForColumns => false;
+
+        /// <summary>
+        /// Gets a value indicating whether the database supports adding and dropping CHECK constraints on existing tables.
+        /// </summary>
+        protected virtual bool SupportsTableCheckConstraints => true;
 
         /// <inheritdoc />
         [StringFormatMethod("format")]
@@ -345,6 +351,96 @@ namespace FluentMigrator.Runner.Generators.Generic
         public override string Generate(DeleteConstraintExpression expression)
         {
             return FormatStatement(DeleteConstraint, Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName), Quoter.QuoteConstraintName(expression.Constraint.ConstraintName));
+        }
+
+        /// <inheritdoc />
+        public override string Generate(CreateCheckConstraintExpression expression)
+        {
+            if (!SupportsTableCheckConstraints)
+            {
+                return CompatibilityMode.HandleCompatibility("Adding CHECK constraints is not supported");
+            }
+
+            if (!expression.Constraint.Enabled || expression.Constraint.NoCheck)
+            {
+                throw new DatabaseOperationNotSupportedException("Adding a CHECK constraint with the requested validation or enforcement options is not supported");
+            }
+
+            return GenerateCreateCheckConstraint(expression.Constraint);
+        }
+
+        /// <inheritdoc />
+        public override string Generate(AlterCheckConstraintExpression expression)
+        {
+            if (!SupportsTableCheckConstraints || expression.Action != CheckConstraintAction.ChangeCondition)
+            {
+                return CompatibilityMode.HandleCompatibility($"The {expression.Action} operation for CHECK constraints is not supported");
+            }
+
+            return string.Join(Environment.NewLine, GenerateCheckConstraintReplacement(expression));
+        }
+
+        /// <summary>
+        /// Generates the commands to replace a CHECK constraint, in execution order.
+        /// Override this method to customise replacement for both script generation and live execution.
+        /// Some drivers execute each command separately, so generate all commands before returning.
+        /// </summary>
+        protected internal virtual IReadOnlyList<string> GenerateCheckConstraintReplacement(AlterCheckConstraintExpression expression)
+        {
+            var createSql = Generate(new CreateCheckConstraintExpression { Constraint = expression.Constraint });
+            if (string.IsNullOrEmpty(createSql))
+            {
+                return Array.Empty<string>();
+            }
+
+            var deleteSql = Generate(new DeleteCheckConstraintExpression { Constraint = expression.Constraint.Clone() });
+            return string.IsNullOrEmpty(deleteSql) ? Array.Empty<string>() : FormatCheckConstraintReplacement(deleteSql, createSql);
+        }
+
+        /// <summary>
+        /// Formats the drop and add as separate commands or a provider-specific block.
+        /// </summary>
+        protected virtual IReadOnlyList<string> FormatCheckConstraintReplacement(string deleteSql, string createSql)
+        {
+            return new[] { deleteSql, createSql };
+        }
+
+        /// <inheritdoc />
+        public override string Generate(DeleteCheckConstraintExpression expression)
+        {
+            if (!SupportsTableCheckConstraints)
+            {
+                return CompatibilityMode.HandleCompatibility("Dropping CHECK constraints is not supported");
+            }
+
+            return GenerateDeleteCheckConstraint(expression.Constraint);
+        }
+
+        /// <summary>
+        /// Generates the standard ADD CONSTRAINT statement for a CHECK constraint.
+        /// </summary>
+        /// <param name="constraint">The constraint to add</param>
+        /// <returns>The generated SQL</returns>
+        protected virtual string GenerateCreateCheckConstraint(CheckConstraintDefinition constraint)
+        {
+            return FormatStatement(
+                "ALTER TABLE {0} ADD CONSTRAINT {1} CHECK ({2})",
+                Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName),
+                Quoter.QuoteConstraintName(constraint.ConstraintName),
+                constraint.Condition);
+        }
+
+        /// <summary>
+        /// Generates the standard DROP CONSTRAINT statement for a CHECK constraint.
+        /// </summary>
+        /// <param name="constraint">The constraint to drop</param>
+        /// <returns>The generated SQL</returns>
+        protected virtual string GenerateDeleteCheckConstraint(CheckConstraintDefinition constraint)
+        {
+            return FormatStatement(
+                "ALTER TABLE {0} DROP CONSTRAINT {1}",
+                Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName),
+                Quoter.QuoteConstraintName(constraint.ConstraintName));
         }
 
         /// <inheritdoc />

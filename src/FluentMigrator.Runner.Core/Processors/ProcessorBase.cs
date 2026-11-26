@@ -24,7 +24,9 @@ using System.IO;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Generation;
+using FluentMigrator.Model;
 using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.Runner.Logging;
 
 using JetBrains.Annotations;
@@ -255,6 +257,42 @@ namespace FluentMigrator.Runner.Processors
 
         /// <inheritdoc />
         public virtual void Process(DeleteConstraintExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
+
+        /// <inheritdoc />
+        public virtual void Process(CreateCheckConstraintExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
+
+        /// <inheritdoc />
+        public virtual void Process(AlterCheckConstraintExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
+
+        /// <summary>
+        /// Processes a CHECK constraint alteration for a database that accepts one statement per command.
+        /// </summary>
+        /// <param name="expression">The CHECK constraint expression</param>
+        protected void ProcessCheckConstraintAlterationInSeparateCommands(AlterCheckConstraintExpression expression)
+        {
+            if (expression.Action != CheckConstraintAction.ChangeCondition || Generator is not GenericGenerator generator)
+            {
+                Process(Generator.Generate(expression));
+                return;
+            }
+
+            foreach (var command in generator.GenerateCheckConstraintReplacement(expression))
+            {
+                Process(command);
+            }
+        }
+
+        /// <inheritdoc />
+        public virtual void Process(DeleteCheckConstraintExpression expression)
         {
             Process(Generator.Generate(expression));
         }

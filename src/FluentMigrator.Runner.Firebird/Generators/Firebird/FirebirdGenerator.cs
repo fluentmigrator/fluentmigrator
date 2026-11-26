@@ -299,6 +299,38 @@ namespace FluentMigrator.Runner.Generators.Firebird
         }
 
         /// <inheritdoc />
+        public override string Generate(CreateCheckConstraintExpression expression)
+        {
+            if (SupportsTableCheckConstraints && expression.Constraint.NoCheck && expression.Constraint.Enabled)
+            {
+                // Firebird never validates existing rows when adding a CHECK constraint.
+                return GenerateCreateCheckConstraint(expression.Constraint);
+            }
+
+            return base.Generate(expression);
+        }
+
+        /// <inheritdoc />
+        protected override string GenerateCreateCheckConstraint(CheckConstraintDefinition constraint)
+        {
+            return base.GenerateCreateCheckConstraint(TruncateCheckConstraintNames(constraint));
+        }
+
+        /// <inheritdoc />
+        protected override string GenerateDeleteCheckConstraint(CheckConstraintDefinition constraint)
+        {
+            return base.GenerateDeleteCheckConstraint(TruncateCheckConstraintNames(constraint));
+        }
+
+        private CheckConstraintDefinition TruncateCheckConstraintNames(CheckConstraintDefinition constraint)
+        {
+            var definition = constraint.Clone();
+            definition.TableName = Truncator.Truncate(definition.TableName);
+            definition.ConstraintName = FBOptions.PackKeyNames ? Truncator.Pack(definition.ConstraintName) : Truncator.Truncate(definition.ConstraintName);
+            return definition;
+        }
+
+        /// <inheritdoc />
         public override string Generate(CreateForeignKeyExpression expression)
         {
             Truncator.Truncate(expression);

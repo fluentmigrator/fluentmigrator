@@ -16,11 +16,12 @@
 //
 #endregion
 
+using FluentMigrator.Builders.Delete.CheckConstraint;
 using FluentMigrator.Builders.Delete.Column;
+using FluentMigrator.Builders.Delete.Constraint;
 using FluentMigrator.Builders.Delete.DefaultConstraint;
 using FluentMigrator.Builders.Delete.ForeignKey;
 using FluentMigrator.Builders.Delete.Index;
-using FluentMigrator.Builders.Delete.Constraint;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Delete
@@ -115,5 +116,15 @@ namespace FluentMigrator.Builders.Delete
         /// </summary>
         /// <returns>The next step</returns>
         IDeleteDefaultConstraintOnTableSyntax DefaultConstraint();
+
+        /// <summary>Specifies a CHECK constraint named from its table and columns.</summary>
+        IDeleteCheckUnnamedFromTableSyntax Check();
+
+        /// <summary>
+        /// Deletes a named check constraint from a table.
+        /// </summary>
+        /// <param name="constraintName">The constraint name.</param>
+        /// <returns>The syntax for specifying the table.</returns>
+        IDeleteCheckFromTableSyntax Check(string constraintName);
     }
 }

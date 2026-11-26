@@ -16,6 +16,7 @@
 //
 #endregion
 
+using FluentMigrator.Builders.Alter.CheckConstraint;
 using FluentMigrator.Builders.Alter.Column;
 using FluentMigrator.Builders.Alter.Table;
 using FluentMigrator.Expressions;
@@ -56,6 +57,19 @@ namespace FluentMigrator.Builders.Alter
             var expression = new AlterColumnExpression { Column = { Name = columnName } };
             _context.Expressions.Add(expression);
             return new AlterColumnExpressionBuilder(expression, _context);
+        }
+
+        /// <inheritdoc />
+        public IAlterCheckUnnamedOnTableSyntax Check() => BuildCheck(null);
+
+        /// <inheritdoc />
+        public IAlterCheckOnTableSyntax Check(string constraintName) => BuildCheck(constraintName);
+
+        private AlterCheckConstraintExpressionBuilder BuildCheck(string constraintName)
+        {
+            var expression = new AlterCheckConstraintExpression { Constraint = { ConstraintName = constraintName } };
+            _context.Expressions.Add(expression);
+            return new AlterCheckConstraintExpressionBuilder(expression);
         }
     }
 }

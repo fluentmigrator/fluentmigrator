@@ -35,6 +35,69 @@ namespace FluentMigrator.Runner.Generators.MySql
     public class MySql8Generator : MySql5Generator
     {
         /// <inheritdoc />
+        protected override bool SupportsTableCheckConstraints => true;
+
+        /// <inheritdoc />
+        public override string Generate(CreateCheckConstraintExpression expression)
+        {
+            var constraint = expression.Constraint;
+            if (constraint.NoCheck)
+            {
+                return base.Generate(expression);
+            }
+
+            return FormatStatement("ALTER TABLE {0} {1}", Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName),
+                AddCheckClause(constraint));
+        }
+
+        /// <inheritdoc />
+        public override string Generate(AlterCheckConstraintExpression expression)
+        {
+            var constraint = expression.Constraint;
+            if (constraint.NoCheck && expression.Action == CheckConstraintAction.Enable)
+            {
+                return CompatibilityMode.HandleCompatibility("MySQL cannot enforce a CHECK constraint without validating existing rows.");
+            }
+
+            if (constraint.NoCheck)
+            {
+                return base.Generate(expression);
+            }
+
+            var table = Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName);
+            var name = Quoter.QuoteConstraintName(constraint.ConstraintName);
+            switch (expression.Action)
+            {
+                case CheckConstraintAction.Enable:
+                    return FormatStatement("ALTER TABLE {0} ALTER CHECK {1} ENFORCED", table, name);
+                case CheckConstraintAction.Disable:
+                    return FormatStatement("ALTER TABLE {0} ALTER CHECK {1} NOT ENFORCED", table, name);
+                default:
+                    return base.Generate(expression);
+            }
+        }
+
+        /// <inheritdoc />
+        protected override IReadOnlyList<string> GenerateCheckConstraintReplacement(AlterCheckConstraintExpression expression)
+        {
+            var constraint = expression.Constraint;
+            if (constraint.NoCheck)
+            {
+                return base.GenerateCheckConstraintReplacement(expression);
+            }
+
+            var table = Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName);
+            var name = Quoter.QuoteConstraintName(constraint.ConstraintName);
+            return new[] { FormatStatement("ALTER TABLE {0} DROP CONSTRAINT {1}, {2}", table, name, AddCheckClause(constraint)) };
+        }
+
+        private string AddCheckClause(CheckConstraintDefinition constraint)
+        {
+            var enforcement = constraint.Enabled ? string.Empty : " NOT ENFORCED";
+            return $"ADD CONSTRAINT {Quoter.QuoteConstraintName(constraint.ConstraintName)} CHECK ({constraint.Condition}){enforcement}";
+        }
+
+        /// <inheritdoc />
         public MySql8Generator()
             : this(new MySqlQuoter())
         {

@@ -662,6 +662,43 @@ namespace FluentMigrator.Runner.Generators.Postgres
         }
 
         /// <inheritdoc />
+        public override string Generate(CreateCheckConstraintExpression expression)
+        {
+            var constraint = expression.Constraint;
+            if (!SupportsTableCheckConstraints || !constraint.NoCheck || !constraint.Enabled)
+            {
+                return base.Generate(expression);
+            }
+
+            return FormatStatement(
+                "ALTER TABLE {0} ADD CONSTRAINT {1} CHECK ({2}) NOT VALID",
+                Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName),
+                Quoter.QuoteConstraintName(constraint.ConstraintName),
+                constraint.Condition);
+        }
+
+        /// <inheritdoc />
+        public override string Generate(AlterCheckConstraintExpression expression)
+        {
+            if (!SupportsTableCheckConstraints || expression.Action != CheckConstraintAction.Enable)
+            {
+                return base.Generate(expression);
+            }
+
+            var constraint = expression.Constraint;
+            if (constraint.NoCheck)
+            {
+                // PostgreSQL enforces NOT VALID constraints on new and updated rows.
+                return string.Empty;
+            }
+
+            return FormatStatement(
+                "ALTER TABLE {0} VALIDATE CONSTRAINT {1}",
+                Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName),
+                Quoter.QuoteConstraintName(constraint.ConstraintName));
+        }
+
+        /// <inheritdoc />
         public override string Generate(DeleteConstraintExpression expression)
         {
             return FormatStatement("ALTER TABLE {0} DROP CONSTRAINT {1}", Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName), Quoter.Quote(expression.Constraint.ConstraintName));

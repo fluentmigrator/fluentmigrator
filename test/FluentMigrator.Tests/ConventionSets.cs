@@ -39,6 +39,7 @@ namespace FluentMigrator.Tests
             {
                 SchemaConvention = schemaConvention,
                 RootPathConvention = new DefaultRootPathConvention(rootPath),
+                CheckConstraintConventions = { new DefaultCheckConstraintNameConvention() },
                 ConstraintConventions =
                 {
                     new DefaultPrimaryKeyNameConvention(),

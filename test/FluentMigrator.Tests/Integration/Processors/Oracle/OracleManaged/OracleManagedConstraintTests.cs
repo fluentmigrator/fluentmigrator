@@ -16,11 +16,20 @@
 //
 #endregion
 
+using System;
+
+using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Runner;
+using FluentMigrator.Tests.Helpers;
 
 using Microsoft.Extensions.DependencyInjection;
 
 using NUnit.Framework;
+
+using Oracle.ManagedDataAccess.Client;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Integration.Processors.Oracle.OracleManaged
 {
@@ -28,6 +37,44 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle.OracleManaged
     [Category("OracleManaged")]
     public class OracleManagedConstraintTests : OracleConstraintTestsBase
     {
+        [Test]
+        public void CheckConstraintWithoutValidationEnforcesNewRowsOnly()
+        {
+            using var table = new OracleTestTable("T_" + Guid.NewGuid().ToString("N").Substring(0, 16).ToUpperInvariant(), Processor, null, "quantity int");
+            var constraintName = "CK_" + table.Name;
+            Processor.Execute($"INSERT INTO {table.Name} (quantity) VALUES (-1)");
+
+            Processor.Process(new CreateCheckConstraintExpression
+            {
+                Constraint = { TableName = table.Name, ConstraintName = constraintName, Condition = "quantity > 0", NoCheck = true },
+            });
+
+            Processor.Execute($"INSERT INTO {table.Name} (quantity) VALUES (1)");
+            var exception = Should.Throw<Exception>(() => Processor.Execute($"INSERT INTO {table.Name} (quantity) VALUES (-1)"));
+            exception.InnerException.ShouldBeOfType<OracleException>().Number.ShouldBe(2290);
+        }
+
+        [Test]
+        public void ReplacingCheckConstraintEnforcesTheNewConditionWithQuotedLiterals()
+        {
+            using var table = new OracleTestTable("T_" + Guid.NewGuid().ToString("N").Substring(0, 16).ToUpperInvariant(), Processor, null, "code varchar2(20)");
+            var constraintName = "CK_" + table.Name;
+            Processor.Process(new CreateCheckConstraintExpression
+            {
+                Constraint = { TableName = table.Name, ConstraintName = constraintName, Condition = "code = 'Don''t;stop'" },
+            });
+
+            Processor.Process(new AlterCheckConstraintExpression
+            {
+                Action = CheckConstraintAction.ChangeCondition,
+                Constraint = { TableName = table.Name, ConstraintName = constraintName, Condition = "code <> 'Don''t;stop'" },
+            });
+
+            Processor.Execute($"INSERT INTO {table.Name} (code) VALUES ('Continue')");
+            var exception = Should.Throw<Exception>(() => Processor.Execute($"INSERT INTO {table.Name} (code) VALUES ('Don''t;stop')"));
+            exception.InnerException.ShouldBeOfType<OracleException>().Number.ShouldBe(2290);
+        }
+
         /// <inheritdoc />
         protected override IServiceCollection AddOracleServices(IServiceCollection services)
         {
