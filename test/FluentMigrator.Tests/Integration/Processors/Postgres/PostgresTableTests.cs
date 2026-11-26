@@ -16,7 +16,10 @@
 //
 #endregion
 
+using System.Data;
+
 using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Postgres;
@@ -87,6 +90,49 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             });
 
             Processor.TableExists("TestSchema", table.Name).ShouldBeFalse();
+        }
+
+        [Test]
+        public void CreateTableIfNotExistsSkipsAnExistingTableTheRoleHasNoPrivilegesOn()
+        {
+            // information_schema.tables lists only the tables the current role owns or has a privilege on. A role that
+            // may create tables in the schema, but has no grant on a table that is already there, would not find it
+            // there, and the CREATE TABLE in the DO block would fail with "relation already exists".
+            var createTable = new CreateTableExpression { SchemaName = "FmNoGrants", TableName = "Widget", IfNotExists = true };
+            createTable.Columns.Add(new ColumnDefinition { Name = "Id", Type = DbType.Int32, TableName = "Widget" });
+            var index = new CreateIndexExpression
+            {
+                Index = new IndexDefinition { Name = "IX_Widget_Id", SchemaName = "FmNoGrants", TableName = "Widget" },
+            };
+            index.Index.Columns.Add(new IndexColumnDefinition { Name = "Id" });
+            createTable.ExpressionsForNewTable.Add(index);
+
+            try
+            {
+                DropSchemaAndRoleWithoutGrants();
+                Processor.Execute("CREATE SCHEMA \"FmNoGrants\"");
+                Processor.Execute("CREATE TABLE \"FmNoGrants\".\"Widget\" (\"Id\" integer)");
+                Processor.Execute("CREATE ROLE fm_no_grants NOLOGIN");
+                Processor.Execute("GRANT USAGE, CREATE ON SCHEMA \"FmNoGrants\" TO fm_no_grants");
+                Processor.Execute("SET ROLE fm_no_grants");
+
+                Processor.Process(createTable);
+
+                Processor.Execute("RESET ROLE");
+                Processor.Exists("SELECT 1 FROM pg_indexes WHERE schemaname = 'FmNoGrants' AND indexname = 'IX_Widget_Id'")
+                    .ShouldBeFalse();
+            }
+            finally
+            {
+                Processor.Execute("RESET ROLE");
+                DropSchemaAndRoleWithoutGrants();
+            }
+        }
+
+        private void DropSchemaAndRoleWithoutGrants()
+        {
+            Processor.Execute("DROP SCHEMA IF EXISTS \"FmNoGrants\" CASCADE");
+            Processor.Execute("DROP ROLE IF EXISTS fm_no_grants");
         }
 
         [OneTimeSetUp]

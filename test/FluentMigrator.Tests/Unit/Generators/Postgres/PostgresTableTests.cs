@@ -291,7 +291,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe(
                 "DO $fluentmigrator$" + Environment.NewLine +
                 "BEGIN" + Environment.NewLine +
-                "IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'TestTable1') THEN" + Environment.NewLine +
+                "IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relname = 'TestTable1') THEN" + Environment.NewLine +
                 "CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" text NOT NULL, \"TestColumn2\" integer NOT NULL);" + Environment.NewLine +
                 "CREATE UNIQUE INDEX \"UX_TestTable1_TestColumn1\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC);" + Environment.NewLine +
                 "ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_TestTable1_TestTable2\" FOREIGN KEY (\"TestColumn2\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\");" + Environment.NewLine +

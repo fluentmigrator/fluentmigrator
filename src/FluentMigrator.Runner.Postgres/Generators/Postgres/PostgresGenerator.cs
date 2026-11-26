@@ -117,8 +117,16 @@ namespace FluentMigrator.Runner.Generators.Postgres
         /// <remarks>
         /// <c>CREATE TABLE IF NOT EXISTS</c> skips only the table. When the table has
         /// <see cref="CreateTableExpression.ExpressionsForNewTable"/>, the table and those run in a <c>DO</c> block when
-        /// <c>information_schema.tables</c> has no such table, the same check as <c>PostgresProcessor.TableExists</c>, so
-        /// an existing table's indexes and foreign keys are not created again.
+        /// the schema has no relation of the table's name, so an existing table's indexes and foreign keys are not
+        /// created again.
+        /// <para>
+        /// The check reads <c>pg_catalog.pg_class</c>, as <c>CREATE TABLE IF NOT EXISTS</c> does, and not
+        /// <c>information_schema.tables</c>, as <c>PostgresProcessor.TableExists</c> does. <c>information_schema.tables</c>
+        /// lists only the tables the current role owns or has a privilege on, so a role that may create tables in the
+        /// schema would not find another role's table there, and the <c>CREATE TABLE</c> would fail with "relation
+        /// already exists". Like <c>IF NOT EXISTS</c>, it matches a relation of any kind, such as a view, since
+        /// <c>CREATE TABLE</c> fails on any of them.
+        /// </para>
         /// </remarks>
         public override string Generate(CreateTableExpression expression)
         {
@@ -145,8 +153,8 @@ namespace FluentMigrator.Runner.Generators.Postgres
             var body = new StringBuilder();
             body.AppendLine("BEGIN");
             body.AppendLine(
-                "IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE "
-              + $"table_schema = '{FormatHelper.FormatSqlEscape(schemaName)}' AND table_name = '{FormatHelper.FormatSqlEscape(NameInCatalog(expression.TableName))}') THEN");
+                "IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE "
+              + $"n.nspname = '{FormatHelper.FormatSqlEscape(schemaName)}' AND c.relname = '{FormatHelper.FormatSqlEscape(NameInCatalog(expression.TableName))}') THEN");
             body.AppendLine(createTable);
             foreach (var statement in GenerateExpressionsForNewTable(expression, IsIndexOrForeignKey))
             {

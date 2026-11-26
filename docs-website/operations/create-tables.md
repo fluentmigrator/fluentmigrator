@@ -268,7 +268,7 @@ Everything declared in the `Create.Table(...)` is conditional, not only the tabl
 | SQL Server 2000 | The same, checking `dbo.sysobjects` |
 | Oracle | The statements through `EXECUTE IMMEDIATE`, in a PL/SQL block that checks `ALL_TABLES` in the table's schema, or without one in the session's current schema |
 | Firebird | The statements through `EXECUTE STATEMENT`, in an `EXECUTE BLOCK` that checks `RDB$RELATIONS`, between `SET TERM ^ ;` and `SET TERM ; ^` |
-| PostgreSQL | `CREATE TABLE IF NOT EXISTS ...`; with indexes or foreign keys, a `DO` block that checks `information_schema.tables` |
+| PostgreSQL | `CREATE TABLE IF NOT EXISTS ...`; with indexes or foreign keys, a `DO` block that checks `pg_catalog.pg_class` |
 | MySQL | `CREATE TABLE IF NOT EXISTS ...`, with the indexes and foreign keys declared in it |
 | SQLite | `CREATE TABLE IF NOT EXISTS ...`, with the `.ForeignKey(...)` foreign keys declared in it, then `CREATE INDEX IF NOT EXISTS ...` |
 | Redshift, Snowflake, SAP HANA, Db2 | `CREATE TABLE IF NOT EXISTS ...`, then the indexes and foreign keys as separate statements |
