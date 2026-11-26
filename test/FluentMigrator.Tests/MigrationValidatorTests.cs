@@ -16,10 +16,7 @@
 //
 #endregion
 
-using System.Linq;
-
 using FluentMigrator.Expressions;
-using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Exceptions;
@@ -86,36 +83,21 @@ namespace FluentMigrator.Tests
         }
 
         [Test]
-        public void ItReturnsExpressionsReplacedByConventions()
+        public void ValidateExpressionsDoesNotThrowIfExpressionsAreValid()
         {
-            var original = new CreateIndexExpression
-            {
-                Index = new IndexDefinition
-                {
-                    Name = "ix_original",
-                    TableName = "items",
-                    Columns = { new IndexColumnDefinition { Name = "qty" } },
-                },
-            };
-            var replacement = new CreateIndexExpression
-            {
-                Index = new IndexDefinition
-                {
-                    Name = "ix_from_convention",
-                    TableName = "items",
-                    Columns = { new IndexColumnDefinition { Name = "qty" } },
-                },
-            };
+            Assert.DoesNotThrow(
+                () => _migrationValidator.ValidateExpressions(
+                    _migration,
+                    new[] { BuildValidExpression() }));
+        }
 
-            var convention = new Mock<IIndexConvention>();
-            convention.Setup(c => c.Apply(original)).Returns(replacement);
-
-            var conventions = new ConventionSet { IndexConventions = { convention.Object } };
-            var validator = new MigrationValidator(Mock.Of<ILogger<MigrationValidator>>(), conventions);
-
-            var result = validator.ApplyConventionsAndValidateExpressions(_migration, new IMigrationExpression[] { original });
-
-            Assert.That(result.Single(), Is.SameAs(replacement));
+        [Test]
+        public void ValidateExpressionsThrowsInvalidMigrationExceptionIfExpressionsAreInvalid()
+        {
+            Assert.Throws<InvalidMigrationException>(
+                () => _migrationValidator.ValidateExpressions(
+                    _migration,
+                    new[] { BuildInvalidExpression() }));
         }
     }
 }

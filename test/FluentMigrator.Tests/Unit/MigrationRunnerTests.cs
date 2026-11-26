@@ -303,6 +303,32 @@ namespace FluentMigrator.Tests.Unit
             Assert.That(secondApplyCount, Is.EqualTo(1));
         }
 
+        [Test]
+        public void UpValidatesReplacementExpressionReturnedByConvention()
+        {
+            var convention = new Mock<IIndexConvention>();
+            convention.Setup(c => c.Apply(It.IsAny<IIndexExpression>()))
+                .Returns((IIndexExpression expression) =>
+                {
+                    if (expression is not CreateIndexExpression || expression.Index.TableName != "items")
+                    {
+                        return expression;
+                    }
+
+                    // Replacement omits required index name so validation must reject it.
+                    return new CreateIndexExpression
+                    {
+                        Index = new IndexDefinition { TableName = "items" },
+                    };
+                });
+
+            var conventions = new ConventionSet { IndexConventions = { convention.Object } };
+            var runner = CreateRunner(services => services.AddSingleton<IConventionSet>(conventions));
+
+            Assert.Throws<InvalidMigrationException>(() => runner.Up(new IndexCopyMigration()));
+            _processorMock.Verify(p => p.Process(It.Is<CreateIndexExpression>(e => e.Index.TableName == "items")), Times.Never());
+        }
+
         private sealed class IndexCopyMigration : AutoReversingMigration
         {
             public override void Up() => Create.Index("ix_original").OnTable("items").OnColumn("qty").Ascending();
