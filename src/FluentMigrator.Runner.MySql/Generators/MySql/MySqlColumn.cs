@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
 using System.Linq;
-using System;
 
 using FluentMigrator.Generation;
 
@@ -56,7 +55,8 @@ namespace FluentMigrator.Runner.Generators.MySql
             };
             descriptionsList.AddRange(from descriptionItem in column.AdditionalColumnDescriptions
                                       select descriptionItem.Key + ":" + descriptionItem.Value);
-            return string.Format("COMMENT {0}", Quoter.QuoteValue(string.Join(Environment.NewLine, descriptionsList)));
+            // "\n", not Environment.NewLine, as in GenericDescriptionGenerator. See #2477.
+            return string.Format("COMMENT {0}", Quoter.QuoteValue(string.Join("\n", descriptionsList)));
         }
 
         /// <inheritdoc />

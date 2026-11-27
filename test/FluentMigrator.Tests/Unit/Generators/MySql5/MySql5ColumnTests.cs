@@ -92,7 +92,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql5
             var expression = GeneratorTestHelper.GetAlterColumnExpressionWithDescriptionWithAdditionalDescriptions();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` MODIFY COLUMN `TestColumn1` NVARCHAR(20) NOT NULL COMMENT 'Description:TestColumn1Description" + Environment.NewLine +
+            result.ShouldBe("ALTER TABLE `TestTable1` MODIFY COLUMN `TestColumn1` NVARCHAR(20) NOT NULL COMMENT 'Description:TestColumn1Description\n" +
                             "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1';");
         }
 
@@ -111,7 +111,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql5
             var expression = GeneratorTestHelper.GetCreateColumnExpressionWithDescriptionWithAdditionalDescriptions();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` NVARCHAR(5) NOT NULL COMMENT 'Description:TestColumn1Description" + Environment.NewLine +
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` NVARCHAR(5) NOT NULL COMMENT 'Description:TestColumn1Description\n" +
                             "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1';");
         }
 
@@ -121,8 +121,8 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql5
             var expression = GeneratorTestHelper.GetCreateColumnExpressionWithDescriptionWithMultipleAdditionalDescriptions();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` NVARCHAR(5) NOT NULL COMMENT 'Description:TestColumn1Description" + Environment.NewLine +
-                            "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1" + Environment.NewLine +
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` NVARCHAR(5) NOT NULL COMMENT 'Description:TestColumn1Description\n" +
+                            "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1\n" +
                             "AdditionalColumnDescriptionKey2:AdditionalColumnDescriptionValue2';");
         }
     }

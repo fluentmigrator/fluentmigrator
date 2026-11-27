@@ -338,8 +338,8 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             var expression = GeneratorTestHelper.GetCreateTableWithTableDescriptionAndColumnDescriptionsAndAdditionalDescriptions();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) COMMENT 'Description:TestColumn1Description" + Environment.NewLine +
-                            "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1', `TestColumn2` INTEGER NOT NULL COMMENT 'Description:TestColumn2Description" + Environment.NewLine +
+            result.ShouldBe("CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) COMMENT 'Description:TestColumn1Description\n" +
+                            "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1', `TestColumn2` INTEGER NOT NULL COMMENT 'Description:TestColumn2Description\n" +
                             "AdditionalColumnDescriptionKey2:AdditionalColumnDescriptionValue2') COMMENT 'TestDescription' ENGINE = INNODB;");
         }
 
