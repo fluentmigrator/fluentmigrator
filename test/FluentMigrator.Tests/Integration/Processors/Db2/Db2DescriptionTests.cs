@@ -67,9 +67,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
         /// Db2 changes a column's nullability with <c>ALTER COLUMN ... SET NOT NULL</c>, but the generator appends
         /// <c>NOT NULL</c> to <c>SET DATA TYPE</c>, which Db2 rejects with SQL0104N.
         /// </summary>
-        protected override string KnownFailure(DescriptionRoot root) =>
+        protected override KnownError KnownFailure(DescriptionRoot root) =>
             root == DescriptionRoot.AlterColumn || root == DescriptionRoot.AlterTableAlterColumn
-                ? "Db2's generator writes ALTER COLUMN ... SET DATA TYPE ... NOT NULL, which Db2 rejects with SQL0104N"
+                ? new KnownError("SQL0104N", "Db2's generator writes ALTER COLUMN ... SET DATA TYPE ... NOT NULL, which Db2 rejects (#2476)")
                 : null;
 
         protected override string TableDescriptionSql(string tableName) =>

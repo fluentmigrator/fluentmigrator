@@ -127,5 +127,25 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             statement.ShouldBe("COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'Description:TestColumn1Description" + Environment.NewLine +
                 "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1';");
         }
+
+        [Test]
+        public void GenerateDescriptionStatementForAlterTableInASchemaNamesTheTableOnce()
+        {
+            var alterTableExpression = GeneratorTestHelper.GetAlterTableWithDescriptionExpression();
+            alterTableExpression.SchemaName = "TestSchema";
+            var statement = DescriptionGenerator.GenerateDescriptionStatement(alterTableExpression);
+
+            statement.ShouldBe("COMMENT ON TABLE \"TestSchema\".\"TestTable1\" IS 'TestDescription';");
+        }
+
+        [Test]
+        public void GenerateDescriptionStatementForCreateColumnInASchemaNamesTheTableOnce()
+        {
+            var createColumnExpression = GeneratorTestHelper.GetCreateColumnExpressionWithDescription();
+            createColumnExpression.SchemaName = "TestSchema";
+            var statement = DescriptionGenerator.GenerateDescriptionStatement(createColumnExpression);
+
+            statement.ShouldBe("COMMENT ON COLUMN \"TestSchema\".\"TestTable1\".\"TestColumn1\" IS 'TestColumn1Description';");
+        }
     }
 }

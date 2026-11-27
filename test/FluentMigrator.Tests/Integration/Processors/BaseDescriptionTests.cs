@@ -89,10 +89,29 @@ namespace FluentMigrator.Tests.Integration.Processors
 
         /// <summary>
         /// A known bug, outside descriptions, that makes the database reject the SQL of <paramref name="root"/>, or
-        /// <c>null</c>. The test then checks that the migration still fails, so fixing the bug turns into a failing test
-        /// that says to remove it here.
+        /// <c>null</c>. The test then checks that the migration still fails with that error, so fixing the bug turns
+        /// into a failing test that says to remove it here, and a different error, such as a lost connection or a new
+        /// bug, isn't taken for the known one.
         /// </summary>
-        protected virtual string KnownFailure(DescriptionRoot root) => null;
+        protected virtual KnownError KnownFailure(DescriptionRoot root) => null;
+
+        /// <summary>
+        /// A database error the tests expect.
+        /// </summary>
+        protected sealed class KnownError
+        {
+            /// <param name="error">Text the error's message contains, such as the database's error code.</param>
+            /// <param name="because">Why the database returns it.</param>
+            public KnownError(string error, string because)
+            {
+                Error = error;
+                Because = because;
+            }
+
+            public string Error { get; }
+
+            public string Because { get; }
+        }
 
         /// <summary>
         /// The connection string of the database the tests run on. By default the one in the test settings. A
@@ -130,10 +149,13 @@ namespace FluentMigrator.Tests.Integration.Processors
                 var knownFailure = KnownFailure(scenario.Root);
                 if (knownFailure != null)
                 {
-                    Assert.That(
+                    var exception = Assert.Catch(
                         () => Run(scenario.Act()),
-                        Throws.Exception,
-                        $"Known failure: {knownFailure}. If {scenario.Syntax} works now, remove it from {GetType().Name}.{nameof(KnownFailure)}.");
+                        $"Known failure: {knownFailure.Because}. If {scenario.Syntax} works now, remove it from {GetType().Name}.{nameof(KnownFailure)}.");
+                    Assert.That(
+                        Messages(exception),
+                        Does.Contain(knownFailure.Error),
+                        $"{scenario.Syntax} failed, but not with the known error {knownFailure.Error}.");
                     return;
                 }
 
@@ -203,6 +225,20 @@ namespace FluentMigrator.Tests.Integration.Processors
             {
                 DropTable(scenario.TableName);
             }
+        }
+
+        /// <summary>
+        /// The messages of the exception and its inner exceptions, since the runner may wrap the database's error.
+        /// </summary>
+        private static string Messages(Exception exception)
+        {
+            var messages = new List<string>();
+            for (var current = exception; current != null; current = current.InnerException)
+            {
+                messages.Add(current.Message);
+            }
+
+            return string.Join(Environment.NewLine, messages);
         }
 
         protected void Run(IMigration migration) =>
