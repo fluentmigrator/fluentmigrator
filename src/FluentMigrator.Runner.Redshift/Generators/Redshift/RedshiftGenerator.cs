@@ -64,19 +64,14 @@ namespace FluentMigrator.Runner.Generators.Redshift
         }
 
         /// <inheritdoc />
+        /// <remarks>
+        /// The table's description, as a <c>COMMENT ON TABLE</c> statement, and otherwise nothing: the columns that
+        /// <c>Alter.Table(...)</c> adds or alters are expressions of their own.
+        /// </remarks>
         public override string Generate(AlterTableExpression expression)
         {
-            var alterStatement = new StringBuilder();
-            var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
-            alterStatement.Append(base.Generate(expression));
-            if (string.IsNullOrEmpty(descriptionStatement))
-            {
-                alterStatement.Append(descriptionStatement);
-            }
-
-            AppendSqlStatementEndToken(alterStatement);
-
-            return alterStatement.ToString();
+            var description = DescriptionGenerator.GenerateDescriptionStatement(expression);
+            return string.IsNullOrEmpty(description) ? base.Generate(expression) : EndStatement(description);
         }
 
         /// <inheritdoc />
@@ -108,21 +103,9 @@ namespace FluentMigrator.Runner.Generators.Redshift
             var tableName = Quoter.Quote(expression.TableName);
             var createTableFormat = expression.IfNotExists ? CreateTableIfNotExists : CreateTable;
             createStatement.AppendFormat(createTableFormat, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Columns, tableName));
-            var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatements(expression)
-                ?.ToList();
-
             AppendSqlStatementEndToken(createStatement);
 
-            if (descriptionStatement != null && descriptionStatement.Count != 0)
-            {
-                foreach (var ds in descriptionStatement)
-                {
-                    createStatement.Append(ds);
-                    AppendSqlStatementEndToken(createStatement);
-                }
-            }
-
-            return createStatement.ToString();
+            return AppendStatements(createStatement.ToString(), DescriptionGenerator.GenerateDescriptionStatements(expression));
         }
 
         /// <inheritdoc />
@@ -135,17 +118,9 @@ namespace FluentMigrator.Runner.Generators.Redshift
             var alterStatement = new StringBuilder();
             var alterColumnFormat = expression.IfExists ? "ALTER TABLE IF EXISTS {0} {1}" : AlterColumn;
             alterStatement.AppendFormat(alterColumnFormat, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), ((RedshiftColumn)Column).GenerateAlterClauses(expression.Column));
-            var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
-
             AppendSqlStatementEndToken(alterStatement);
 
-            if (!string.IsNullOrEmpty(descriptionStatement))
-            {
-                alterStatement.Append(descriptionStatement);
-                AppendSqlStatementEndToken(alterStatement);
-            }
-
-            return alterStatement.ToString();
+            return AppendStatements(alterStatement.ToString(), new[] { DescriptionGenerator.GenerateDescriptionStatement(expression) });
         }
 
         /// <inheritdoc />
@@ -158,17 +133,9 @@ namespace FluentMigrator.Runner.Generators.Redshift
             var createStatement = new StringBuilder();
             var addColumnFormat = expression.IfExists ? "ALTER TABLE IF EXISTS {0} ADD {1}" : AddColumn;
             createStatement.AppendFormat(addColumnFormat, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Column));
-            var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
-
             AppendSqlStatementEndToken(createStatement);
 
-            if (!string.IsNullOrEmpty(descriptionStatement))
-            {
-                createStatement.Append(descriptionStatement);
-                AppendSqlStatementEndToken(createStatement);
-            }
-
-            return createStatement.ToString();
+            return AppendStatements(createStatement.ToString(), new[] { DescriptionGenerator.GenerateDescriptionStatement(expression) });
         }
 
         /// <inheritdoc />

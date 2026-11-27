@@ -122,10 +122,13 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
         /// <inheritdoc />
         /// <remarks>
-        /// <c>CREATE TABLE IF NOT EXISTS</c> skips only the table. When the table has
+        /// The table's and its columns' descriptions follow the <c>CREATE TABLE</c> as <c>COMMENT ON</c> statements.
+        /// <para>
+        /// <c>CREATE TABLE IF NOT EXISTS</c> skips only the table. When the table has descriptions or
         /// <see cref="CreateTableExpression.ExpressionsForNewTable"/>, the table and those run in a <c>DO</c> block when
-        /// the schema has no relation of the table's name, so an existing table's indexes and foreign keys are not
-        /// created again.
+        /// the schema has no relation of the table's name, so an existing table's descriptions are kept and its indexes
+        /// and foreign keys are not created again.
+        /// </para>
         /// <para>
         /// The check reads <c>pg_catalog.pg_class</c>, as <c>CREATE TABLE IF NOT EXISTS</c> does, and not
         /// <c>information_schema.tables</c>, as <c>PostgresProcessor.TableExists</c> does. <c>information_schema.tables</c>
@@ -137,9 +140,14 @@ namespace FluentMigrator.Runner.Generators.Postgres
         /// </remarks>
         public override string Generate(CreateTableExpression expression)
         {
-            if (!expression.IfNotExists || !(expression.ExpressionsForNewTable ?? Enumerable.Empty<IMigrationExpression>()).Any(e => GeneratesWithTable(expression, e)))
+            var descriptions = DescriptionGenerator.GenerateDescriptionStatements(expression)
+                .Where(statement => !string.IsNullOrEmpty(statement))
+                .ToList();
+
+            if (!expression.IfNotExists
+             || (descriptions.Count == 0 && !(expression.ExpressionsForNewTable ?? Enumerable.Empty<IMigrationExpression>()).Any(e => GeneratesWithTable(expression, e))))
             {
-                return base.Generate(expression);
+                return AppendStatements(base.Generate(expression), descriptions);
             }
 
             var createTable = base.Generate(new CreateTableExpression
@@ -169,6 +177,11 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 "IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE "
               + $"{schemaCondition} AND c.relname = '{FormatHelper.FormatSqlEscape(NameInCatalog(expression.TableName))}') THEN");
             body.AppendLine(createTable);
+            foreach (var description in descriptions)
+            {
+                body.AppendLine(EndStatement(description));
+            }
+
             foreach (var statement in GenerateExpressionsForNewTable(expression, e => GeneratesWithTable(expression, e)))
             {
                 body.AppendLine(statement);
@@ -191,6 +204,26 @@ namespace FluentMigrator.Runner.Generators.Postgres
             builder.Append(tag);
             AppendSqlStatementEndToken(builder);
             return builder.ToString();
+        }
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// The column's descriptions follow the <c>ALTER TABLE</c> as a <c>COMMENT ON COLUMN</c> statement.
+        /// </remarks>
+        public override string Generate(CreateColumnExpression expression)
+        {
+            return AppendStatements(base.Generate(expression), new[] { DescriptionGenerator.GenerateDescriptionStatement(expression) });
+        }
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// The table's description, as a <c>COMMENT ON TABLE</c> statement. The columns that <c>Alter.Table(...)</c> adds
+        /// or alters are expressions of their own.
+        /// </remarks>
+        public override string Generate(AlterTableExpression expression)
+        {
+            var description = DescriptionGenerator.GenerateDescriptionStatement(expression);
+            return string.IsNullOrEmpty(description) ? base.Generate(expression) : EndStatement(description);
         }
 
         /// <summary>
@@ -241,15 +274,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
             AppendSqlStatementEndToken(alterStatement);
 
-            var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
-
-            if (!string.IsNullOrEmpty(descriptionStatement))
-            {
-                alterStatement.Append(descriptionStatement);
-                AppendSqlStatementEndToken(alterStatement);
-            }
-
-            return alterStatement.ToString();
+            return AppendStatements(alterStatement.ToString(), new[] { DescriptionGenerator.GenerateDescriptionStatement(expression) });
         }
 
         /// <inheritdoc />

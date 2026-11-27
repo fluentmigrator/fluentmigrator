@@ -14,7 +14,9 @@
 // limitations under the License.
 #endregion
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using FluentMigrator.Exceptions;
 using FluentMigrator.Infrastructure.Extensions;
@@ -44,10 +46,27 @@ namespace FluentMigrator.Runner.Generators.Snowflake
             clauses.Add(setNullableClause);
             var typeClause = $"COLUMN {FormatString(column)} {FormatType(column)}";
             clauses.Add(typeClause);
-            var commentClause = $"COLUMN {FormatString(column)} COMMENT '{(column.ColumnDescription ?? string.Empty).Replace("'", "''")}'";
+            var commentClause = $"COLUMN {FormatString(column)} COMMENT '{Describe(column).Replace("'", "''")}'";
             clauses.Add(commentClause);
 
             return string.Join(", ", clauses);
+        }
+
+        /// <summary>
+        /// The column's comment: its description, followed by its additional descriptions, labelled as the description
+        /// generator labels them in a <c>COMMENT ON COLUMN</c>.
+        /// </summary>
+        private static string Describe(ColumnDefinition column)
+        {
+            if (string.IsNullOrEmpty(column.ColumnDescription) || column.AdditionalColumnDescriptions.Count == 0)
+            {
+                return column.ColumnDescription ?? string.Empty;
+            }
+
+            return string.Join(
+                Environment.NewLine,
+                new[] { "Description:" + column.ColumnDescription }
+                    .Concat(column.AdditionalColumnDescriptions.Select(description => description.Key + ":" + description.Value)));
         }
 
         /// <inheritdoc />

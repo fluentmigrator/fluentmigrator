@@ -99,23 +99,41 @@ namespace FluentMigrator.Runner.Generators.Snowflake
         }
 
         /// <inheritdoc />
+        /// <remarks>
+        /// The table's and its columns' descriptions follow the <c>CREATE TABLE</c> as <c>COMMENT ON</c> statements.
+        /// With <c>IfNotExists()</c> they run even when the table exists, and replace its descriptions.
+        /// </remarks>
         public override string Generate(CreateTableExpression expression)
         {
             if (expression.Columns.Any(x => x.Expression != null))
             {
                 CompatibilityMode.HandleCompatibility("Computed columns are not supported");
             }
-            return base.Generate(expression);
+            return AppendStatements(base.Generate(expression), DescriptionGenerator.GenerateDescriptionStatements(expression));
         }
 
         /// <inheritdoc />
+        /// <remarks>
+        /// The column's descriptions follow the <c>ALTER TABLE</c> as a <c>COMMENT ON COLUMN</c> statement.
+        /// </remarks>
         public override string Generate(CreateColumnExpression expression)
         {
             if (expression.Column.Expression != null)
             {
                 CompatibilityMode.HandleCompatibility("Computed columns are not supported");
             }
-            return base.Generate(expression);
+            return AppendStatements(base.Generate(expression), new[] { DescriptionGenerator.GenerateDescriptionStatement(expression) });
+        }
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// The table's description, as a <c>COMMENT ON TABLE</c> statement. The columns that <c>Alter.Table(...)</c> adds
+        /// or alters are expressions of their own.
+        /// </remarks>
+        public override string Generate(AlterTableExpression expression)
+        {
+            var description = DescriptionGenerator.GenerateDescriptionStatement(expression);
+            return string.IsNullOrEmpty(description) ? base.Generate(expression) : EndStatement(description);
         }
 
         /// <inheritdoc />
