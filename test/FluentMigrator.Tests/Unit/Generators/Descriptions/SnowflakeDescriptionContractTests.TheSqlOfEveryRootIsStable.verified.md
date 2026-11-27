@@ -33,7 +33,7 @@ Owner:Catalog team';
 Descriptions: Written
 
 ```sql
-ALTER TABLE PUBLIC.FmDescCreateColumn ADD COLUMN Name VARCHAR(100);COMMENT ON COLUMN PUBLIC.FmDescCreateColumn.Name IS 'Description:What the thing is called
+ALTER TABLE PUBLIC.FmDescCreateColumn ADD COLUMN Name VARCHAR(100);ALTER TABLE PUBLIC.FmDescCreateColumn ALTER COLUMN Name COMMENT 'Description:What the thing is called
 Owner:Catalog team';
 ```
 
@@ -42,7 +42,7 @@ Owner:Catalog team';
 Descriptions: Written
 
 ```sql
-ALTER TABLE PUBLIC.FmDescAddColumn ADD COLUMN Name VARCHAR(100);COMMENT ON COLUMN PUBLIC.FmDescAddColumn.Name IS 'Description:What the thing is called
+ALTER TABLE PUBLIC.FmDescAddColumn ADD COLUMN Name VARCHAR(100);ALTER TABLE PUBLIC.FmDescAddColumn ALTER COLUMN Name COMMENT 'Description:What the thing is called
 Owner:Catalog team';
 ```
 

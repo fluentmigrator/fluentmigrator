@@ -114,7 +114,9 @@ namespace FluentMigrator.Runner.Generators.Snowflake
 
         /// <inheritdoc />
         /// <remarks>
-        /// The column's descriptions follow the <c>ALTER TABLE</c> as a <c>COMMENT ON COLUMN</c> statement.
+        /// The column's descriptions follow the <c>ADD COLUMN</c>, which takes no comment, as an
+        /// <c>ALTER TABLE ... ALTER COLUMN ... COMMENT</c>. Unlike <c>COMMENT ON COLUMN</c>, it can say <c>IF EXISTS</c>, so
+        /// with <c>Alter.Table(...).IfExists()</c> a missing table skips the comment as well as the column.
         /// </remarks>
         public override string Generate(CreateColumnExpression expression)
         {
@@ -122,7 +124,18 @@ namespace FluentMigrator.Runner.Generators.Snowflake
             {
                 CompatibilityMode.HandleCompatibility("Computed columns are not supported");
             }
-            return AppendStatements(base.Generate(expression), new[] { DescriptionGenerator.GenerateDescriptionStatement(expression) });
+
+            var addColumn = base.Generate(expression);
+            if (string.IsNullOrEmpty(addColumn) || string.IsNullOrEmpty(expression.Column.ColumnDescription))
+            {
+                return addColumn;
+            }
+
+            var comment = FormatStatement(
+                expression.IfExists ? "ALTER TABLE IF EXISTS {0} ALTER {1}" : AlterColumn,
+                Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
+                ((SnowflakeColumn)Column).GenerateCommentClause(expression.Column));
+            return AppendStatements(addColumn, new[] { comment });
         }
 
         /// <inheritdoc />

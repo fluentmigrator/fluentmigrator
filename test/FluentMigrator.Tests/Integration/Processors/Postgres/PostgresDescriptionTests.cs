@@ -17,6 +17,7 @@
 #endregion
 
 using FluentMigrator.Runner;
+using FluentMigrator.Tests.SyntaxRoots;
 
 using NUnit.Framework;
 
@@ -39,5 +40,25 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
 
         protected override string ColumnDescriptionsSql(string tableName, string columnName) =>
             $"SELECT col_description(a.attrelid, a.attnum) FROM pg_catalog.pg_attribute a WHERE a.attrelid = '\"public\".\"{tableName}\"'::regclass AND a.attname = '{columnName}'";
+
+        /// <summary>
+        /// <c>COMMENT ON</c> has no <c>IF EXISTS</c>, so the description must be skipped with the column.
+        /// </summary>
+        [Test]
+        public void AlterTableIfExistsSkipsTheDescriptionOfAMissingTable([Values] bool addColumn)
+        {
+            const string tableName = "FmDescMissing";
+            DropTable(tableName);
+
+            Assert.That(
+                () => Run(new DelegateMigration(
+                    m =>
+                    {
+                        var table = m.Alter.Table(tableName).IfExists();
+                        var column = addColumn ? table.AddColumn(DescriptionScenario.Column) : table.AlterColumn(DescriptionScenario.Column);
+                        column.AsString(100).Nullable().WithColumnDescription(DescriptionScenario.ColumnDescription);
+                    })),
+                Throws.Nothing);
+        }
     }
 }

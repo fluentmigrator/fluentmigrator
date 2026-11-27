@@ -205,10 +205,10 @@ namespace FluentMigrator.Tests.Integration.Processors
             }
         }
 
-        private void Run(IMigration migration) =>
+        protected void Run(IMigration migration) =>
             SyntaxRootRunner.Live(ConfigureRunner, ConnectionString, arrange: null, act: migration);
 
-        private void DropTable(string tableName) =>
+        protected void DropTable(string tableName) =>
             Run(new DelegateMigration(
                 m =>
                 {

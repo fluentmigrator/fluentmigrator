@@ -16,6 +16,9 @@
 //
 #endregion
 
+using System;
+using System.IO;
+
 using FluentMigrator.Runner;
 using FluentMigrator.Tests.SyntaxRoots;
 
@@ -31,9 +34,30 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
     [Category("SQLite")]
     public class SQLiteDescriptionTests : BaseDescriptionTests
     {
+        private string _directory;
+
         protected override IntegrationTestOptions.DatabaseServerOptions ServerOptions => IntegrationTestOptions.SQLite;
 
         protected override void ConfigureRunner(IMigrationRunnerBuilder builder) => builder.AddSQLite();
+
+        /// <summary>
+        /// A database file of the fixture's own. The configured connection string's <c>|DataDirectory|</c> is whatever
+        /// the last <see cref="IntegrationTestBase"/> test set it to, a directory that test has deleted.
+        /// </summary>
+        protected override string OpenDatabase() =>
+            $"Data Source={Path.Combine(_directory, "Descriptions.db")};Pooling=False;Mode=ReadWriteCreate;";
+
+        [OneTimeSetUp]
+        public void CreateTheDirectory() => _directory = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"))).FullName;
+
+        [OneTimeTearDown]
+        public void DeleteTheDirectory()
+        {
+            if (_directory != null && Directory.Exists(_directory))
+            {
+                Directory.Delete(_directory, recursive: true);
+            }
+        }
 
         protected override DescriptionSupport Support(DescriptionRoot root) =>
             root == DescriptionRoot.AlterColumn || root == DescriptionRoot.AlterTableAlterColumn

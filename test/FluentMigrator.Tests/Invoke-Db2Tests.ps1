@@ -105,8 +105,8 @@ if ($IsLinux) {
 }
 
 if ($NewContainer) {
-    # Testcontainers' Db2 module, which Db2Container uses.
-    $containers = & docker ps --all --quiet --filter 'ancestor=icr.io/db2_community/db2:12.1.0.0'
+    # Only the container Db2Container labels, so another Db2 on this machine, and its data, is left alone.
+    $containers = & docker ps --all --quiet --filter 'label=org.fluentmigrator.tests=db2'
     if ($containers) {
         & docker rm --force @containers | Out-Null
     }

@@ -142,6 +142,44 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
+        public void CreateColumnIfExistsCommentsOnlyWhenTheTableExists()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithDescription();
+            expression.IfExists = true;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(WhenTestTable1Exists(
+                "ALTER TABLE IF EXISTS \"public\".\"TestTable1\" ADD \"TestColumn1\" varchar(5) NOT NULL;",
+                "COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'TestColumn1Description';"));
+        }
+
+        [Test]
+        public void AlterColumnIfExistsCommentsOnlyWhenTheTableExists()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpression();
+            expression.Column.IsNullable = null;
+            expression.Column.ColumnDescription = "TestColumn1Description";
+            expression.IfExists = true;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(WhenTestTable1Exists(
+                "ALTER TABLE IF EXISTS \"public\".\"TestTable1\" ALTER \"TestColumn1\" TYPE varchar(20);",
+                "COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'TestColumn1Description';"));
+        }
+
+        private static string WhenTestTable1Exists(params string[] statements) =>
+            string.Join(
+                Environment.NewLine,
+                new[]
+                    {
+                        "DO $fluentmigrator$",
+                        "BEGIN",
+                        "IF EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relname = 'TestTable1') THEN",
+                    }
+                    .Concat(statements)
+                    .Concat(new[] { "END IF;", "END", "$fluentmigrator$;" }));
+
+        [Test]
         public override void CanCreateColumnWithSystemMethodAndCustomSchema()
         {
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression("TestSchema");
