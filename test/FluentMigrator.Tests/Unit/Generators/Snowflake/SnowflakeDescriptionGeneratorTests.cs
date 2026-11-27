@@ -83,8 +83,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             var statements = DescriptionGenerator.GenerateDescriptionStatements(createTableExpression).ToArray();
 
             var result = string.Join("", statements);
-            result.ShouldBe($@"COMMENT ON TABLE ""{TestSchema}"".""TestTable1"" IS 'TestDescription';COMMENT ON COLUMN ""{TestSchema}"".""TestTable1"".""TestColumn1"" IS 'Description:TestColumn1Description" + Environment.NewLine +
-                $@"AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1';COMMENT ON COLUMN ""{TestSchema}"".""TestTable1"".""TestColumn2"" IS 'Description:TestColumn2Description" + Environment.NewLine +
+            result.ShouldBe($@"COMMENT ON TABLE ""{TestSchema}"".""TestTable1"" IS 'TestDescription';COMMENT ON COLUMN ""{TestSchema}"".""TestTable1"".""TestColumn1"" IS 'Description:TestColumn1Description" + "\n" +
+                $@"AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1';COMMENT ON COLUMN ""{TestSchema}"".""TestTable1"".""TestColumn2"" IS 'Description:TestColumn2Description" + "\n" +
                 "AdditionalColumnDescriptionKey2:AdditionalColumnDescriptionValue2';", _quotingEnabled);
         }
 
@@ -115,7 +115,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             createColumnExpression.SchemaName = TestSchema;
             var statement = DescriptionGenerator.GenerateDescriptionStatement(createColumnExpression);
 
-            statement.ShouldBe($@"COMMENT ON COLUMN ""{TestSchema}"".""TestTable1"".""TestColumn1"" IS 'Description:TestColumn1Description" + Environment.NewLine +
+            statement.ShouldBe($@"COMMENT ON COLUMN ""{TestSchema}"".""TestTable1"".""TestColumn1"" IS 'Description:TestColumn1Description" + "\n" +
                 "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1';", _quotingEnabled);
         }
 
@@ -126,8 +126,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             createColumnExpression.SchemaName = TestSchema;
             var statement = DescriptionGenerator.GenerateDescriptionStatement(createColumnExpression);
 
-            statement.ShouldBe($@"COMMENT ON COLUMN ""{TestSchema}"".""TestTable1"".""TestColumn1"" IS 'Description:TestColumn1Description" + Environment.NewLine +
-                "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1" + Environment.NewLine +
+            statement.ShouldBe($@"COMMENT ON COLUMN ""{TestSchema}"".""TestTable1"".""TestColumn1"" IS 'Description:TestColumn1Description" + "\n" +
+                "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1" + "\n" +
                 "AdditionalColumnDescriptionKey2:AdditionalColumnDescriptionValue2';", _quotingEnabled);
         }
 
@@ -148,7 +148,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             alterColumnExpression.SchemaName = TestSchema;
             var statement = DescriptionGenerator.GenerateDescriptionStatement(alterColumnExpression);
 
-            statement.ShouldBe($@"COMMENT ON COLUMN ""{TestSchema}"".""TestTable1"".""TestColumn1"" IS 'Description:TestColumn1Description" + Environment.NewLine +
+            statement.ShouldBe($@"COMMENT ON COLUMN ""{TestSchema}"".""TestTable1"".""TestColumn1"" IS 'Description:TestColumn1Description" + "\n" +
                 "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1';", _quotingEnabled);
         }
 

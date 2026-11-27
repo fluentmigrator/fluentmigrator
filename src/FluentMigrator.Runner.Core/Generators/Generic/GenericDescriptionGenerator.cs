@@ -16,7 +16,6 @@
 //
 #endregion
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -30,6 +29,10 @@ namespace FluentMigrator.Runner.Generators.Generic
     /// </summary>
     public abstract class GenericDescriptionGenerator : IDescriptionGenerator
     {
+        // Not Environment.NewLine: the stored comment must not depend on the OS that runs the
+        // migration. See #2477.
+        private const string AdditionalDescriptionSeparator = "\n";
+
         /// <inheritdoc />
         protected abstract string GenerateTableDescription(
             string schemaName, string tableName, string tableDescription);
@@ -89,7 +92,7 @@ namespace FluentMigrator.Runner.Generators.Generic
                     descriptionsList.AddRange(from description in column.AdditionalColumnDescriptions
                                               let newDescriptionStatement = description.Key + ":" + description.Value
                                               select newDescriptionStatement);
-                    statements.Add(GenerateColumnDescription("Description", expression.SchemaName, expression.TableName, column.Name, string.Join(Environment.NewLine, descriptionsList)));
+                    statements.Add(GenerateColumnDescription("Description", expression.SchemaName, expression.TableName, column.Name, string.Join(AdditionalDescriptionSeparator, descriptionsList)));
                 }
             }
 
@@ -127,7 +130,7 @@ namespace FluentMigrator.Runner.Generators.Generic
                 descriptionsList.AddRange(from description in expression.Column.AdditionalColumnDescriptions
                                           let newDescriptionStatement = description.Key + ":" + description.Value
                                           select newDescriptionStatement);
-                return GenerateColumnDescription("Description", expression.SchemaName, expression.TableName, expression.Column.Name, string.Join(Environment.NewLine, descriptionsList));
+                return GenerateColumnDescription("Description", expression.SchemaName, expression.TableName, expression.Column.Name, string.Join(AdditionalDescriptionSeparator, descriptionsList));
             }
         }
 
@@ -152,7 +155,7 @@ namespace FluentMigrator.Runner.Generators.Generic
                 descriptionsList.AddRange(from description in expression.Column.AdditionalColumnDescriptions
                                           let newDescriptionStatement = description.Key + ":" + description.Value
                                           select newDescriptionStatement);
-                return GenerateColumnDescription("Description", expression.SchemaName, expression.TableName, expression.Column.Name, string.Join(Environment.NewLine, descriptionsList));
+                return GenerateColumnDescription("Description", expression.SchemaName, expression.TableName, expression.Column.Name, string.Join(AdditionalDescriptionSeparator, descriptionsList));
             }
         }
     }
