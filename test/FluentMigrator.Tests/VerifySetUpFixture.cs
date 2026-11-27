@@ -18,10 +18,10 @@ using DiffEngine;
 
 using NUnit.Framework;
 
-namespace FluentMigrator.Tests.Unit.TokenSubstitution
+namespace FluentMigrator.Tests
 {
     /// <summary>
-    /// Verify configuration for the token substitution snapshots.
+    /// Verify configuration for every snapshot test in this assembly.
     /// </summary>
     /// <remarks>
     /// Uses a <see cref="SetUpFixtureAttribute"/> rather than a <c>[ModuleInitializer]</c> so the
