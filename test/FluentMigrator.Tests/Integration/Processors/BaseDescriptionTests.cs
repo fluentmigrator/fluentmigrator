@@ -88,6 +88,13 @@ namespace FluentMigrator.Tests.Integration.Processors
         protected virtual DescriptionSupport Support(DescriptionRoot root) => DescriptionSupport.Written;
 
         /// <summary>
+        /// A known bug, outside descriptions, that makes the database reject the SQL of <paramref name="root"/>, or
+        /// <c>null</c>. The test then checks that the migration still fails, so fixing the bug turns into a failing test
+        /// that says to remove it here.
+        /// </summary>
+        protected virtual string KnownFailure(DescriptionRoot root) => null;
+
+        /// <summary>
         /// The connection string of the database the tests run on. By default the one in the test settings. A
         /// subclass that makes a database for the tests drops it in a <c>[OneTimeTearDown]</c> of its own.
         /// </summary>
@@ -117,6 +124,16 @@ namespace FluentMigrator.Tests.Integration.Processors
                 if (Support(scenario.Root) == DescriptionSupport.RootNotSupported)
                 {
                     Assert.Throws<DatabaseOperationNotSupportedException>(() => Run(scenario.Act()));
+                    return;
+                }
+
+                var knownFailure = KnownFailure(scenario.Root);
+                if (knownFailure != null)
+                {
+                    Assert.That(
+                        () => Run(scenario.Act()),
+                        Throws.Exception,
+                        $"Known failure: {knownFailure}. If {scenario.Syntax} works now, remove it from {GetType().Name}.{nameof(KnownFailure)}.");
                     return;
                 }
 
