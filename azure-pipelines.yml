@@ -52,15 +52,17 @@ steps:
     packageType: 'runtime'
     version: '8.x'
 
-- task: gitversion-setup@4.1.0
-  displayName: 'Install GitVersion (using GitTools 4.1.0 or later)'
+# GitTools 5.0.0 accepts GitVersion 7.0.x only, installed as a net10.0 tool.
+# The .NET 11 SDK above installs it; it runs on the .NET 10 runtime.
+# See https://github.com/GitTools/actions/blob/main/docs/versions.md
+- task: gitversion-setup@5.0.0
+  displayName: 'Install GitVersion (using GitTools 5.0.0)'
   inputs:
-    versionSpec: '6.3.x'
-    includePrerelease: true
+    versionSpec: '7.0.x'
 
-- task: gitversion-execute@4.1.0
+- task: gitversion-execute@5.0.0
   name: version_step
-  displayName: 'Execute GitVersion (using GitTools 4.1.0 or later)'
+  displayName: 'Execute GitVersion (using GitTools 5.0.0)'
   inputs:
     updateAssemblyInfo: false
   env:

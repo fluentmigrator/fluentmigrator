@@ -49,18 +49,27 @@ steps:
   fetchDepth: 0
   fetchTags: true
 
-- task: gitversion/setup@0
-  displayName: 'Install GitVersion (using GitTools 0.10.2.23031113 or later)'
+# Same GitTools tasks and GitVersion as azure-pipelines.yml.
+- task: gitversion-setup@5.0.0
+  displayName: 'Install GitVersion (using GitTools 5.0.0)'
   inputs:
-    versionSpec: '5.12'
-    includePrerelease: true
+    versionSpec: '7.0.x'
 
-- task: gitversion/execute@0
-  displayName: 'Execute GitVersion (using GitTools 0.10.2.23031113 or later)'
+- task: gitversion-execute@5.0.0
+  name: version_step
+  displayName: 'Execute GitVersion (using GitTools 5.0.0)'
   inputs:
     updateAssemblyInfo: false
-  env:
-      BUILD_BUILDNUMBER: $(GitVersion.NuGetVersionV2)
+
+# The GitTools 5 task runs GitVersion with `--output file`, so unlike the old
+# gitversion/execute@0 (`/output buildserver`) it leaves the build number at
+# Azure's default, such as 20261128.3. Set it to FullSemVer, as before.
+- task: PowerShell@2
+  name: update_build_number
+  displayName: 'Update Build Number with GitVersion'
+  inputs:
+    targetType: 'inline'
+    script: Write-Host "##vso[build.updatebuildnumber]$(version_step.fullSemVer)"
 
 - task: DotNetCoreCLI@2
   displayName: 'Restore NuGet packages'
@@ -73,7 +82,7 @@ steps:
   inputs:
     command: 'build'
     projects: '$(solution)'
-    arguments: '--configuration $(buildConfiguration) -p:Version="$(build.buildNumber)" --no-restore'
+    arguments: '--configuration $(buildConfiguration) -p:Version="$(version_step.fullSemVer)" --no-restore'
 
 - task: DotNetCoreCLI@2
   displayName: 'Run tests'
