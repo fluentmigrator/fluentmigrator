@@ -99,16 +99,27 @@ namespace FluentMigrator.Runner
         }
 
         /// <summary>
-        /// Validates each migration expression that has implemented the ICanBeValidated interface.
+        /// Applies conventions to each migration expression and validates each expression that has implemented the ICanBeValidated interface.
         /// It throws an InvalidMigrationException exception if validation fails.
         /// </summary>
         /// <param name="migration">The current migration being run</param>
         /// <param name="expressions">All the expressions contained in the up or down action</param>
         public void ApplyConventionsToAndValidateExpressions(IMigration migration, IEnumerable<IMigrationExpression> expressions)
         {
+            ValidateExpressions(migration, expressions.Apply(_conventions));
+        }
+
+        /// <summary>
+        /// Validates each migration expression that has implemented the ICanBeValidated interface.
+        /// It throws an <see cref="InvalidMigrationException"/> exception if validation fails.
+        /// </summary>
+        /// <param name="migration">The current migration being run</param>
+        /// <param name="expressions">All the expressions contained in the up or down action</param>
+        public void ValidateExpressions(IMigration migration, IEnumerable<IMigrationExpression> expressions)
+        {
             var errorMessageBuilder = new StringBuilder();
 
-            foreach (var expression in expressions.Apply(_conventions))
+            foreach (var expression in expressions)
             {
                 var errors = new Collection<string>();
                 foreach (var result in _validator.Validate(expression))

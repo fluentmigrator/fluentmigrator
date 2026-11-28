@@ -26,6 +26,7 @@ using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Exceptions;
+using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Exceptions;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Versioning;
@@ -819,7 +820,13 @@ namespace FluentMigrator.Runner
 
             getExpressions(migration, context);
 
-            _migrationValidator.ApplyConventionsToAndValidateExpressions(migration, context.Expressions);
+            var conventions = _serviceProvider.GetService<IConventionSet>();
+            if (conventions != null)
+            {
+                context.Expressions = context.Expressions.Apply(conventions).ToList();
+            }
+
+            _migrationValidator.ValidateExpressions(migration, context.Expressions);
             ExecuteExpressions(context.Expressions);
         }
 

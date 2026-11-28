@@ -18,6 +18,7 @@
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Exceptions;
 
 using Microsoft.Extensions.Logging;
@@ -79,6 +80,24 @@ namespace FluentMigrator.Tests
                 () => _migrationValidator.ApplyConventionsToAndValidateExpressions(
                     _migration,
                     new[] { BuildInvalidExpression(), BuildInvalidExpression() }));
+        }
+
+        [Test]
+        public void ValidateExpressionsDoesNotThrowIfExpressionsAreValid()
+        {
+            Assert.DoesNotThrow(
+                () => _migrationValidator.ValidateExpressions(
+                    _migration,
+                    new[] { BuildValidExpression() }));
+        }
+
+        [Test]
+        public void ValidateExpressionsThrowsInvalidMigrationExceptionIfExpressionsAreInvalid()
+        {
+            Assert.Throws<InvalidMigrationException>(
+                () => _migrationValidator.ValidateExpressions(
+                    _migration,
+                    new[] { BuildInvalidExpression() }));
         }
     }
 }

@@ -27,7 +27,9 @@ using System.Text.RegularExpressions;
 using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Model;
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Exceptions;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Generic;
@@ -191,6 +193,145 @@ namespace FluentMigrator.Tests.Unit
             runner.Up(migration);
 
             Assert.That(migration.ConnectionString, Is.EqualTo(IntegrationTestOptions.SqlServer2008.ConnectionString), "The migration does not have the expected connection string.");
+        }
+
+        [Test]
+        public void UpExecutesTheIndexReturnedByTheConvention()
+        {
+            var convention = new Mock<IIndexConvention>();
+            convention.Setup(c => c.Apply(It.IsAny<IIndexExpression>()))
+                .Returns((IIndexExpression expression) =>
+                {
+                    if (expression is not CreateIndexExpression || expression.Index.TableName != "items")
+                    {
+                        return expression;
+                    }
+
+                    var index = (IndexDefinition)expression.Index.Clone();
+                    index.Name = "ix_from_convention";
+                    return new CreateIndexExpression { Index = index };
+                });
+
+            var conventions = new ConventionSet { IndexConventions = { convention.Object } };
+            var runner = CreateRunner(services => services.AddSingleton<IConventionSet>(conventions));
+            var names = new List<string>();
+            _processorMock.Setup(p => p.Process(It.Is<CreateIndexExpression>(e => e.Index.TableName == "items")))
+                .Callback((CreateIndexExpression e) => names.Add(e.Index.Name));
+
+            runner.Up(new IndexCopyMigration());
+
+            Assert.That(names, Is.EqualTo(new[] { "ix_from_convention" }));
+        }
+
+        [Test]
+        public void DownExecutesTheIndexReturnedByTheConvention()
+        {
+            var convention = new Mock<IIndexConvention>();
+            convention.Setup(c => c.Apply(It.IsAny<IIndexExpression>()))
+                .Returns((IIndexExpression expression) =>
+                {
+                    if (expression is not DeleteIndexExpression || expression.Index.TableName != "items")
+                    {
+                        return expression;
+                    }
+
+                    var index = (IndexDefinition)expression.Index.Clone();
+                    index.Name = "ix_from_convention";
+                    return new DeleteIndexExpression { Index = index };
+                });
+
+            var conventions = new ConventionSet { IndexConventions = { convention.Object } };
+            var runner = CreateRunner(services => services.AddSingleton<IConventionSet>(conventions));
+            var names = new List<string>();
+            _processorMock.Setup(p => p.Process(It.Is<DeleteIndexExpression>(e => e.Index.TableName == "items")))
+                .Callback((DeleteIndexExpression e) => names.Add(e.Index.Name));
+
+            runner.Down(new IndexCopyMigration());
+
+            Assert.That(names, Is.EqualTo(new[] { "ix_from_convention" }));
+        }
+
+        [Test]
+        public void UpAppliesChainedReplacementConventionsOnce()
+        {
+            var firstApplyCount = 0;
+            var secondApplyCount = 0;
+
+            var firstConvention = new Mock<IIndexConvention>();
+            firstConvention.Setup(c => c.Apply(It.IsAny<IIndexExpression>()))
+                .Returns((IIndexExpression expression) =>
+                {
+                    if (expression is not CreateIndexExpression || expression.Index.TableName != "items")
+                    {
+                        return expression;
+                    }
+
+                    firstApplyCount++;
+                    var index = (IndexDefinition)expression.Index.Clone();
+                    index.SchemaName = "custom_schema";
+                    return new CreateIndexExpression { Index = index };
+                });
+
+            var secondConvention = new Mock<IIndexConvention>();
+            secondConvention.Setup(c => c.Apply(It.IsAny<IIndexExpression>()))
+                .Returns((IIndexExpression expression) =>
+                {
+                    if (expression is not CreateIndexExpression || expression.Index.TableName != "items")
+                    {
+                        return expression;
+                    }
+
+                    secondApplyCount++;
+                    var index = (IndexDefinition)expression.Index.Clone();
+                    index.Name = "ix_from_convention";
+                    return new CreateIndexExpression { Index = index };
+                });
+
+            var conventions = new ConventionSet
+            {
+                IndexConventions = { firstConvention.Object, secondConvention.Object },
+            };
+            var runner = CreateRunner(services => services.AddSingleton<IConventionSet>(conventions));
+            var processed = new List<(string Schema, string Name)>();
+            _processorMock.Setup(p => p.Process(It.Is<CreateIndexExpression>(e => e.Index.TableName == "items")))
+                .Callback((CreateIndexExpression e) => processed.Add((e.Index.SchemaName, e.Index.Name)));
+
+            runner.Up(new IndexCopyMigration());
+
+            Assert.That(processed, Is.EqualTo(new[] { ("custom_schema", "ix_from_convention") }));
+            Assert.That(firstApplyCount, Is.EqualTo(1));
+            Assert.That(secondApplyCount, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void UpValidatesReplacementExpressionReturnedByConvention()
+        {
+            var convention = new Mock<IIndexConvention>();
+            convention.Setup(c => c.Apply(It.IsAny<IIndexExpression>()))
+                .Returns((IIndexExpression expression) =>
+                {
+                    if (expression is not CreateIndexExpression || expression.Index.TableName != "items")
+                    {
+                        return expression;
+                    }
+
+                    // Replacement omits required index name so validation must reject it.
+                    return new CreateIndexExpression
+                    {
+                        Index = new IndexDefinition { TableName = "items" },
+                    };
+                });
+
+            var conventions = new ConventionSet { IndexConventions = { convention.Object } };
+            var runner = CreateRunner(services => services.AddSingleton<IConventionSet>(conventions));
+
+            Assert.Throws<InvalidMigrationException>(() => runner.Up(new IndexCopyMigration()));
+            _processorMock.Verify(p => p.Process(It.Is<CreateIndexExpression>(e => e.Index.TableName == "items")), Times.Never());
+        }
+
+        private sealed class IndexCopyMigration : AutoReversingMigration
+        {
+            public override void Up() => Create.Index("ix_original").OnTable("items").OnColumn("qty").Ascending();
         }
 
         [Test]
