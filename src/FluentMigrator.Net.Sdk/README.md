@@ -89,6 +89,13 @@ The mapping to `EmbeddedResource`/`Content` runs at target time
 (`BeforeTargets="AssignTargetPaths"`), so body-level `Update` edits are
 respected.
 
+The same `Update` works for a whole repository in `Directory.Build.props`. The
+built-in pivots are declared before `Microsoft.NET.Sdk` imports that file, so
+the order of precedence is the SDK's default, then the repository's
+`Directory.Build.props`, then the module's project file. Don't use
+`Directory.Build.targets` for this: it is imported after the project body, so
+the repository would override the module.
+
 ## Conventions
 
 A *convention* is a layout dialect within a provider — how paths and filenames
@@ -108,13 +115,48 @@ Every convention normalizes onto the same **execution facet** vocabulary —
 `always` (staged) — so two repositories in different layouts still produce
 comparable manifests.
 
-All built-in convention packs are imported before the project body (that is
-what makes body-level `Update` edits possible), and the packs the project did
-not select are filtered out at build time. Custom packs are imported by path
-from `$(CustomSourceModelConventionPacks)`; because that list is read at import
-time it must be set in `Directory.Build.props` or as a global property, while
-`$(SourceModelConvention)` may be set anywhere. A custom pack must stamp
-`Convention` metadata matching the value the project selects.
+All built-in convention packs are imported before `Directory.Build.props` and
+the project body (that is what makes `Update` edits in either possible), and
+the packs the project did not select are filtered out at build time. Custom
+packs are imported by path from `$(CustomSourceModelConventionPacks)`; because
+that list is read at import time it must be set in `Directory.Build.props`,
+while `$(SourceModelConvention)` may be set anywhere. Custom packs are imported
+after `Directory.Build.props`, so set their items' metadata in the pack itself.
+A custom pack must stamp `Convention` metadata matching the value the project
+selects, and should put `Condition="'$(EnableDefaultSourceModelItems)' == 'true'"`
+on its `ItemGroup`s as the built-in packs do: the SDK checks that property when
+it imports the pack, which is before the project body, so without the condition
+a module that turns the defaults off in its project file still gets the pack's
+items.
+
+## A module's settings are a contract
+
+A module's pivot metadata and properties such as `DatabaseDialect` and
+`DefaultSchema` decide what its manifest says and what its migrations create. A
+common module used through `ProjectReference` is shared by every module that
+references it, so its settings must come only from its own project file and its
+directory tree.
+
+A global property (`-p:`, a solution build, or a parent's `MSBuild` task)
+overrides even the project file, and MSBuild passes it on to every referenced
+project: `dotnet build Sales.csproj -p:DefaultSchema=sales` also builds the
+modules Sales references with that schema. A module with references therefore
+warns (`FMSDK106`) when a property in `$(SourceModelContractProperties)` arrives
+as a global property, and a host does the same (`FMSDK213`). A `-p:` on a
+module without references is fine; its provenance records it.
+
+The SDK warns rather than removing those properties from `ProjectReference`:
+in a solution build the solution passes them to the referenced module directly
+too, so removing them on the reference would build the same module twice, with
+two different manifests, into one output folder.
+
+Add a custom pack's own properties to the list:
+
+```xml
+<PropertyGroup>
+  <SourceModelContractProperties>MyPackRoot</SourceModelContractProperties>
+</PropertyGroup>
+```
 
 ## Central Package Management
 
@@ -361,8 +403,10 @@ frameworks, each one is checked.
 | `IsDatabaseRootModule` | `false` | The one module per database that owns `Tools/` and database-scoped `Maintenance/` |
 | `VersionTableName` / `VersionTableSchema` | `VersionInfo` / `$(DefaultSchema)` | Per-module VersionInfo table; compiler-visible |
 | `EnableDefaultSourceModelItems` | `true` | Disable built-in pivots for full manual control |
+| `FlywayLocationRoot` | `sql/` | Layout root of the `flyway` convention |
+| `SourceModelContractProperties` | the properties above that shape the manifest | Properties that warn (`FMSDK106`) when they arrive as global properties; the SDK appends its own to what you set |
 | `GenerateSourceModelManifest` | `true` | Turn the manifest step off |
-| `TreatSourceModelWarningsAsErrors` | `false` | Promote FMSDK1xx warnings |
+| `TreatSourceModelWarningsAsErrors` | `$(TreatWarningsAsErrors)`, else `false` | Promote FMSDK1xx warnings, except `FMSDK105` and codes in `NoWarn` or `WarningsNotAsErrors` |
 | `SourceModelManifestFileName` | `$(MSBuildProjectName).sourcemodel.json` | Output file name, without a path (`FMSDK003`) |
 | `GenerateSourceModelLockFile` | `false` | Compare the lock file every build; create or update it |
 | `SourceModelLockedMode` | `false` | Fail (`FMSDK004`) instead of writing the lock; for CI |
@@ -375,22 +419,34 @@ frameworks, each one is checked.
 | `CollectSourceModelProvenanceSourceDependsOn` | `_CollectGitSourceModelProvenanceSource` | Targets that describe the source; replace for another VCS |
 | `SourceModelVerifyManifest` / `SourceModelVerifyProvenance` | the `bin/` manifest / its provenance | What `-t:VerifySourceModel` checks |
 
-Diagnostics: `FMSDK001` duplicate object identity — case-insensitive, only for
-pivots declaring `UniqueIdentity` (error); `FMSDK002` missing file (error);
-`FMSDK003` path in `SourceModelManifestFileName` (error); `FMSDK004` locked
-mode: lock file missing or out of date (error); `FMSDK005` target frameworks
-produced different source models, so there is no single lock (error);
-`FMSDK006` verify: the manifest or its provenance is missing (error);
-`FMSDK007` verify: the manifest changed after its provenance was written
-(error); `FMSDK008` verify: this checkout produces a different manifest (error);
-`FMSDK009` verify: this checkout produces a different provenance (error);
-`FMSDK010` unknown `SourceModelProvenanceFormat` (error);
-`FMSDK100` file with no `ObjectType` (warning); `FMSDK101` empty file (warning);
-`FMSDK102` `Tools/` artifact in a non-root module (warning); `FMSDK103` file
-outside `SourceModelRoot` without `Link` metadata (warning); `FMSDK104`
-`Execution` other than `once`, `onChange` or `always` (warning; a known value in
-another case is written in its canonical spelling instead); `FMSDK105`
-`SourceModelProvenanceCheckWorkingTree` is on but `git status` failed (warning).
+Diagnostics (the warnings other than `FMSDK105` become errors with
+`TreatSourceModelWarningsAsErrors=true`).
+`TreatSourceModelWarningsAsErrors` follows `TreatWarningsAsErrors` unless you
+set it. `TreatWarningsAsErrors` on its own only reaches the C# compiler, so
+without this a repository that fails its build on any warning would still let
+these scroll past. As with C# warnings, a code in `NoWarn` stays hidden and a
+code in `WarningsNotAsErrors` stays a warning. To keep all of them warnings
+while C# warnings are errors, set `TreatSourceModelWarningsAsErrors` to `false`.
+
+| Code | Severity | Meaning |
+|---|---|---|
+| `FMSDK001` | error | Duplicate object identity; case-insensitive, and only for pivots declaring `UniqueIdentity` |
+| `FMSDK002` | error | Missing file |
+| `FMSDK003` | error | A path in `SourceModelManifestFileName` |
+| `FMSDK004` | error | Locked mode: the lock file is missing or out of date |
+| `FMSDK005` | error | Target frameworks produced different source models, so there is no single lock |
+| `FMSDK006` | error | Verify: the manifest or its provenance is missing |
+| `FMSDK007` | error | Verify: the manifest changed after its provenance was written |
+| `FMSDK008` | error | Verify: this checkout produces a different manifest |
+| `FMSDK009` | error | Verify: this checkout produces a different provenance |
+| `FMSDK010` | error | Unknown `SourceModelProvenanceFormat` |
+| `FMSDK100` | warning | A file with no `ObjectType` |
+| `FMSDK101` | warning | An empty file |
+| `FMSDK102` | warning | A `Tools/` artifact in a non-root module |
+| `FMSDK103` | warning | A file outside `SourceModelRoot` without `Link` metadata |
+| `FMSDK104` | warning | `Execution` other than `once`, `onChange` or `always` (a known value in another case is written in its canonical spelling instead) |
+| `FMSDK105` | warning | `SourceModelProvenanceCheckWorkingTree` is on, but `git status` failed |
+| `FMSDK106` | warning | A property in `SourceModelContractProperties` is a global property of a module that references other projects |
 
 ## Building and testing
 

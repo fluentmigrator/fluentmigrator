@@ -156,20 +156,32 @@ VersionInfo tables make mechanically possible.
 | `GenerateHostManifest` | `true` | Turn manifest generation off |
 | `HostManifestFile` | *(empty)* | Ship a hand-authored manifest verbatim |
 | `HostManifestFileName` | `$(MSBuildProjectName).host.json` | Output name |
-| `TreatHostWarningsAsErrors` | `false` | Promote FMSDK2xx warnings |
+| `TreatHostWarningsAsErrors` | `$(TreatWarningsAsErrors)`, else `false` | Promote FMSDK2xx warnings, except codes in `NoWarn` or `WarningsNotAsErrors` |
 | `RequireSourceModelProvenance` | `false` | Make `FMSDK211` and `FMSDK212` errors |
+| `SourceModelContractProperties` | the modules' contract properties | Properties that warn (`FMSDK213`) when they arrive as global properties; the same list as FluentMigrator.Net.Sdk's |
 | `GenerateMigrationHost` | `false` | Reserved: `OutputType=Exe` entry-point generation over `FluentMigrator.Runner.Host` |
 
-Diagnostics: `FMSDK201` declared order contradicts the reference graph (warn),
-`FMSDK202` multiple roots (error), `FMSDK203` root not first (error),
-`FMSDK204` unknown module in target (error), `FMSDK205` no root (warn),
-`FMSDK206` custom manifest file missing (error), `FMSDK207` unknown host
-context (error), `FMSDK208` no runner registered for a target's dialect (warn),
-`FMSDK209` a module listed twice in a target's `Modules` (error), `FMSDK210` the
-modules of a target without a `Dialect` declare different dialects (warn),
-`FMSDK211` a module's source model manifest has no provenance beside it (warn),
-`FMSDK212` a module's manifest doesn't have the SHA-256 its provenance records
-(warn). `FMSDK211` and `FMSDK212` are errors with `RequireSourceModelProvenance`.
+Diagnostics (the warnings become errors with `TreatHostWarningsAsErrors=true`,
+and `FMSDK211` and `FMSDK212` also with `RequireSourceModelProvenance=true`).
+`TreatHostWarningsAsErrors` follows `TreatWarningsAsErrors` unless you set it,
+and a code in `NoWarn` or `WarningsNotAsErrors` is never promoted, as with C#
+warnings; see FluentMigrator.Net.Sdk's README for why.
+
+| Code | Severity | Meaning |
+|---|---|---|
+| `FMSDK201` | warning | The declared order contradicts the reference graph |
+| `FMSDK202` | error | Multiple roots |
+| `FMSDK203` | error | The root is not first |
+| `FMSDK204` | error | An unknown module in a target |
+| `FMSDK205` | warning | No root |
+| `FMSDK206` | error | The custom manifest file is missing |
+| `FMSDK207` | error | An unknown host context |
+| `FMSDK208` | warning | No runner is registered for a target's dialect |
+| `FMSDK209` | error | A module is listed twice in a target's `Modules` |
+| `FMSDK210` | warning | The modules of a target without a `Dialect` declare different dialects |
+| `FMSDK211` | warning | A module's source model manifest has no provenance beside it |
+| `FMSDK212` | warning | A module's manifest doesn't have the SHA-256 its provenance records |
+| `FMSDK213` | warning | A module contract property such as `DatabaseDialect` is a global property of the host, so MSBuild passes it on to every module; set a target's dialect with its `Dialect` metadata instead |
 
 ## Module provenance
 

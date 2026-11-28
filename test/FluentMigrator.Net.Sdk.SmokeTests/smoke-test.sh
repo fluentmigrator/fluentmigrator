@@ -35,9 +35,17 @@ BACKUPS=()
 backup() { cp "$1" "$1.smokebak"; BACKUPS+=("$1"); }
 restore() { if [ -f "$1.smokebak" ]; then mv "$1.smokebak" "$1"; fi; }
 
+# Adds XML to a sample project's body, just before it imports Sdk.targets,
+# where a project file sets its own properties and items. Unlike -p:, this is
+# not a global property: it is what a module or host sets for itself.
+in_body() { # project xml
+  backup "$1"
+  sed -i "s|^  <Import Project=\"[./]*/src/FluentMigrator\.Net\.Sdk[.A-Za-z]*/Sdk/Sdk\.targets\" />|  $2\n&|" "$1"
+}
+
 cleanup() {
   rm -rf "$FEED" "$SCRATCH" "$SHARED"
-  rm -rf "$ADVENTURE/Schema/Views/legacy" "$ADVENTURE/Schema/Functions/sales.open_orders.sql"
+  rm -rf "$ADVENTURE/Schema/Views/legacy" "$ADVENTURE/Schema/Functions/sales.open_orders.sql" "$ADVENTURE/Schema/Views/sales.empty_view.sql"
   rm -f "$ADVENTURE/AdventureLite.sourcemodel.lock.json" "$ADVENTURE/Schema/Views/sales.tmp_lock.sql"
   if [ -f "$COMPOSITE/AdventureHost/AdventureHost.csproj.bak" ]; then
     mv "$COMPOSITE/AdventureHost/AdventureHost.csproj.bak" "$COMPOSITE/AdventureHost/AdventureHost.csproj"
@@ -159,6 +167,27 @@ assert_contains "$OUT/AdventureLite.dll" "V001_backfill_status" "embedded script
 assert_contains "$OUT/AdventureLite.dll" "order_statuses"       "embedded migration data is in the assembly"
 assert_contains "$OUT/AdventureLite.dll" "seed_customers"       "embedded seed data is in the assembly"
 assert_not_contains "$OUT/AdventureLite.dll" "V002_rebuild_stats" "external script is not embedded"
+
+section "a repository-wide Update in Directory.Build.props"
+# Regression: the built-in pivots were declared after Microsoft.NET.Sdk had
+# imported Directory.Build.props, so an Update there matched no item and did
+# nothing, without a warning. This replaces the repository's file with one
+# that imports it and adds two Updates.
+REPO_PROPS=$SCRATCH/Directory.Build.props
+cat > "$REPO_PROPS" <<XML
+<Project>
+  <Import Project="$(native_path "$REPO_ROOT")/Directory.Build.props" />
+  <ItemGroup>
+    <MigrationScript Update="Migrations/Scripts/V001_backfill_status.sql" ContentType="External" />
+    <MigrationScript Update="Migrations/Scripts/V002_rebuild_stats.sql" ContentType="Embedded" />
+  </ItemGroup>
+</Project>
+XML
+build "$ADVENTURE" -p:DirectoryBuildPropsPath="$(native_path "$REPO_PROPS")" > /dev/null
+assert_object "$MANIFEST" "Migrations/Scripts/V001_backfill_status.sql" '"contentType": "external"' "an Update in Directory.Build.props applies"
+assert_object "$MANIFEST" "Migrations/Scripts/V002_rebuild_stats.sql"   '"contentType": "external"' "the module's own Update still wins over the repository's"
+build "$ADVENTURE" > /dev/null
+assert_object "$MANIFEST" "Migrations/Scripts/V001_backfill_status.sql" '"contentType": "embedded"' "and back without it"
 
 # --------------------------------------------------------------- diagnostics
 
@@ -645,6 +674,71 @@ dotnet clean "$COMPOSITE/AdventureHost" -v:minimal > /dev/null
 assert_no_file "$HOST" "dotnet clean removes the host manifest"
 build "$COMPOSITE/AdventureHost" > /dev/null
 
+section "FMSDK106/213 a contract property set as a global property"
+# A global property overrides even the project file and flows on to every
+# referenced project, so -p:DefaultSchema on Sales also rebuilds Core with it.
+# FMSDK106 and FMSDK213 are warnings, so those builds must still succeed; only
+# the strict build is expected to fail.
+CONTRACT_OUT=$(build "$COMPOSITE/Sales" -p:DefaultSchema=elsewhere 2>&1) || fail "Sales with -p:DefaultSchema should still build"
+if printf '%s' "$CONTRACT_OUT" | grep "warning FMSDK106" | grep -q "DefaultSchema.*Core"; then
+  pass "FMSDK106 names the property and the referenced module"
+else
+  fail "FMSDK106 expected for -p:DefaultSchema on a module that references Core"
+fi
+STRICT_OUT=$(build "$COMPOSITE/Sales" -p:DefaultSchema=elsewhere -p:TreatSourceModelWarningsAsErrors=true 2>&1 || true)
+if printf '%s' "$STRICT_OUT" | grep -q "error FMSDK106"; then pass "and is an error with TreatSourceModelWarningsAsErrors"; else fail "FMSDK106 error expected with TreatSourceModelWarningsAsErrors"; fi
+if ! NOREF_OUT=$(build "$ADVENTURE" -p:DatabaseDialect=postgres 2>&1); then
+  fail "a -p: on a module without references should build"
+elif printf '%s' "$NOREF_OUT" | grep -q "FMSDK106"; then
+  fail "FMSDK106 should not fire for a module without references"
+else
+  pass "a -p: on a module without references builds, without FMSDK106"
+fi
+HOST_GLOBAL_OUT=$(build "$COMPOSITE/AdventureHost" -p:DatabaseDialect=postgres 2>&1) || fail "the host with -p:DatabaseDialect should still build"
+if printf '%s' "$HOST_GLOBAL_OUT" | grep "warning FMSDK213" | grep -q "Core, Sales"; then
+  pass "FMSDK213 names every module the host passes it to"
+else
+  fail "FMSDK213 expected for -p:DatabaseDialect on the host"
+fi
+build "$COMPOSITE/AdventureHost" > /dev/null
+build "$ADVENTURE" > /dev/null
+
+section "TreatWarningsAsErrors in the project body promotes FMSDK warnings"
+# Unset, TreatSourceModelWarningsAsErrors and TreatHostWarningsAsErrors
+# follow TreatWarningsAsErrors. Set in the body, as most projects set it, it
+# is only visible because the SDKs decide those defaults in their targets.
+# A code in NoWarn or WarningsNotAsErrors stays a warning, as with C#.
+outcome() { # code build-args...  -> prints "<exit status>:<error, warning or none>"
+  local code=$1 out status=0 kind=none; shift
+  out=$(build "$@" 2>&1) || status=1
+  if printf '%s' "$out" | grep -q "error $code"; then kind=error
+  elif printf '%s' "$out" | grep -q "warning $code"; then kind=warning; fi
+  printf '%s:%s' "$status" "$kind"
+}
+expect() { # actual expected message
+  if [ "$1" = "$2" ]; then pass "$3"; else fail "$3 (expected $2, got $1)"; fi
+}
+SALES_PROJ=$COMPOSITE/Sales/Sales.csproj
+in_body "$SALES_PROJ" '<PropertyGroup><TreatWarningsAsErrors>true</TreatWarningsAsErrors></PropertyGroup>'
+expect "$(outcome FMSDK106 "$COMPOSITE/Sales" -p:DefaultSchema=elsewhere)" "1:error" "FMSDK106 is an error, and the build fails"
+expect "$(outcome FMSDK106 "$COMPOSITE/Sales" -p:DefaultSchema=elsewhere -p:NoWarn=FMSDK106)" "0:none" "NoWarn still hides it"
+expect "$(outcome FMSDK106 "$COMPOSITE/Sales" -p:DefaultSchema=elsewhere -p:WarningsNotAsErrors=FMSDK106)" "0:warning" "WarningsNotAsErrors keeps it a warning"
+expect "$(outcome FMSDK106 "$COMPOSITE/Sales" -p:DefaultSchema=elsewhere -p:TreatSourceModelWarningsAsErrors=false)" "0:warning" "TreatSourceModelWarningsAsErrors=false keeps it a warning"
+restore "$SALES_PROJ"
+# A warning the BuildSourceModel task reports, rather than the targets.
+in_body "$ADVENTURE_PROJ" '<PropertyGroup><TreatWarningsAsErrors>true</TreatWarningsAsErrors></PropertyGroup>'
+: > "$ADVENTURE/Schema/Views/sales.empty_view.sql"
+expect "$(outcome FMSDK101 "$ADVENTURE")" "1:error" "FMSDK101 from the task is an error too"
+expect "$(outcome FMSDK101 "$ADVENTURE" -p:NoWarn=FMSDK101)" "0:none" "and NoWarn hides it"
+rm -f "$ADVENTURE/Schema/Views/sales.empty_view.sql"
+restore "$ADVENTURE_PROJ"
+HOST_PROJ=$COMPOSITE/AdventureHost/AdventureHost.csproj
+in_body "$HOST_PROJ" '<PropertyGroup><TreatWarningsAsErrors>true</TreatWarningsAsErrors></PropertyGroup>'
+expect "$(outcome FMSDK213 "$COMPOSITE/AdventureHost" -p:DatabaseDialect=postgres)" "1:error" "FMSDK213 is an error in a host"
+restore "$HOST_PROJ"
+build "$COMPOSITE/AdventureHost" > /dev/null
+build "$ADVENTURE" > /dev/null
+
 # ------------------------------------------------------------------- flyway
 
 section "flyway convention pack"
@@ -660,6 +754,30 @@ assert_object   "$FLY" "sql/R__01_Create_User_View.sql"  '"execution": "onChange
 assert_object   "$FLY" "sql/callback/beforeMigrate.sql"  '"stage": "callback"'     "callbacks carry their stage"
 # The fluentmigrator pack is imported too; selection must filter it back out.
 assert_not_contains "$FLY" '"type": "migration"' "non-selected convention's pivots excluded"
+
+section "EnableDefaultSourceModelItems=false in the project body"
+# The built-in packs are imported before the project body, so the opt-out is
+# an item condition rather than an import condition: item conditions see the
+# body's value. Each project turns the defaults off and declares one item of
+# its own, which has to survive.
+opt_out() { # project item-xml
+  in_body "$1" "<PropertyGroup><EnableDefaultSourceModelItems>false</EnableDefaultSourceModelItems></PropertyGroup><ItemGroup>$2</ItemGroup>"
+}
+opt_out "$ADVENTURE_PROJ" '<SqlObject Include="Schema/Views/sales.open_orders.sql" ObjectType="view" NamePolicy="SchemaDotObject" Execution="onChange" />'
+build "$ADVENTURE" > /dev/null
+assert_count        "$MANIFEST" '"provider": "sql"' 1 "fluentmigrator: only the explicitly declared object is left"
+assert_object       "$MANIFEST" "Schema/Views/sales.open_orders.sql" '"type": "view"' "fluentmigrator: the explicit item is kept"
+assert_not_contains "$MANIFEST" "V001_backfill_status" "fluentmigrator: the built-in pivots are gone"
+restore "$ADVENTURE_PROJ"
+build "$ADVENTURE" > /dev/null
+FLYWAY_PROJ=$FLYWAY/FlywayStyle.csproj
+opt_out "$FLYWAY_PROJ" '<SqlObject Include="sql/V1__Initial_Schema.sql" ObjectType="migration-script" NamePolicy="FlywayPrefixed" Execution="once" />'
+build "$FLYWAY" > /dev/null
+assert_count        "$FLY" '"provider": "sql"' 1 "flyway: only the explicitly declared object is left"
+assert_object       "$FLY" "sql/V1__Initial_Schema.sql" '"version": "1"' "flyway: the explicit item is kept"
+assert_not_contains "$FLY" "R__01_Create_User_View" "flyway: the built-in pivots are gone"
+restore "$FLYWAY_PROJ"
+build "$FLYWAY" > /dev/null
 
 # --------------------------------------------------------------------- pack
 

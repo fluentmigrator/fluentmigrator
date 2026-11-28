@@ -46,6 +46,9 @@
     -->
     <SourceModelConvention Condition="'$(SourceModelConvention)' == ''">fluentmigrator</SourceModelConvention>
 
+    <!-- The flyway pack's layout root, mirroring flyway.locations. -->
+    <FlywayLocationRoot Condition="'$(FlywayLocationRoot)' == ''">sql/</FlywayLocationRoot>
+
     <!--
       Fallback schema for SchemaDotObject-policy files without a schema
       segment. Empty by default (any concrete default is a dialect opinion).
@@ -57,7 +60,8 @@
 
     <EnableDefaultSourceModelItems Condition="'$(EnableDefaultSourceModelItems)' == ''">true</EnableDefaultSourceModelItems>
     <GenerateSourceModelManifest Condition="'$(GenerateSourceModelManifest)' == ''">true</GenerateSourceModelManifest>
-    <TreatSourceModelWarningsAsErrors Condition="'$(TreatSourceModelWarningsAsErrors)' == ''">false</TreatSourceModelWarningsAsErrors>
+    <!-- TreatSourceModelWarningsAsErrors defaults in Manifest.targets, after
+         the project body, because it follows TreatWarningsAsErrors. -->
     <SourceModelManifestFileName Condition="'$(SourceModelManifestFileName)' == ''">$(MSBuildProjectName).sourcemodel.json</SourceModelManifestFileName>
 
     <!--
@@ -85,22 +89,31 @@
     Same provider (sql), different mapping of paths/filenames to the object
     model.
 
-    Every built-in pack is imported here and stamps its items with
-    Convention metadata; the SelectSourceModelConvention target then keeps
-    only the selected pack's items. Declaring the pivots before the project
-    body is what makes body-level `<MigrationScript Update="..." />` edits
-    work at all — but $(SourceModelConvention) itself is usually set *in*
-    that body, so the choice cannot be an import condition without silently
+    Every built-in pack is imported, by FluentMigrator.Net.Sdk.DefaultItems.props
+    at the top of Sdk.props, and stamps its items with Convention metadata;
+    the SelectSourceModelConvention target then keeps only the selected
+    pack's items. Declaring the pivots before Directory.Build.props and the
+    project body is what makes `<MigrationScript Update="..." />` edits work
+    in either — but $(SourceModelConvention) itself is usually set *in* the
+    body, so the choice cannot be an import condition without silently
     producing an empty model. Declare-then-filter is how the .NET SDK
     handles EnableDefaultCompileItems for exactly the same reason.
 
-    Custom packs are imported by path from $(CustomSourceModelConventionPacks)
-    (a ';'-separated list). That list is read at import time, so it has to be
-    set before the SDK's props are evaluated — Directory.Build.props or a
-    global property — while $(SourceModelConvention) may be set anywhere.
+    Custom packs are imported here, by path, from
+    $(CustomSourceModelConventionPacks) (a ';'-separated list). That list is
+    read at import time, so it has to be set in Directory.Build.props, while
+    $(SourceModelConvention) may be set anywhere. Because this import comes
+    after Directory.Build.props, a repository-wide `Update` of a custom pack's
+    items does nothing; the repository owns the pack, so it sets that
+    metadata in the pack itself.
+
+    The import's EnableDefaultSourceModelItems condition is also evaluated
+    before the project body, so it sees only a value set in
+    Directory.Build.props or on the command line. A custom pack therefore
+    puts the same condition on its own ItemGroups, as the built-in packs
+    do, so that a module turning the defaults off in its project file turns
+    the pack's items off too.
   -->
-  <Import Project="$(MSBuildThisFileDirectory)conventions/*.props"
-          Condition="'$(EnableDefaultSourceModelItems)' == 'true'" />
   <Import Project="$(CustomSourceModelConventionPacks)"
           Condition="'$(EnableDefaultSourceModelItems)' == 'true' and '$(CustomSourceModelConventionPacks)' != ''" />
 

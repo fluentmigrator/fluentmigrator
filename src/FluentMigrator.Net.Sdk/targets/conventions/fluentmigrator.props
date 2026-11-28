@@ -13,9 +13,12 @@
     all packs are imported, and SelectSourceModelConvention keeps only the
     selected one. A custom pack must stamp the same value the project puts
     in $(SourceModelConvention), or its items are filtered right back out.
+
+    This file is imported before Directory.Build.props (see
+    FluentMigrator.Net.Sdk.DefaultItems.props), so it declares items only.
   -->
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(EnableDefaultSourceModelItems)' == 'true'">
 
     <!-- Schema/* : programmable objects, one file per object, dup-checked. -->
     <SqlObject Include="Schema/Functions/**/*.sql"        Convention="fluentmigrator" ObjectType="function"  NamePolicy="SchemaDotObject" UniqueIdentity="true" Execution="onChange" />

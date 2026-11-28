@@ -14,6 +14,19 @@
     <HostManifestPath>$(OutputPath)$(HostManifestFileName)</HostManifestPath>
   </PropertyGroup>
 
+  <!--
+    Whether the FMSDK2xx warnings are errors: unset, TreatHostWarningsAsErrors
+    follows TreatWarningsAsErrors, and a code in NoWarn or
+    WarningsNotAsErrors stays a warning. Decided here, after the project
+    body, for the reasons given beside TreatSourceModelWarningsAsErrors in
+    FluentMigrator.Net.Sdk's Manifest.targets.
+  -->
+  <PropertyGroup>
+    <TreatHostWarningsAsErrors Condition="'$(TreatHostWarningsAsErrors)' == ''">$(TreatWarningsAsErrors)</TreatHostWarningsAsErrors>
+    <TreatHostWarningsAsErrors Condition="'$(TreatHostWarningsAsErrors)' == ''">false</TreatHostWarningsAsErrors>
+    <_FmWarningsNotAsErrors>;$([System.Text.RegularExpressions.Regex]::Replace('$(NoWarn);$(WarningsNotAsErrors)', '[\s,;]+', ';').ToUpperInvariant());</_FmWarningsNotAsErrors>
+  </PropertyGroup>
+
   <UsingTask TaskName="FluentMigrator.Net.Sdk.Host.Tasks.BuildHostManifest"
              TaskFactory="RoslynCodeTaskFactory"
              AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
@@ -21,6 +34,79 @@
       <Code Type="Class" Language="cs" Source="$(MSBuildThisFileDirectory)../tasks/BuildHostManifest.cs" />
     </Task>
   </UsingTask>
+
+  <!--
+    Which of Names this build received as global properties. The same task
+    as FluentMigrator.Net.Sdk's: the two packages ship separately, so each
+    carries its own copy.
+  -->
+  <UsingTask TaskName="FindHostGlobalProperties"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Names ParameterType="System.String[]" Required="true" />
+      <Found ParameterType="System.String[]" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        var found = new System.Collections.Generic.List<string>();
+        var engine = BuildEngine as Microsoft.Build.Framework.IBuildEngine6;
+        if (engine != null)
+        {
+            var globals = engine.GetGlobalProperties();
+            foreach (var name in Names)
+            {
+                foreach (var key in globals.Keys)
+                {
+                    if (string.Equals(key, name.Trim(), System.StringComparison.OrdinalIgnoreCase) && !found.Contains(key))
+                    {
+                        found.Add(key);
+                    }
+                }
+            }
+        }
+        Found = found.ToArray();
+      ]]></Code>
+    </Task>
+  </UsingTask>
+
+  <!--
+    The modules' contract properties, as FluentMigrator.Net.Sdk lists them
+    (keep the two lists the same). Add a custom pack's own properties here.
+  -->
+  <PropertyGroup>
+    <SourceModelContractProperties>DatabaseDialect;DefaultSchema;IsDatabaseRootModule;VersionTableName;VersionTableSchema;SourceModelConvention;SourceModelRoot;EnableDefaultSourceModelItems;CustomSourceModelConventionPacks;FlywayLocationRoot;$(SourceModelContractProperties)</SourceModelContractProperties>
+  </PropertyGroup>
+
+  <!--
+    FMSDK213: a module contract property arrived as a global property of the
+    host. MSBuild passes it on to every module the host references, so
+    `dotnet build AdventureHost -p:DatabaseDialect=postgres` would rebuild
+    every module, root included, as postgres. A deployment target's dialect
+    is set with the target's Dialect metadata instead. See FMSDK106 in
+    FluentMigrator.Net.Sdk for why this warns rather than stripping the
+    property from the references.
+  -->
+  <Target Name="WarnOnSourceModelContractGlobalProperties"
+          BeforeTargets="ResolveProjectReferences;CollectDeploymentModules"
+          Condition="'@(ProjectReference)' != ''">
+    <FindHostGlobalProperties Names="$(SourceModelContractProperties)">
+      <Output TaskParameter="Found" ItemName="_FmContractGlobalProperty" />
+    </FindHostGlobalProperties>
+    <PropertyGroup>
+      <_FmContractGlobalPropertyList>@(_FmContractGlobalProperty, ', ')</_FmContractGlobalPropertyList>
+      <_FmContractReferenceList>@(ProjectReference->'%(Filename)', ', ')</_FmContractReferenceList>
+      <_FmContractGlobalPropertyText>Set as a global property: $(_FmContractGlobalPropertyList). MSBuild passes global properties on to referenced projects, so the value also applies to $(_FmContractReferenceList). Set the property in each module's project file or Directory.Build.props, and a target's dialect with its Dialect metadata.</_FmContractGlobalPropertyText>
+    </PropertyGroup>
+    <PropertyGroup>
+      <_FmContractAsError>false</_FmContractAsError>
+      <_FmContractAsError Condition="'$(TreatHostWarningsAsErrors)' == 'true' and !$(_FmWarningsNotAsErrors.Contains(';FMSDK213;'))">true</_FmContractAsError>
+    </PropertyGroup>
+    <Warning Condition="'$(_FmContractGlobalPropertyList)' != '' and '$(_FmContractAsError)' != 'true'"
+             Code="FMSDK213" Text="$(_FmContractGlobalPropertyText)" />
+    <Error Condition="'$(_FmContractGlobalPropertyList)' != '' and '$(_FmContractAsError)' == 'true'"
+           Code="FMSDK213" Text="$(_FmContractGlobalPropertyText)" />
+  </Target>
 
   <!--
     Collect module info from every ProjectReference that speaks the
@@ -52,6 +138,7 @@
                        ProjectName="$(MSBuildProjectName)"
                        ManifestPath="$(HostIntermediateManifestPath)"
                        TreatValidationWarningsAsErrors="$(TreatHostWarningsAsErrors)"
+                       WarningsNotAsErrors="$(_FmWarningsNotAsErrors)"
                        RequireSourceModelProvenance="$(RequireSourceModelProvenance)" />
 
     <Copy SourceFiles="$(HostIntermediateManifestPath)"
