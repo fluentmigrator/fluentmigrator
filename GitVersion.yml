@@ -1,11 +1,15 @@
-assembly-versioning-scheme: Major
-assembly-file-versioning-format: MajorMinorPatch
-# mode: ContinuousDeployment
-tag-prefix: '[vV]?'
-branches:
-  release:
-    mode: ContinuousDeployment
-  hotfix:
-    mode: ContinuousDeployment
-ignore:
-  sha: []
+# GitVersion 7 layout: `calculation` decides the version, `output` formats it.
+# Migrated from the GitVersion 6 file with `gitversion config migrate`.
+calculation:
+  # mode: ContinuousDeployment
+  tag-prefix: '[vV]?'
+  branches:
+    release:
+      mode: ContinuousDeployment
+    hotfix:
+      mode: ContinuousDeployment
+  ignore:
+    sha: []
+output:
+  assembly-versioning-scheme: Major
+  assembly-file-versioning-format: MajorMinorPatch

@@ -49,18 +49,16 @@ steps:
   fetchDepth: 0
   fetchTags: true
 
-- task: gitversion/setup@0
-  displayName: 'Install GitVersion (using GitTools 0.10.2.23031113 or later)'
+# Same GitTools tasks and GitVersion as azure-pipelines.yml.
+- task: gitversion-setup@5.0.0
+  displayName: 'Install GitVersion (using GitTools 5.0.0)'
   inputs:
-    versionSpec: '5.12'
-    includePrerelease: true
+    versionSpec: '7.0.x'
 
-- task: gitversion/execute@0
-  displayName: 'Execute GitVersion (using GitTools 0.10.2.23031113 or later)'
+- task: gitversion-execute@5.0.0
+  displayName: 'Execute GitVersion (using GitTools 5.0.0)'
   inputs:
     updateAssemblyInfo: false
-  env:
-      BUILD_BUILDNUMBER: $(GitVersion.NuGetVersionV2)
 
 - task: DotNetCoreCLI@2
   displayName: 'Restore NuGet packages'
