@@ -45,6 +45,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - New ADR: Connection Management (`adr/proposed/ConnectionManagement.md`)
 - New ADR: FluentMigrator.Runner.Host — a general command-hosting framework (`adr/proposed/FluentMigrator-Host-Design.md`)
 - New ADR: A source-controlled database model (`adr/proposed/SourceControlledDatabaseModel.md`)
+- New ADR: Conventions (`adr/proposed/Conventions.md`) names three kinds of convention (SQL object, source and discovery) and proposes configuring SQL object naming and the default schema from the SDK project file, with dialect-specific patterns resolved at run time and an opt-in hashed fallback for names longer than the dialect allows
 - ADRs AsyncAllTheWay (D4) and ParallelAsyncAllTheWay (§4.5) note where `PreviewFromNothing`'s version-table step must go in 10.0, so the async runner and the `VersionInfoStep` table keep the script complete (PR #2370)
 
 ### Changed
