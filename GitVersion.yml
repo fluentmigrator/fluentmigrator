@@ -12,4 +12,7 @@ calculation:
     sha: []
 output:
   assembly-versioning-scheme: Major
-  assembly-file-versioning-format: MajorMinorPatch
+  # AssemblySemFileVer, such as 8.0.2.0. Not assembly-file-versioning-format,
+  # which takes a format string such as '{MajorMinorPatch}' and outputs a bare
+  # MajorMinorPatch as the literal text.
+  assembly-file-versioning-scheme: MajorMinorPatch
