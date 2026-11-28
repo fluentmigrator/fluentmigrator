@@ -437,6 +437,45 @@ namespace FluentMigrator.Runner.Generators.Generic
             return stringBuilder.Append(";");
         }
 
+        /// <summary>
+        /// <paramref name="sql"/> followed by each of <paramref name="statements"/> that isn't empty, each ended once.
+        /// </summary>
+        /// <remarks>
+        /// For statements that may already end with the statement end token, such as a description generator's: ending
+        /// them again would write <c>;;</c>, an empty statement. An empty <paramref name="sql"/> is returned as it is.
+        /// </remarks>
+        /// <param name="sql">The SQL the statements follow</param>
+        /// <param name="statements">The statements, ended or not</param>
+        /// <returns>The SQL followed by the statements</returns>
+        protected string AppendStatements(string sql, IEnumerable<string> statements)
+        {
+            if (string.IsNullOrEmpty(sql))
+            {
+                return sql;
+            }
+
+            var builder = new StringBuilder(sql);
+            foreach (var statement in (statements ?? Enumerable.Empty<string>()).Where(s => !string.IsNullOrEmpty(s)))
+            {
+                builder.Append(EndStatement(statement));
+            }
+
+            return builder.ToString();
+        }
+
+        /// <summary>
+        /// <paramref name="statement"/> ended with the statement end token, once.
+        /// </summary>
+        /// <param name="statement">The statement, ended or not</param>
+        /// <returns>The statement, ended once</returns>
+        protected string EndStatement(string statement)
+        {
+            var trimmed = statement.TrimEnd();
+            return trimmed.EndsWith(";", StringComparison.Ordinal)
+                ? trimmed
+                : AppendSqlStatementEndToken(new StringBuilder(trimmed)).ToString();
+        }
+
         /// <inheritdoc />
         protected List<KeyValuePair<string,string>> GenerateColumnNamesAndValues(InsertDataExpression expression)
         {

@@ -149,6 +149,29 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         }
 
         [Test]
+        public void CreateColumnWithDescriptionCommentsInAnAlterColumn()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithDescription();
+            var result = Generator.Generate(expression);
+            result.ShouldBe(
+                @"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD COLUMN ""TestColumn1"" VARCHAR(5) NOT NULL;"
+              + @"ALTER TABLE ""PUBLIC"".""TestTable1"" ALTER COLUMN ""TestColumn1"" COMMENT 'TestColumn1Description';",
+                _quotingEnabled);
+        }
+
+        [Test]
+        public void CreateColumnIfExistsCommentsOnlyWhenTheTableExists()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithDescription();
+            expression.IfExists = true;
+            var result = Generator.Generate(expression);
+            result.ShouldBe(
+                @"ALTER TABLE IF EXISTS ""PUBLIC"".""TestTable1"" ADD COLUMN ""TestColumn1"" VARCHAR(5) NOT NULL;"
+              + @"ALTER TABLE IF EXISTS ""PUBLIC"".""TestTable1"" ALTER COLUMN ""TestColumn1"" COMMENT 'TestColumn1Description';",
+                _quotingEnabled);
+        }
+
+        [Test]
         public override void CanCreateColumnWithSystemMethodAndCustomSchema()
         {
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression("TestSchema");

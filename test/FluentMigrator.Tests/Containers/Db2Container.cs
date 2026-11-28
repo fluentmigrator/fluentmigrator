@@ -28,6 +28,12 @@ public class Db2Container : ContainerBase
     /// <inheritdoc />
     protected override int Port => 50000;
 
+    /// <summary>
+    /// A label on the container, so <c>Invoke-Db2Tests.ps1 -NewContainer</c> removes this container and no other Db2.
+    /// </summary>
+    public const string Label = "org.fluentmigrator.tests";
+
     /// <inheritdoc />
-    protected override DockerContainer Build() => new Db2Builder().WithAcceptLicenseAgreement(true).WithReuse(true).Build();
+    protected override DockerContainer Build() =>
+        new Db2Builder().WithAcceptLicenseAgreement(true).WithLabel(Label, "db2").WithReuse(true).Build();
 }

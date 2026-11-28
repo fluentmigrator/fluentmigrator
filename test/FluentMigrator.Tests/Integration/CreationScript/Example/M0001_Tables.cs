@@ -30,7 +30,7 @@ namespace FluentMigrator.Tests.Integration.CreationScript.Example
     {
         public override void Up()
         {
-            // Descriptions: SQL Server extended properties, MySQL COMMENT, Oracle COMMENT ON. The PostgreSQL, Firebird
+            // Descriptions: SQL Server extended properties, MySQL COMMENT, Oracle and PostgreSQL COMMENT ON. The Firebird
             // and Db2 generators leave them out.
             Create.Table("Customer")
                 .WithDescription("People and companies that place orders")

@@ -55,8 +55,8 @@ namespace FluentMigrator.Builders.Create.Table
         /// foreign key from another table; and on PostgreSQL, an index built with <c>CONCURRENTLY</c>.
         /// </para>
         /// <para>
-        /// On Redshift and SAP HANA, the descriptions are <c>COMMENT ON</c> statements after the table, which also set
-        /// the existing table's descriptions.
+        /// On Redshift, Snowflake and SAP HANA, the descriptions are <c>COMMENT ON</c> statements after the table, which
+        /// also set the existing table's descriptions.
         /// </para>
         /// </remarks>
         /// <returns>Define the table schema, description or a new column</returns>

@@ -222,13 +222,24 @@ Create.Table("ExternalData")
 
 Column descriptions are supported by different databases with varying storage mechanisms:
 
-| Provider   | Storage Method      | Notes                               |
-|------------|---------------------|-------------------------------------|
-| SQL Server | Extended Properties | Stored as MS_Description properties |
-| PostgreSQL | COMMENT ON COLUMN   | Native comment support              |
-| Oracle     | COMMENT ON COLUMN   | Native comment support              |
-| MySQL      | Column comments     | Native comment support              |
-| SQLite     | Not supported       | Descriptions are ignored            |
+| Provider      | Storage Method                                    | Notes                                         |
+|---------------|---------------------------------------------------|-----------------------------------------------|
+| SQL Server    | Extended Properties                               | `MS_Description`; see below for `Alter.Column` |
+| PostgreSQL    | `COMMENT ON COLUMN`                               | Native comment support                        |
+| Oracle        | `COMMENT ON COLUMN`                               | Native comment support                        |
+| MySQL         | Column `COMMENT`                                  | Native comment support                        |
+| Snowflake     | `COMMENT ON COLUMN`, or `COMMENT` in `ALTER COLUMN` | Native comment support                      |
+| Redshift      | `COMMENT ON COLUMN`                               | Native comment support                        |
+| SAP HANA      | `COMMENT ON COLUMN`                               | Native comment support                        |
+| Firebird, Db2 | Not supported                                     | Descriptions are ignored                      |
+| SQLite        | Not supported                                     | Descriptions are ignored                      |
+
+A column's additional descriptions are stored with its description, in the same comment, one per line:
+`Description:<description>`, then `<name>:<value>` for each. On SQL Server, `Alter.Column(...)` and
+`Alter.Table(...).AlterColumn(...)` instead store each one as an extended property of its own, `MS_<name>`.
+
+Every way of declaring a column carries its descriptions: `Create.Table(...).WithColumn(...)`, `Create.Column(...)`,
+`Alter.Table(...).AddColumn(...)`, `Alter.Table(...).AlterColumn(...)` and `Alter.Column(...)`.
 
 ### Advanced Description Patterns
 

@@ -63,9 +63,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
 
         private string GetFullTableName(string schemaName, string tableName)
         {
-            return string.IsNullOrEmpty(schemaName)
-               ? Quoter.QuoteTableName(tableName)
-               : $"{Quoter.QuoteSchemaName(schemaName)}.{Quoter.QuoteTableName(tableName)}";
+            return Quoter.QuoteTableName(tableName, schemaName);
         }
 
         /// <inheritdoc />

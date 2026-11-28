@@ -99,23 +99,54 @@ namespace FluentMigrator.Runner.Generators.Snowflake
         }
 
         /// <inheritdoc />
+        /// <remarks>
+        /// The table's and its columns' descriptions follow the <c>CREATE TABLE</c> as <c>COMMENT ON</c> statements.
+        /// With <c>IfNotExists()</c> they run even when the table exists, and replace its descriptions.
+        /// </remarks>
         public override string Generate(CreateTableExpression expression)
         {
             if (expression.Columns.Any(x => x.Expression != null))
             {
                 CompatibilityMode.HandleCompatibility("Computed columns are not supported");
             }
-            return base.Generate(expression);
+            return AppendStatements(base.Generate(expression), DescriptionGenerator.GenerateDescriptionStatements(expression));
         }
 
         /// <inheritdoc />
+        /// <remarks>
+        /// The column's descriptions follow the <c>ADD COLUMN</c>, which takes no comment, as an
+        /// <c>ALTER TABLE ... ALTER COLUMN ... COMMENT</c>. Unlike <c>COMMENT ON COLUMN</c>, it can say <c>IF EXISTS</c>, so
+        /// with <c>Alter.Table(...).IfExists()</c> a missing table skips the comment as well as the column.
+        /// </remarks>
         public override string Generate(CreateColumnExpression expression)
         {
             if (expression.Column.Expression != null)
             {
                 CompatibilityMode.HandleCompatibility("Computed columns are not supported");
             }
-            return base.Generate(expression);
+
+            var addColumn = base.Generate(expression);
+            if (string.IsNullOrEmpty(addColumn) || string.IsNullOrEmpty(expression.Column.ColumnDescription))
+            {
+                return addColumn;
+            }
+
+            var comment = FormatStatement(
+                expression.IfExists ? "ALTER TABLE IF EXISTS {0} ALTER {1}" : AlterColumn,
+                Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
+                ((SnowflakeColumn)Column).GenerateCommentClause(expression.Column));
+            return AppendStatements(addColumn, new[] { comment });
+        }
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// The table's description, as a <c>COMMENT ON TABLE</c> statement. The columns that <c>Alter.Table(...)</c> adds
+        /// or alters are expressions of their own.
+        /// </remarks>
+        public override string Generate(AlterTableExpression expression)
+        {
+            var description = DescriptionGenerator.GenerateDescriptionStatement(expression);
+            return string.IsNullOrEmpty(description) ? base.Generate(expression) : EndStatement(description);
         }
 
         /// <inheritdoc />
